@@ -24,6 +24,7 @@
 - 설명(description)은 선택이다.
 - 티켓의 공개 식별자 `ticketId`는 도메인에서 생성한 UUID다. DB PK와는 별개의 유니크 키다. ([data_model.md](data_model.md))
 - 제목은 최대 100자, 설명은 최대 2000자다.
+- 새로 만든 티켓은 `TODO` 컬럼의 맨 뒤에 놓인다.
 - 생성은 컬럼 하단의 인라인 입력(제목만)으로 하고, 나머지 필드는 카드 상세 모달에서 편집한다. ([wireframe.md](wireframe.md))
 
 ### FR-02 상태 관리
