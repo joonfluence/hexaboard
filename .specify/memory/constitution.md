@@ -50,6 +50,16 @@
 
 근거: 학습용 1인 프로젝트에서 범위 확산은 완성을 막는다.
 
+### VI. 타입 안전과 API 계약 준수 (Type Safety & Contract)
+
+- 모든 패키지는 TypeScript `strict` 모드로 컴파일한다. `strict`를 끄거나 패키지별로 완화하지 않는다.
+- `any` 타입을 쓰지 않는다. 타입을 알 수 없는 값은 `unknown`으로 받아 좁힌다. ESLint(`@typescript-eslint/no-explicit-any`)로 강제하고, 예외는 사유를 주석으로 남긴 줄 단위 비활성화만 허용한다.
+- `@ts-ignore`·`@ts-nocheck`·근거 없는 타입 단언(`as`)으로 검사를 우회하지 않는다.
+- API 요청·응답과 오류 형식은 [docs/api_spec.md](../../docs/api_spec.md)를 따른다. 필드 이름·상태 코드·오류 코드·오류 응답 형식을 임의로 바꾸지 않고, 계약이 바뀌면 문서를 먼저 개정한다 (원칙 I).
+- 계약 테스트는 명세의 상태 코드와 응답 형태를 직접 검증한다.
+
+근거: 컴파일 단계에서 오류를 잡고, 프론트와 백엔드가 같은 계약을 공유해야 `api-client` 생성 타입이 의미를 갖는다.
+
 ## 제약 사항
 
 - 저장소가 공개(public)이므로 비밀값(DB 연결 문자열, 토큰 등)을 절대 커밋하지 않는다. 환경 변수와 배포 플랫폼의 시크릿을 쓴다.
@@ -70,4 +80,4 @@
 - 버전은 시맨틱 버전을 따른다. 원칙 삭제·재정의는 MAJOR, 원칙·섹션 추가나 실질적 확장은 MINOR, 표현 정리는 PATCH다.
 - `/speckit-plan`의 Constitution Check와 `/speckit-analyze`에서 준수 여부를 검증한다. 헌법 위반은 CRITICAL로 취급한다.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-21 | **Last Amended**: 2026-09-21
+**Version**: 1.1.0 | **Ratified**: 2026-09-21 | **Last Amended**: 2026-09-21

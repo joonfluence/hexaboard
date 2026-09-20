@@ -50,6 +50,7 @@
 ## 린트·포맷
 
 - 린트는 ESLint, 포맷은 Prettier를 쓴다.
+- TypeScript는 모든 패키지에서 `strict` 모드다. `any`는 금지하며 ESLint(`no-explicit-any`)로 강제한다. `@ts-ignore`도 쓰지 않는다.
 - FSD 레이어 경계 검사는 ESLint 플러그인으로 한다. 구체적인 플러그인은 구현 시점에 확인한다.
 
 ## 커밋·PR 규칙
