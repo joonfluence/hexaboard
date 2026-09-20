@@ -81,3 +81,4 @@
 | v0.75 | 2026-09-21 | 새 티켓은 `TODO` 컬럼 맨 뒤에 놓기, 응답에 `position` 미노출 확정 (첫 기능 명세 `specs/001-ticket-create-get` 작성 중 결정) | joonfluence (with Claude) |
 | v0.76 | 2026-09-21 | 제목 공백 제거, 빈 설명 정규화, 미지 요청 필드 무시 확정 (`/speckit-clarify` 결과) | joonfluence (with Claude) |
 | v0.77 | 2026-09-21 | 헌법 v1.1.0: 원칙 VI(TS strict, any 금지, API 계약 준수) 추가, 개발환경 문서에 반영 | joonfluence (with Claude) |
+| v0.78 | 2026-09-21 | 헌법 v1.2.0: 원칙 VII(필수 가드레일) 추가 | joonfluence (with Claude) |
