@@ -15,6 +15,7 @@
 - **작업 브랜치**: `development`에서 작업하고 커밋한다. `main`으로는 PR로만 반영한다 (D-62). 커밋은 사용자가 완료 조건으로 요청한 것이며 **push는 하지 않는다** (헌법 VII).
 - **커밋 전 비밀값 확인**: 스테이징된 diff에 비밀값(접속 문자열, 토큰, `.env`)이 없는지 확인한다 (헌법 VII).
 - **의존성**: [tech_stack.md](../../docs/tech_stack.md)의 확정 스택 밖 패키지는 추가 전에 사용자에게 확인한다. 패키지 버전은 도입 시 공식 문서로 확인한다 (헌법 VII).
+- **테스트 케이스 정의**: RED 태스크 전에 [docs/test_cases.md](../../docs/test_cases.md)의 해당 TC를 ⏳로 정의해 두고 테스트 이름에 TC ID를 넣는다. 통과하는 GREEN 커밋에서 ✅로 바꾼다 (헌법 III, D-87). 이미 끝난 T011~T044의 TC는 사후 정의했다(v0.81).
 - 테스트를 통과시키려고 테스트를 약화·삭제하지 않는다 (헌법 III). 미결 항목을 만나면 값을 지어내지 않고 멈춰 보고한다 (헌법 I, VII).
 - 결정이 생기면 해당 문서를 갱신한다 (Phase 6 DOC 태스크, 헌법 I).
 
@@ -109,7 +110,7 @@
 
 **Independent Test**: 티켓을 만들고 응답의 `ticketId`로 조회해 같은 값이 돌아오는지 확인한다.
 
-- [ ] T045 [P] [US2] RED 조회 API 테스트: G1(존재하는 `ticketId` → `200`, 생성 시 값과 일치, 내부 PK·`position` 없음), G2(UUID 형식이나 없는 티켓 → `404`, `TICKET_NOT_FOUND`), G3(UUID 형식이 아닌 값 → `400`, `INVALID_TICKET_ID`). 오류 응답 형식 확인 (apps/bootstrap-http/test/tickets.get.api-spec.ts)
+- [ ] T045 [P] [US2] RED 조회 API 테스트(TC-API-014~017): G1(존재하는 `ticketId` → `200`, 생성 시 값과 일치, 내부 PK·`position` 없음), G2(UUID 형식이나 없는 티켓 → `404`, `TICKET_NOT_FOUND`), G3(UUID 형식이 아닌 값 → `400`, `INVALID_TICKET_ID`). 오류 응답 형식 확인 (apps/bootstrap-http/test/tickets.get.api-spec.ts)
 - [ ] T046 [US2] RED T045를 실행해 **GET 엔드포인트 미존재로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
 - [ ] T047 [P] [US2] GREEN `GetTicket` 유스케이스: `ticketId`로 조회, 없으면 `TicketNotFoundError`. 오류 클래스는 `application`에 둔다 (packages/application/src/get-ticket.use-case.ts, packages/application/src/errors.ts)
 - [ ] T048 [US2] GREEN `GET /tickets/:ticketId`: 경로 값이 UUID 형식이 아니면 `INVALID_TICKET_ID`(`400`), `TicketNotFoundError` → `404 TICKET_NOT_FOUND`로 변환하는 필터 규칙 추가. T047에 의존 (apps/bootstrap-http/src/tickets/tickets.controller.ts, apps/bootstrap-http/src/common/domain-error.filter.ts)
@@ -125,9 +126,9 @@
 
 **Independent Test**: 검증 규칙을 하나씩 위반하는 요청을 보내 모두 오류 응답을 받고 저장된 티켓이 없음을 확인한다.
 
-- [ ] T050 [P] [US3] RED 검증 실패 API 테스트: V1(제목 없음·`null`·`""`·공백뿐 → `400` `VALIDATION_FAILED`, `details`에 `title`), V2(제목 101자·설명 2001자), V3(우선순위가 허용 값 밖, `null`), V4(`dueAt`이 ISO 8601 아님) — 모두 `400` `VALIDATION_FAILED`이며 실패 뒤 DB에 티켓이 0건 (apps/bootstrap-http/test/tickets.create-validation.api-spec.ts)
-- [ ] T051 [P] [US3] RED 서버 지정 값·범위 밖 필드 API 테스트: V5(`ticketId`·`status`·`position`·`createdAt`·`updatedAt` 포함 → `400` `VALIDATION_FAILED`, 무시하지 않고 거부), V6(`tags` 포함 → `400` `VALIDATION_FAILED`, 이 슬라이스 한정 임시 규칙) (apps/bootstrap-http/test/tickets.create-rejected-fields.api-spec.ts)
-- [ ] T052 [P] [US3] RED 본문·미디어 타입 API 테스트: V7(올바르지 않은 JSON → `400` `INVALID_REQUEST_BODY`), V8(`Content-Type`이 JSON이 아님 → `415` `UNSUPPORTED_MEDIA_TYPE`). 프레임워크 기본 동작이 다르면 기대값을 지어내지 말고 실제 동작을 확인해 사용자에게 보고한다 (apps/bootstrap-http/test/tickets.create-body.api-spec.ts)
+- [ ] T050 [P] [US3] RED 검증 실패 API 테스트(TC-API-018~021, 026, 027): V1(제목 없음·`null`·`""`·공백뿐 → `400` `VALIDATION_FAILED`, `details`에 `title`), V2(제목 101자·설명 2001자), V3(우선순위가 허용 값 밖, `null`), V4(`dueAt`이 ISO 8601 아님) — 모두 `400` `VALIDATION_FAILED`이며 실패 뒤 DB에 티켓이 0건 (apps/bootstrap-http/test/tickets.create-validation.api-spec.ts)
+- [ ] T051 [P] [US3] RED 서버 지정 값·범위 밖 필드 API 테스트(TC-API-022, 023): V5(`ticketId`·`status`·`position`·`createdAt`·`updatedAt` 포함 → `400` `VALIDATION_FAILED`, 무시하지 않고 거부), V6(`tags` 포함 → `400` `VALIDATION_FAILED`, 이 슬라이스 한정 임시 규칙) (apps/bootstrap-http/test/tickets.create-rejected-fields.api-spec.ts)
+- [ ] T052 [P] [US3] RED 본문·미디어 타입 API 테스트(TC-API-024, 025): V7(올바르지 않은 JSON → `400` `INVALID_REQUEST_BODY`), V8(`Content-Type`이 JSON이 아님 → `415` `UNSUPPORTED_MEDIA_TYPE`). 프레임워크 기본 동작이 다르면 기대값을 지어내지 말고 실제 동작을 확인해 사용자에게 보고한다 (apps/bootstrap-http/test/tickets.create-body.api-spec.ts)
 - [ ] T053 [US3] RED T050~T052를 실행해 **검증 미구현으로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
 - [ ] T054 [P] [US3] GREEN 요청 형식 검증: DTO 검증 규칙(형식·타입·enum·`dueAt` ISO 8601), 검증 실패를 오류 응답 형식(`statusCode`, `code`=`VALIDATION_FAILED`, `message`, 필드별 `details`)으로 변환, 정의되지 않은 필드는 제거해 무시 (apps/bootstrap-http/src/tickets/dto/create-ticket.dto.ts, apps/bootstrap-http/src/common/validation.ts)
 - [ ] T055 [US3] GREEN 서버 지정 값과 `tags`를 거부하는 검사를 추가한다. 미지 필드 무시(D-81)와 충돌하지 않게 이름 목록 기반으로 처리한다 (apps/bootstrap-http/src/tickets/dto/create-ticket.dto.ts, apps/bootstrap-http/src/common/validation.ts)
@@ -172,3 +173,4 @@ Phase 5 RED:           T050, T051, T052
 - **MVP**: Phase 1~3 (US1)까지 끝내면 티켓 생성이 동작한다. 여기서 검증·데모한다.
 - **증분 전달**: US2(조회) → US3(검증) 순으로 추가한다. 각 단계는 게이트가 통과한 상태로 커밋한다.
 - **주의**: US1에서는 유효한 입력만 다루므로, 도메인 검증 오류는 US3의 필터가 생기기 전까지 `400`으로 변환되지 않는다. 이는 의도된 순서이며 US3에서 해결한다.
+- [ ] T065 CHECK [docs/test_cases.md](../../docs/test_cases.md)의 ✅/⏳ 표시와 현황 수치가 실제 통과한 테스트와 일치하는지 확인하고, 이 기능의 API 케이스(TC-API-014~027)가 모두 ✅인지 확인한다 (docs/test_cases.md, docs/test_cases/03-api.md)

@@ -82,6 +82,8 @@
 - 기능 단위로 `specify → clarify → plan → tasks → analyze → implement` 순서로 진행한다. 산출물은 `specs/`에 둔다.
 - plan은 시작 전에 이 헌법과 `docs/`를 점검하고(Constitution Check), 위반은 정당화 없이 통과시키지 않는다.
 - 커밋은 Conventional Commits 관례를 따른다 (도구 강제 없음). 상세는 [docs/decision_log.md](../../docs/decision_log.md)의 D-62(커밋·PR 규칙)를 참조한다.
+- 테스트(RED)를 쓰기 전에 [docs/test_cases.md](../../docs/test_cases.md)에 해당 테스트 케이스(시나리오·기대 결과·근거)를 정의하고 테스트 이름에 TC ID를 넣는다. 통과하면 같은 커밋에서 상태를 갱신한다.
+- 프론트엔드 컴포넌트는 구현 전에 [docs/component_spec.md](../../docs/component_spec.md)의 명세와 TC-UI를 정의한다.
 - 하나의 태스크는 테스트와 구현이 통과한 상태로 커밋한다.
 
 ## Governance
@@ -91,4 +93,4 @@
 - 버전은 시맨틱 버전을 따른다. 원칙 삭제·재정의는 MAJOR, 원칙·섹션 추가나 실질적 확장은 MINOR, 표현 정리는 PATCH다.
 - `/speckit-plan`의 Constitution Check와 `/speckit-analyze`에서 준수 여부를 검증한다. 헌법 위반은 CRITICAL로 취급한다.
 
-**Version**: 1.2.0 | **Ratified**: 2026-09-21 | **Last Amended**: 2026-09-21
+**Version**: 1.3.0 | **Ratified**: 2026-09-21 | **Last Amended**: 2026-09-21

@@ -10,6 +10,8 @@ To-do-app 기획·설계 문서 모음이다. **한 문서는 200줄을 넘기�
 | [non_functional_requirements.md](non_functional_requirements.md) | 비기능 요구사항 |
 | [user_stories.md](user_stories.md) | 사용자 스토리 (사용자 시나리오) |
 | [wireframe.md](wireframe.md) | 와이어프레임 참고, UI 방향 |
+| [component_spec.md](component_spec.md) | 프론트엔드 UI 컴포넌트 명세. 하위 3개 문서는 [component_spec/](component_spec/) |
+| [test_cases.md](test_cases.md) | 테스트 케이스 정본과 구현 현황. 하위 4개 문서는 [test_cases/](test_cases/) |
 | [tech_stack.md](tech_stack.md) | 기술 스택 요약표 |
 | [TRD.md](TRD.md) | 기술 요구사항 문서. 하위 6개 문서는 [trd/](trd/) |
 | [data_model.md](data_model.md) | 티켓 데이터 모델 |
@@ -35,7 +37,8 @@ To-do-app 기획·설계 문서 모음이다. **한 문서는 200줄을 넘기�
 | 새 기능 구현 (예: 카드 이동) | [functional_requirements.md](functional_requirements.md), [data_model.md](data_model.md), [api_spec.md](api_spec.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md) |
 | API 추가·변경 | [api_spec.md](api_spec.md), [data_model.md](data_model.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md) |
 | DB 스키마·마이그레이션 | [data_model.md](data_model.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md), [trd/03-data-flow.md](trd/03-data-flow.md), [trd/06-deployment.md](trd/06-deployment.md) |
-| 프론트 화면 구현 | [wireframe.md](wireframe.md), [functional_requirements.md](functional_requirements.md), [api_spec.md](api_spec.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md) (FSD) |
+| 프론트 화면 구현 | [wireframe.md](wireframe.md), [component_spec.md](component_spec.md), [functional_requirements.md](functional_requirements.md), [api_spec.md](api_spec.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md) (FSD) |
+| 테스트 작성 (TDD) | [test_cases.md](test_cases.md)와 해당 영역의 [test_cases/](test_cases/) 문서 |
 | 패키지·모듈 구조 | [trd/01-system-architecture.md](trd/01-system-architecture.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md) |
 | 개발환경·CI·배포 | [trd/05-dev-environment.md](trd/05-dev-environment.md), [trd/06-deployment.md](trd/06-deployment.md), [non_functional_requirements.md](non_functional_requirements.md) |
 | 기술 선택 확인 | [tech_stack.md](tech_stack.md), [trd/02-tech-stack-detail.md](trd/02-tech-stack-detail.md) |
