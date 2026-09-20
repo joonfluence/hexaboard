@@ -77,3 +77,4 @@
 | v0.71 | 2026-09-21 | 배포 롤백 절차를 git revert 후 재배포로 확정 | joonfluence (with Claude) |
 | v0.72 | 2026-09-21 | Neon·Render 무료 플랜 공식 페이지 확인 후 잠정→확정, GitHub Actions 공개 저장소 무료 확인 | joonfluence (with Claude) |
 | v0.73 | 2026-09-21 | 정합성 점검: 결정된 항목에 남아 있던 낡은 "미정·미결" 문구 7곳 갱신, 문서에만 있고 미결 목록에 빠져 있던 마감일 표시 방식·응답 시간 목표를 미결에 추가, 미사용 "잠정" 범례 제거 | joonfluence (with Claude) |
+| v0.74 | 2026-09-21 | SDD(Spec Kit)·TDD 도입 확정, 프로젝트 헌법 v1.0.0 작성(`.specify/memory/constitution.md`) | joonfluence (with Claude) |
