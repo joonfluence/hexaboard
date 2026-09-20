@@ -1,0 +1,71 @@
+import { InvalidTitleError } from '../src/errors';
+import { Position } from '../src/position';
+import { Ticket } from '../src/ticket';
+
+const UUID_V4 =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+describe('Ticket.create', () => {
+  const position = Position.first();
+
+  it('공개 식별자는 UUID v4 형식이다', () => {
+    expect(Ticket.create({ title: '문서 정리', position }).ticketId).toMatch(
+      UUID_V4,
+    );
+  });
+
+  it('호출마다 서로 다른 식별자를 만든다 (C6)', () => {
+    const a = Ticket.create({ title: '같은 내용', position });
+    const b = Ticket.create({ title: '같은 내용', position });
+    expect(a.ticketId).not.toBe(b.ticketId);
+  });
+
+  it('상태는 항상 TODO다', () => {
+    expect(Ticket.create({ title: 't', position }).status).toBe('TODO');
+  });
+
+  it('제목만 주면 우선순위 MEDIUM, 설명·마감일 없음이다 (C1)', () => {
+    const ticket = Ticket.create({ title: 't', position });
+    expect(ticket.priority.value).toBe('MEDIUM');
+    expect(ticket.description).toBeNull();
+    expect(ticket.dueAt).toBeNull();
+  });
+
+  it('입력한 값을 그대로 보관한다 (C2)', () => {
+    const dueAt = new Date('2026-12-31T23:59:00.000Z');
+    const ticket = Ticket.create({
+      title: '문서 정리',
+      description: '설명',
+      priority: 'HIGH',
+      dueAt,
+      position,
+    });
+    expect(ticket.title.value).toBe('문서 정리');
+    expect(ticket.description).toBe('설명');
+    expect(ticket.priority.value).toBe('HIGH');
+    expect(ticket.dueAt).toEqual(dueAt);
+    expect(ticket.position).toBe(position);
+  });
+
+  it('제목과 설명을 정규화한다 (C3, C4)', () => {
+    const ticket = Ticket.create({
+      title: '  제목  ',
+      description: '   ',
+      position,
+    });
+    expect(ticket.title.value).toBe('제목');
+    expect(ticket.description).toBeNull();
+  });
+
+  it('잘못된 제목은 도메인 오류로 거부한다 (V1)', () => {
+    expect(() => Ticket.create({ title: '  ', position })).toThrow(
+      InvalidTitleError,
+    );
+  });
+
+  it('DB 내부 식별자를 갖지 않는다', () => {
+    const keys = Object.keys(Ticket.create({ title: 't', position }));
+    expect(keys).not.toContain('id');
+    expect(keys).toContain('ticketId');
+  });
+});

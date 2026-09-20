@@ -45,17 +45,17 @@
 
 ### domain (프레임워크 없음, 순수 단위 테스트)
 
-- [ ] T011 [P] RED `Title` 테스트: 앞뒤 공백을 제거한 값을 보관, 제거 후 빈 값·공백뿐·`null`은 도메인 오류, **100자 허용·101자 거부**(제거 후 기준), 앞뒤 공백 때문에 100자를 넘긴 제목도 제거 후 100자 이하면 허용. C3·C5·V1·V2에 대응 (packages/domain/test/title.spec.ts)
-- [ ] T012 [P] RED 설명 정규화 테스트: 생략·`null`·`""`·공백뿐이면 `null`, **2000자 허용·2001자 거부**. C4·C5·V2에 대응. 설명 앞뒤 공백을 보존하는지와 2000자 검사 기준(정규화 전/후)은 문서에 없으므로 구현 전 사용자에게 확인하고 D-81에 반영한다 (packages/domain/test/description.spec.ts)
-- [ ] T013 [P] RED `Priority` 테스트: 값은 `LOW`/`MEDIUM`/`HIGH`/`URGENT`만 허용, 생략 시 `MEDIUM`, `null`·그 외 값은 도메인 오류. C1·V3에 대응 (packages/domain/test/priority.spec.ts)
-- [ ] T014 [P] RED `Position` 테스트: 컬럼 첫 카드의 키를 만든다, 마지막 키 뒤의 키는 항상 바이트 순서로 마지막 키보다 크다, 반복해도 단조 증가, 문자열 순서 키는 사전순(바이트 순서) 비교. 두 키 사이 계산과 키 길이 상한은 이 기능 범위 밖이다 (구현 시 확정) (packages/domain/test/position.spec.ts)
-- [ ] T015 [P] RED `Ticket.create()` 테스트: 공개 식별자 `ticketId`가 UUID v4 형식, 호출마다 다른 값(C6), 상태는 항상 `TODO`, 우선순위 기본 `MEDIUM`, 마감일 선택, 내부 PK를 갖지 않음. UUID 생성 방식(내장 기능 또는 라이브러리)은 공식 문서로 확인하며 `domain`에 프레임워크 의존을 넣지 않는다. 새 라이브러리가 필요하면 추가 전 사용자에게 확인 (packages/domain/test/ticket.spec.ts)
-- [ ] T016 RED T011~T015를 실행해 **모든 테스트가 모듈 미존재로 실패**함을 확인하고 tdd-log.md에 기록한다 (specs/001-ticket-create-get/tdd-log.md)
-- [ ] T017 [P] GREEN `Title`과 설명 정규화, 도메인 오류를 구현한다: 도메인 오류는 프레임워크를 모르는 클래스로 정의한다 (packages/domain/src/title.ts, packages/domain/src/description.ts, packages/domain/src/errors.ts)
-- [ ] T018 GREEN `Priority`를 구현한다: 문자열 enum 값과 기본값 `MEDIUM` (packages/domain/src/priority.ts)
-- [ ] T019 [P] GREEN `Position`을 구현한다: 첫 키와 마지막 키 뒤 키. 경계 조건 테스트를 통과시킨다 (packages/domain/src/position.ts)
-- [ ] T020 GREEN `Ticket.create()`와 `index.ts` export를 구현한다. T017~T019에 의존한다 (packages/domain/src/ticket.ts, packages/domain/src/index.ts)
-- [ ] T021 REFACTOR domain 패키지의 중복·명명을 정리한다. 테스트는 그대로 통과해야 하고, `domain`이 어떤 프레임워크도 import하지 않음을 확인해 커밋한다 (packages/domain/src/)
+- [X] T011 [P] RED `Title` 테스트: 앞뒤 공백을 제거한 값을 보관, 제거 후 빈 값·공백뿐·`null`은 도메인 오류, **100자 허용·101자 거부**(제거 후 기준), 앞뒤 공백 때문에 100자를 넘긴 제목도 제거 후 100자 이하면 허용. C3·C5·V1·V2에 대응 (packages/domain/test/title.spec.ts)
+- [X] T012 [P] RED 설명 정규화 테스트: 생략·`null`·`""`·공백뿐이면 `null`, **2000자 허용·2001자 거부**. C4·C5·V2에 대응. 설명 앞뒤 공백을 보존하는지와 2000자 검사 기준(정규화 전/후)은 문서에 없으므로 구현 전 사용자에게 확인하고 D-81에 반영한다 (packages/domain/test/description.spec.ts)
+- [X] T013 [P] RED `Priority` 테스트: 값은 `LOW`/`MEDIUM`/`HIGH`/`URGENT`만 허용, 생략 시 `MEDIUM`, `null`·그 외 값은 도메인 오류. C1·V3에 대응 (packages/domain/test/priority.spec.ts)
+- [X] T014 [P] RED `Position` 테스트: 컬럼 첫 카드의 키를 만든다, 마지막 키 뒤의 키는 항상 바이트 순서로 마지막 키보다 크다, 반복해도 단조 증가, 문자열 순서 키는 사전순(바이트 순서) 비교. 두 키 사이 계산과 키 길이 상한은 이 기능 범위 밖이다 (구현 시 확정) (packages/domain/test/position.spec.ts)
+- [X] T015 [P] RED `Ticket.create()` 테스트: 공개 식별자 `ticketId`가 UUID v4 형식, 호출마다 다른 값(C6), 상태는 항상 `TODO`, 우선순위 기본 `MEDIUM`, 마감일 선택, 내부 PK를 갖지 않음. UUID 생성 방식(내장 기능 또는 라이브러리)은 공식 문서로 확인하며 `domain`에 프레임워크 의존을 넣지 않는다. 새 라이브러리가 필요하면 추가 전 사용자에게 확인 (packages/domain/test/ticket.spec.ts)
+- [X] T016 RED T011~T015를 실행해 **모든 테스트가 모듈 미존재로 실패**함을 확인하고 tdd-log.md에 기록한다 (specs/001-ticket-create-get/tdd-log.md)
+- [X] T017 [P] GREEN `Title`과 설명 정규화, 도메인 오류를 구현한다: 도메인 오류는 프레임워크를 모르는 클래스로 정의한다 (packages/domain/src/title.ts, packages/domain/src/description.ts, packages/domain/src/errors.ts)
+- [X] T018 GREEN `Priority`를 구현한다: 문자열 enum 값과 기본값 `MEDIUM` (packages/domain/src/priority.ts)
+- [X] T019 [P] GREEN `Position`을 구현한다: 첫 키와 마지막 키 뒤 키. 경계 조건 테스트를 통과시킨다 (packages/domain/src/position.ts)
+- [X] T020 GREEN `Ticket.create()`와 `index.ts` export를 구현한다. T017~T019에 의존한다 (packages/domain/src/ticket.ts, packages/domain/src/index.ts)
+- [X] T021 REFACTOR domain 패키지의 중복·명명을 정리한다. 테스트는 그대로 통과해야 하고, `domain`이 어떤 프레임워크도 import하지 않음을 확인해 커밋한다 (packages/domain/src/)
 
 ### persistence (Testcontainers Postgres 통합 테스트)
 

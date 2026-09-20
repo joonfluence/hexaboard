@@ -36,3 +36,15 @@
 - 결정: Jest + CommonJS 유지, 테스트 스크립트에만 `--experimental-vm-modules`를 붙임(application·persistence·bootstrap-http). Vitest 전환은 하지 않음. **T061/T062에서 `docs/trd/02-tech-stack-detail.md`(테스트 절)와 결정 로그에 반영할 것.**
 - 부가 결정: ts-jest는 `nodenext`에서 `isolatedModules: true`를 요구해 `tsconfig.base.json`에 설정. TS 6은 `@types`를 자동 포함하지 않아 `types: ["node", "jest"]` 명시.
 - 부가 결정: pnpm 12는 의존성 빌드 스크립트를 기본 차단(`ERR_PNPM_IGNORED_BUILDS`). Jest 내부 의존성 `@parcel/watcher`, `unrs-resolver`는 사전 빌드 바이너리를 쓰므로 `allowBuilds: false`로 거부(최소 권한)하고 정상 동작 확인.
+
+### T016 (2026-09-21) — RED: domain 테스트 5개 스위트
+- 작성: `title`, `description`, `priority`, `position`, `ticket` 테스트(C1·C2·C3·C4·C5·C6·V1·V2·V3 대응).
+- 실행: `pnpm test`(packages/domain)
+- 결과(Red): `Test Suites: 5 failed, 5 total` — 모두 `Cannot find module '../src/errors'`(구현 없음).
+
+### T017~T021 (2026-09-21) — GREEN·REFACTOR: domain 구현
+- 결과: `Test Suites: 5 passed, Tests: 55 passed`. typecheck·lint·prettier 통과.
+- `domain`의 외부 import는 `node:crypto`(내장, UUID v4 `randomUUID()`)뿐. 프레임워크·라이브러리 의존 없음(SC-005). 새 의존성 추가 없음.
+- **가정(사용자 확인 전, A1)**: 설명은 앞뒤 공백을 다듬지 않고 그대로 저장, 2000자 검사는 저장할 값 기준. 질문 도구가 거절되어 기본 제안으로 진행. 변경이 필요하면 `description.ts`와 테스트만 수정하면 됨. Phase 6에서 D-81 보완 여부 확인.
+- **가정**: 제목·설명 길이는 UTF-16 코드 유닛이 아니라 문자(코드 포인트) 수 기준(DB 문자 길이와 동일). 이모지 테스트로 고정.
+- **설계**: `Position`은 머리 문자(a-z) + 정수 자릿수 + 소수부 형식(fractional-indexing 계열). 이번 범위는 `first()`, `after()`, `from()`만. 소수부 키 뒤 계산도 테스트. 두 키 사이 계산·길이 상한은 카드 이동 기능에서 확정.
