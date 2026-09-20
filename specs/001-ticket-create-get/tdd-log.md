@@ -109,3 +109,33 @@
 - 역할 분담: 형식·타입 검증은 DTO, 제목·설명 내용 규칙은 `domain` 값 객체, 오류 코드 변환은 필터(웹 계층). 우선순위 `null`은 DTO의 `ValidateIf(!== undefined) + IsIn`으로 거부.
 - 결과: bootstrap-http `Tests: 62 passed`(RUN 13 + 생성 16 + 조회 6 + 검증 27).
 - 테스트 결함 수정: `it.each([['a'], []])`의 빈 배열 케이스가 `tags` 없이 전송되어 201이 나오던 것을 객체 매개변수로 수정(RED 단계의 테스트 자체 결함, 구현과 무관).
+
+### T058 (2026-09-21) — CHECK: 계약 케이스 커버리지
+| 계약 케이스 | TC | 상태 |
+|-------------|----|------|
+| C1 | TC-API-001, 002 | 통과 |
+| C2 | TC-API-003 | 통과 |
+| C3 | TC-API-004 | 통과 |
+| C4 | TC-API-005 | 통과 |
+| C5 | TC-API-006 | 통과 |
+| C6 | TC-API-007 | 통과 |
+| C7 | TC-API-008 | 통과 |
+| V1~V4 | TC-API-018~021 | 통과 |
+| V5, V6 | TC-API-022, 023 | 통과 |
+| V7, V8 | TC-API-024, 025 | 통과 |
+| V9 | TC-API-011~013 | 통과 |
+| G1 | TC-API-014, 015 | 통과 |
+| G2, G3 | TC-API-016, 017 | 통과 |
+- 빠진 케이스 없음. 전체 테스트: domain 59, persistence 25, bootstrap-http 62 통과.
+
+### T059 (2026-09-21) — CHECK: 성공 기준
+- SC-003(응답에 내부 PK 없음): TC-API-002·015(응답 필드가 정해진 8개뿐), TC-DOM-033·037, TC-PER-002·007·022. 확인.
+- SC-004(RED 이력): T006, T016, 사전 작업(rehydrate), T026, T034, config, T040, T046, T053에 실패 기록이 있음. 확인.
+- SC-005(계층 경계): `domain`의 외부 import는 `node:crypto`뿐, `persistence`는 `bootstrap-http`를 참조하지 않음(패키지 `dependencies`와 T008 검증). 확인.
+
+### T060 (2026-09-21) — CHECK: quickstart 실행
+- 게이트: `pnpm typecheck`·`lint`·`test`·`build`·`prettier --check` 통과.
+- 서버: Docker Compose Postgres 18 + `pnpm dev`. 기동 시 마이그레이션 적용 로그 확인.
+- 시나리오 1~6과 415·잘못된 JSON을 curl로 확인: 201/200, 응답 필드 8개(id·position·tags 없음), 빈 제목 400 `VALIDATION_FAILED`, 없는 UUID 404 `TICKET_NOT_FOUND`, UUID 아님 400 `INVALID_TICKET_ID`, 순서 키 `a0` → `a1`(생성 순 증가), 415 `UNSUPPORTED_MEDIA_TYPE`, 400 `INVALID_REQUEST_BODY`.
+- 발견·수정: (1) 호스트의 PostgreSQL(5432)과 다른 컨테이너(3000·3100 포트)가 이미 있어 서버가 사용자의 다른 DB에 접속하려 했다(`role "todo" does not exist`로 거부, 변경 없음). compose를 `127.0.0.1:54320`으로 바꾸고 서버는 3456에서 실행. (2) `pnpm dev`가 의존 패키지를 빌드하지 않아 `turbo.json`의 `dev`에 `dependsOn: ["^build"]` 추가.
+- 정리: 서버 종료, `docker compose down -v`로 임시 컨테이너·볼륨 제거. 다른 컨테이너는 그대로.

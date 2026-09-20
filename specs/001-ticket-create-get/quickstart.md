@@ -6,7 +6,8 @@
 
 - Node.js: `.nvmrc`의 버전 (`nvm use`), pnpm, Docker 실행 중
 - `.env.example`을 복사해 `.env`를 만들고 로컬 전용 값을 채운다 (`.env`는 커밋하지 않는다)
-- 로컬 DB: Docker Compose로 PostgreSQL 실행 ([TRD 05](../../docs/trd/05-dev-environment.md))
+- 로컬 DB: `docker compose up -d`로 PostgreSQL 18 실행 (호스트 포트 `127.0.0.1:54320`, [TRD 05](../../docs/trd/05-dev-environment.md))
+- `.env`: `DATABASE_HOST=127.0.0.1`, `DATABASE_PORT=54320`, `DATABASE_NAME`·`DATABASE_USER`·`DATABASE_PASSWORD`는 compose와 같은 로컬 값, `PORT`는 비어 있는 포트(이미 쓰는 포트는 피한다)
 
 ## 1. 품질 게이트
 

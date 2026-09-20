@@ -42,7 +42,9 @@
 | 프론트엔드 | Vitest | 순수 로직 + 컴포넌트(Testing Library) |
 | 테스트용 DB | Testcontainers (Postgres) | 로컬·CI에서 동일한 방식으로 컨테이너를 띄움 |
 
-- Vitest의 기본 변환기는 데코레이터 메타데이터(`emitDecoratorMetadata`)를 지원하지 않는 것으로 알고 있어, Nest·MikroORM 테스트는 각 진영 기본값인 Jest로 분리했다. 버전에 따라 다를 수 있어 공식 문서로 확인한다.
+- Vitest의 기본 변환기는 데코레이터 메타데이터(`emitDecoratorMetadata`)를 지원하지 않는 것으로 알고 있어, Nest·MikroORM 테스트는 각 진영 기본값인 Jest로 분리했다.
+- 구현 중 확인(2026-09-21): Nest 12와 MikroORM 7은 ESM 전용이다. Nest 공식 문서는 CommonJS 앱이 `require(esm)`으로 계속 동작하고 CommonJS 프로젝트는 Jest를 쓴다고 안내한다. 다만 Jest가 ESM 패키지를 불러오려면 Node 24.21에서 `--experimental-vm-modules`가 필요해(문서는 불필요하다고 하나 실제로는 필요) 테스트 스크립트에 붙였다. Vitest로 바꾸지 않았다.
+- MikroORM 7은 데코레이터 대신 `defineEntity`로 엔티티를 정의하고, 마이그레이션은 파일 탐색 대신 `migrationsList`로 등록한다. Nest 통합 패키지(`@mikro-orm/nestjs`)는 쓰지 않는다.
 - `application` 유스케이스 단위 테스트(Fake 포트)는 2차 범위다. API 테스트가 실제 DB로 전체 경로를 함께 검증한다.
 
 ## 인프라

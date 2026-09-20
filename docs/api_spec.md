@@ -82,7 +82,7 @@ REST API 명세다. 리소스 이름은 `tickets`(복수 명사)다. 서버 DTO�
 | 존재하지 않는 티켓 | `404` | `TICKET_NOT_FOUND` |
 | 존재하지 않는 경로 | `404` | (프레임워크 기본) |
 | 허용되지 않는 메서드 | `405` | (프레임워크 기본) |
-| `Content-Type`이 JSON이 아님 | `415` | `UNSUPPORTED_MEDIA_TYPE` (프레임워크 동작은 구현 시 확인) |
+| `Content-Type`이 JSON이 아님 | `415` | `UNSUPPORTED_MEDIA_TYPE` (프레임워크 기본은 검사하지 않아 `500`이 되므로 가드로 구현) |
 
 ### 엔드포인트별
 
@@ -93,7 +93,7 @@ REST API 명세다. 리소스 이름은 `tickets`(복수 명사)다. 서버 DTO�
 - `dueAt`이 시각 형식(ISO 8601)이 아님 → `400`
 - `tags`가 문자열 배열이 아니거나, 11개 이상이거나, 이름이 30자를 넘음 → `400`
 - 같은 컬럼에 동시에 생성되어 순서 키가 충돌하고 서버 재시도(최대 3회) 후에도 실패 → `409` `POSITION_CONFLICT`
-- 서버가 정하는 값(`ticketId`, `status`, `position`, `createdAt`, `updatedAt`)을 본문에 보냄 → `400` (거부. 무시하지 않는다)
+- 서버가 정하는 값(`ticketId`, `status`, `position`, `createdAt`, `updatedAt`)을 본문에 보냄 → `400` `VALIDATION_FAILED` (거부. 무시하지 않는다. 여러 개면 모두 `details`에 담는다)
 
 **`GET /tickets`**
 - `status` 또는 `priority` 쿼리 값이 enum에 없음 → `400` `VALIDATION_FAILED`

@@ -16,12 +16,12 @@ ticket ──N:M── tag      (연결 테이블 ticket_tag)
 | `public_id` | UUID | 필수 | **공개 식별자**(별도 유니크 키). 도메인(`Ticket.create()`)에서 생성. UUID v4(무작위). API의 `ticketId`에 대응(매퍼가 변환) |
 | `title` | 문자열 | 필수 | 도메인의 Title 값 객체가 검증. 최대 100자 (DB 컬럼 길이도 100) |
 | `description` | text | 선택 | 최대 2000자 (도메인·DTO에서 검증) |
-| `status` | 문자열 + CHECK 제약 | 필수 | `TODO` / `IN_PROGRESS` / `DONE`. 생성 시 항상 `TODO`. 전이는 자유 |
+| `status` | `text` + CHECK 제약 | 필수 | `TODO` / `IN_PROGRESS` / `DONE`. 생성 시 항상 `TODO`. 전이는 자유 |
 | `priority` | `smallint` | 필수 | 도메인·API는 `LOW` / `MEDIUM` / `HIGH` / `URGENT`. 기본값 `MEDIUM` |
-| `due_at` | timestamp | 선택 | 날짜+시간. UTC 저장, 표시 시 변환 |
-| `position` | 문자열 순서 키 | 필수 | 컬럼(상태) 안 카드 순서. 사전순으로 정렬되는 키. (상태, `position`)은 유니크 |
-| `created_at` | timestamp | 필수 | 생성 시각. ORM 훅이 채움 |
-| `updated_at` | timestamp | 필수 | 수정 시각. ORM 훅이 채움 |
+| `due_at` | `timestamptz` | 선택 | 날짜+시간. UTC 저장, 표시 시 변환 |
+| `position` | `text COLLATE "C"` | 필수 | 컬럼(상태) 안 카드 순서. 사전순으로 정렬되는 키. (상태, `position`)은 유니크 |
+| `created_at` | `timestamptz` | 필수 | 생성 시각. ORM 훅이 채움 |
+| `updated_at` | `timestamptz` | 필수 | 수정 시각. ORM 훅이 채움 |
 
 `status`는 문자열 컬럼에 CHECK 제약으로 저장한다. DB enum 타입은 값 변경 시 마이그레이션 부담이 커서 쓰지 않는다.
 
@@ -44,7 +44,7 @@ ticket ──N:M── tag      (연결 테이블 ticket_tag)
 
 ## 우선순위 변환
 
-- DB에는 순서를 나타내는 숫자로 저장한다. 예: `LOW`→1 … `URGENT`→4. 정확한 값은 구현 시 확정한다.
+- DB에는 순서를 나타내는 숫자로 저장한다: `LOW`=1, `MEDIUM`=2, `HIGH`=3, `URGENT`=4 (매퍼 테스트로 고정).
 - 이렇게 하면 DB에서 정렬이 자연스럽다. 문자열로 저장하면 알파벳순(`HIGH` → `LOW` → `MEDIUM`)이 되기 때문이다.
 - 순서 지식은 도메인의 `Priority` 값 객체와 매퍼에만 둔다.
 

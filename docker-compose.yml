@@ -1,9 +1,10 @@
 # 로컬 개발용 PostgreSQL. 접속 정보는 로컬 전용 값이며 비밀값이 아니다.
+# 호스트에 이미 설치된 PostgreSQL(5432)과 충돌하지 않도록 54320에 루프백으로만 연다.
 services:
   postgres:
     image: postgres:18
     ports:
-      - '5432:5432'
+      - '127.0.0.1:54320:5432'
     environment:
       POSTGRES_DB: todo
       POSTGRES_USER: todo

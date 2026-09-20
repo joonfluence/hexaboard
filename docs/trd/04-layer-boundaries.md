@@ -1,6 +1,6 @@
 # TRD 04. 계층 간 경계 규칙
 
-계층 경계를 폴더가 아니라 **패키지 단위**로 나누고, 의존 방향을 `package.json`의 `dependencies`로 강제한다. 역방향 import는 컨벤션 위반이 아니라 빌드·설치 단계의 오류로 드러난다.
+계층 경계를 폴더가 아니라 **패키지 단위**로 나누고, 의존 방향을 `package.json`의 `dependencies`로 강제한다. 역방향 import는 컨벤션 위반이 아니라 빌드·설치 단계의 오류로 드러난다. 검증 결과: 선언하지 않은 패키지를 import하면 타입 검사가 `TS2307`로 실패하고, 역방향 `dependencies`를 추가하면 Turborepo가 `Cyclic dependency detected`로 실패한다.
 
 ## 의존 방향 (백엔드)
 

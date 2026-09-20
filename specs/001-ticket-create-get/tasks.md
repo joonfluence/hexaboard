@@ -141,13 +141,13 @@
 
 ## Phase 6: Polish & 마무리 (plan F)
 
-- [ ] T058 CHECK 케이스 커버리지를 확인한다: C1~C7, V1~V9, G1~G3가 각각 하나 이상의 통과하는 테스트에 대응하는지 표로 tdd-log.md에 기록한다. 빠진 케이스는 RED부터 다시 진행한다 (specs/001-ticket-create-get/tdd-log.md)
-- [ ] T059 CHECK 응답 어디에도 내부 PK와 `position`이 없는지(SC-003), `domain`이 프레임워크를 import하지 않는지(SC-005), 모든 RED 실패 기록이 tdd-log.md에 있는지(SC-004)를 확인한다 (specs/001-ticket-create-get/tdd-log.md)
-- [ ] T060 CHECK [quickstart.md](quickstart.md)의 품질 게이트와 수동 시나리오 1~6을 실제로 실행해 결과를 기록한다. 로컬 DB는 Docker Compose로 띄운다 (specs/001-ticket-create-get/tdd-log.md)
-- [ ] T061 [P] DOC 구현 중 확정한 값을 정본 문서에 반영한다: Node 버전(`docs/trd/05-dev-environment.md`의 미결과 `docs/open_questions.md`의 해당 항목 삭제), ESLint 설정 형식·규칙 이름(`docs/trd/05-dev-environment.md`), 계층 역방향 검사 방식(`docs/trd/04-layer-boundaries.md`), 우선순위 숫자 매핑(`docs/data_model.md`), `415` 동작과 서버 지정 값·`tags` 거부의 오류 코드(`docs/api_spec.md`) (docs/)
-- [ ] T062 DOC 위 변경과 구현 중 생긴 결정을 `docs/decision_log.md`에 근거와 함께 추가하고 `docs/changelog.md`에 기록한다. 문서 한 개는 200줄을 넘기지 않는다. `docs/open_questions.md`에서 해소된 항목을 지운다 (docs/decision_log.md, docs/changelog.md, docs/open_questions.md)
-- [ ] T063 DOC `spec.md`의 Status를 갱신하고 `tags` 거부 임시 규칙(태그 기능에서 폐기)을 spec 또는 문서에 다음 기능 이월 항목으로 남긴다 (specs/001-ticket-create-get/spec.md)
-- [ ] T064 최종 `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build`를 실행해 모두 통과함을 확인하고 커밋한다 (전체)
+- [X] T058 CHECK 케이스 커버리지를 확인한다: C1~C7, V1~V9, G1~G3가 각각 하나 이상의 통과하는 테스트에 대응하는지 표로 tdd-log.md에 기록한다. 빠진 케이스는 RED부터 다시 진행한다 (specs/001-ticket-create-get/tdd-log.md)
+- [X] T059 CHECK 응답 어디에도 내부 PK와 `position`이 없는지(SC-003), `domain`이 프레임워크를 import하지 않는지(SC-005), 모든 RED 실패 기록이 tdd-log.md에 있는지(SC-004)를 확인한다 (specs/001-ticket-create-get/tdd-log.md)
+- [X] T060 CHECK [quickstart.md](quickstart.md)의 품질 게이트와 수동 시나리오 1~6을 실제로 실행해 결과를 기록한다. 로컬 DB는 Docker Compose로 띄운다 (specs/001-ticket-create-get/tdd-log.md)
+- [X] T061 [P] DOC 구현 중 확정한 값을 정본 문서에 반영한다: Node 버전(`docs/trd/05-dev-environment.md`의 미결과 `docs/open_questions.md`의 해당 항목 삭제), ESLint 설정 형식·규칙 이름(`docs/trd/05-dev-environment.md`), 계층 역방향 검사 방식(`docs/trd/04-layer-boundaries.md`), 우선순위 숫자 매핑(`docs/data_model.md`), `415` 동작과 서버 지정 값·`tags` 거부의 오류 코드(`docs/api_spec.md`) (docs/)
+- [X] T062 DOC 위 변경과 구현 중 생긴 결정을 `docs/decision_log.md`에 근거와 함께 추가하고 `docs/changelog.md`에 기록한다. 문서 한 개는 200줄을 넘기지 않는다. `docs/open_questions.md`에서 해소된 항목을 지운다 (docs/decision_log.md, docs/changelog.md, docs/open_questions.md)
+- [X] T063 DOC `spec.md`의 Status를 갱신하고 `tags` 거부 임시 규칙(태그 기능에서 폐기)을 spec 또는 문서에 다음 기능 이월 항목으로 남긴다 (specs/001-ticket-create-get/spec.md)
+- [X] T064 최종 `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build`를 실행해 모두 통과함을 확인하고 커밋한다 (전체)
 
 ---
 
@@ -173,4 +173,4 @@ Phase 5 RED:           T050, T051, T052
 - **MVP**: Phase 1~3 (US1)까지 끝내면 티켓 생성이 동작한다. 여기서 검증·데모한다.
 - **증분 전달**: US2(조회) → US3(검증) 순으로 추가한다. 각 단계는 게이트가 통과한 상태로 커밋한다.
 - **주의**: US1에서는 유효한 입력만 다루므로, 도메인 검증 오류는 US3의 필터가 생기기 전까지 `400`으로 변환되지 않는다. 이는 의도된 순서이며 US3에서 해결한다.
-- [ ] T065 CHECK [docs/test_cases.md](../../docs/test_cases.md)의 ✅/⏳ 표시와 현황 수치가 실제 통과한 테스트와 일치하는지 확인하고, 이 기능의 API 케이스(TC-API-014~027)가 모두 ✅인지 확인한다 (docs/test_cases.md, docs/test_cases/03-api.md)
+- [X] T065 CHECK [docs/test_cases.md](../../docs/test_cases.md)의 ✅/⏳ 표시와 현황 수치가 실제 통과한 테스트와 일치하는지 확인하고, 이 기능의 API 케이스(TC-API-014~027)가 모두 ✅인지 확인한다 (docs/test_cases.md, docs/test_cases/03-api.md)
