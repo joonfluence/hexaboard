@@ -1,0 +1,17 @@
+{
+  "name": "@todo/persistence",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@todo/domain": "workspace:*",
+    "@todo/application": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+  }
+}

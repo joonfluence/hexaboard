@@ -24,16 +24,16 @@
 
 **목적**: 모노레포 골격과 품질 게이트를 만들고, 게이트가 실제로 위반을 잡는지 확인한다.
 
-- [ ] T001 CHECK 구현 착수 시점의 Node LTS 버전을 nodejs.org 공식 릴리스 페이지에서 확인하고 결과(버전, 확인일, 출처 URL)를 tdd-log.md에 기록한다. 값을 추측하지 않는다 (specs/001-ticket-create-get/tdd-log.md)
-- [ ] T002 루트 워크스페이스를 만든다: `.nvmrc`와 `package.json`의 `engines`에 T001에서 확인한 버전을 기록, pnpm `engine-strict` 설정, `pnpm-workspace.yaml`(`apps/*`, `packages/*`), Turborepo `turbo.json`(태스크 `typecheck`, `lint`, `test`, `build`, `dev`, D-85). 패키지 버전은 공식 문서로 확인 (package.json, pnpm-workspace.yaml, turbo.json, .nvmrc, .npmrc)
-- [ ] T003 [P] `.gitignore`(`.env`, `node_modules`, 빌드 산출물 포함)와 값 없는 `.env.example`(필요한 변수 이름만: DB 접속 정보, 서버 포트)을 만든다. 비밀값은 커밋하지 않는다 (.gitignore, .env.example)
-- [ ] T004 [P] 로컬 개발용 PostgreSQL을 Docker Compose로 정의한다. 접속 정보는 비밀값이 아닌 로컬 전용 값만 쓴다 (docker-compose.yml)
-- [ ] T005 네 패키지 골격을 만든다. 각 `package.json`은 의존 방향 `domain ← application ← persistence / bootstrap-http`만 `dependencies`로 선언하고, `persistence`는 `bootstrap-http`를 참조하지 않는다. `persistence`는 자체 `dependencies`로 ORM(MikroORM)·PostgreSQL 드라이버·마이그레이션 도구와 DI 모듈용 `@nestjs/common`을 가지며 웹 의존성(`@nestjs/platform-express` 등)은 없다. MikroORM의 Nest 통합 패키지가 필요한지는 공식 문서로 확인한다 (packages/domain/package.json, packages/application/package.json, packages/persistence/package.json, apps/bootstrap-http/package.json)
-- [ ] T006 RED 게이트가 위반을 잡는지 보는 위반 픽스처를 만든다: `any` 사용, `@ts-ignore` 사용, 암묵적 any 파라미터, `domain`이 `application`을 import하는 파일. typecheck·lint를 실행해 **위반을 잡는 검사가 아직 없음**(설정 전이라 typecheck·lint가 없거나 위반을 통과시킴, Red)을 확인하고 기록한다 (packages/domain/src/__gate_fixture__.ts)
-- [ ] T007 GREEN 공통 `tsconfig.base.json`(`strict: true`, 완화 금지)을 만들어 네 패키지가 상속하게 하고, ESLint를 구성한다(`@typescript-eslint/no-explicit-any` 오류, `@ts-ignore`·`@ts-nocheck` 금지, Prettier 연동). 규칙 이름과 설정 형식은 설치한 버전의 공식 문서로 확인. 루트 스크립트가 Turborepo 태스크를 호출한다. T006 픽스처가 이제 typecheck·lint에서 **실패**함을 확인해 기록한다 (tsconfig.base.json, eslint.config.*, packages/*/tsconfig.json, apps/bootstrap-http/tsconfig.json)
-- [ ] T008 CHECK 계층 역방향 의존이 실제로 차단되는지 검증한다: (a) `domain`이 선언하지 않은 패키지를 import하면 pnpm 엄격 모드에서 실패하는지, (b) 역방향 `dependencies` 추가 시 Turborepo가 순환으로 실패하는지 확인한다. 차단되지 않는 경우가 있으면 ESLint `no-restricted-imports`로 보완하고 방식을 기록한다 (specs/001-ticket-create-get/tdd-log.md, eslint.config.*)
-- [ ] T009 [P] Jest를 패키지별로 설정한다(TypeScript 변환 방식과 Nest·MikroORM 데코레이터 메타데이터 동작은 공식 문서로 확인). 각 패키지에 자명한 테스트 하나로 `pnpm test`가 동작함을 확인한다. 통합·API 테스트 파일 이름 규칙을 정한다 (packages/*/jest.config.*, apps/bootstrap-http/jest.config.*)
-- [ ] T010 GREEN T006 픽스처를 삭제하고 `pnpm typecheck`, `pnpm lint`, `pnpm test`가 깨끗한 저장소에서 통과함을 확인한 뒤 커밋한다 (packages/domain/src/__gate_fixture__.ts 삭제)
+- [X] T001 CHECK 구현 착수 시점의 Node LTS 버전을 nodejs.org 공식 릴리스 페이지에서 확인하고 결과(버전, 확인일, 출처 URL)를 tdd-log.md에 기록한다. 값을 추측하지 않는다 (specs/001-ticket-create-get/tdd-log.md)
+- [X] T002 루트 워크스페이스를 만든다: `.nvmrc`와 `package.json`의 `engines`에 T001에서 확인한 버전을 기록, pnpm `engine-strict` 설정, `pnpm-workspace.yaml`(`apps/*`, `packages/*`), Turborepo `turbo.json`(태스크 `typecheck`, `lint`, `test`, `build`, `dev`, D-85). 패키지 버전은 공식 문서로 확인 (package.json, pnpm-workspace.yaml, turbo.json, .nvmrc, .npmrc)
+- [X] T003 [P] `.gitignore`(`.env`, `node_modules`, 빌드 산출물 포함)와 값 없는 `.env.example`(필요한 변수 이름만: DB 접속 정보, 서버 포트)을 만든다. 비밀값은 커밋하지 않는다 (.gitignore, .env.example)
+- [X] T004 [P] 로컬 개발용 PostgreSQL을 Docker Compose로 정의한다. 접속 정보는 비밀값이 아닌 로컬 전용 값만 쓴다 (docker-compose.yml)
+- [X] T005 네 패키지 골격을 만든다. 각 `package.json`은 의존 방향 `domain ← application ← persistence / bootstrap-http`만 `dependencies`로 선언하고, `persistence`는 `bootstrap-http`를 참조하지 않는다. `persistence`는 자체 `dependencies`로 ORM(MikroORM)·PostgreSQL 드라이버·마이그레이션 도구와 DI 모듈용 `@nestjs/common`을 가지며 웹 의존성(`@nestjs/platform-express` 등)은 없다. MikroORM의 Nest 통합 패키지가 필요한지는 공식 문서로 확인한다 (packages/domain/package.json, packages/application/package.json, packages/persistence/package.json, apps/bootstrap-http/package.json)
+- [X] T006 RED 게이트가 위반을 잡는지 보는 위반 픽스처를 만든다: `any` 사용, `@ts-ignore` 사용, 암묵적 any 파라미터, `domain`이 `application`을 import하는 파일. typecheck·lint를 실행해 **위반을 잡는 검사가 아직 없음**(설정 전이라 typecheck·lint가 없거나 위반을 통과시킴, Red)을 확인하고 기록한다 (packages/domain/src/__gate_fixture__.ts)
+- [X] T007 GREEN 공통 `tsconfig.base.json`(`strict: true`, 완화 금지)을 만들어 네 패키지가 상속하게 하고, ESLint를 구성한다(`@typescript-eslint/no-explicit-any` 오류, `@ts-ignore`·`@ts-nocheck` 금지, Prettier 연동). 규칙 이름과 설정 형식은 설치한 버전의 공식 문서로 확인. 루트 스크립트가 Turborepo 태스크를 호출한다. T006 픽스처가 이제 typecheck·lint에서 **실패**함을 확인해 기록한다 (tsconfig.base.json, eslint.config.*, packages/*/tsconfig.json, apps/bootstrap-http/tsconfig.json)
+- [X] T008 CHECK 계층 역방향 의존이 실제로 차단되는지 검증한다: (a) `domain`이 선언하지 않은 패키지를 import하면 pnpm 엄격 모드에서 실패하는지, (b) 역방향 `dependencies` 추가 시 Turborepo가 순환으로 실패하는지 확인한다. 차단되지 않는 경우가 있으면 ESLint `no-restricted-imports`로 보완하고 방식을 기록한다 (specs/001-ticket-create-get/tdd-log.md, eslint.config.*)
+- [X] T009 [P] Jest를 패키지별로 설정한다(TypeScript 변환 방식과 Nest·MikroORM 데코레이터 메타데이터 동작은 공식 문서로 확인). 각 패키지에 자명한 테스트 하나로 `pnpm test`가 동작함을 확인한다. 통합·API 테스트 파일 이름 규칙을 정한다 (packages/*/jest.config.*, apps/bootstrap-http/jest.config.*)
+- [X] T010 GREEN T006 픽스처를 삭제하고 `pnpm typecheck`, `pnpm lint`, `pnpm test`가 깨끗한 저장소에서 통과함을 확인한 뒤 커밋한다 (packages/domain/src/__gate_fixture__.ts 삭제)
 
 **Checkpoint**: 게이트가 위반을 실제로 잡고, 깨끗한 상태에서는 통과한다.
 
