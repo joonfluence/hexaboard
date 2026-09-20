@@ -69,3 +69,45 @@ describe('Ticket.create', () => {
     expect(keys).toContain('ticketId');
   });
 });
+
+describe('Ticket.rehydrate', () => {
+  const stored = {
+    ticketId: '0194f0a6-1b2c-4d3e-8f4a-5b6c7d8e9f00',
+    title: '저장된 제목',
+    description: null,
+    status: 'IN_PROGRESS' as const,
+    priority: 'URGENT',
+    dueAt: new Date('2026-12-31T23:59:00.000Z'),
+    position: 'a1',
+    createdAt: new Date('2026-09-21T00:00:00.000Z'),
+    updatedAt: new Date('2026-09-21T01:00:00.000Z'),
+  };
+
+  it('저장된 값 그대로 복원하고 새 식별자를 만들지 않는다', () => {
+    const ticket = Ticket.rehydrate(stored);
+    expect(ticket.ticketId).toBe(stored.ticketId);
+    expect(ticket.title.value).toBe('저장된 제목');
+    expect(ticket.status).toBe('IN_PROGRESS');
+    expect(ticket.priority.value).toBe('URGENT');
+    expect(ticket.dueAt).toEqual(stored.dueAt);
+    expect(ticket.position.value).toBe('a1');
+  });
+
+  it('ORM이 채운 생성·수정 시각을 보관한다', () => {
+    const ticket = Ticket.rehydrate(stored);
+    expect(ticket.createdAt).toEqual(stored.createdAt);
+    expect(ticket.updatedAt).toEqual(stored.updatedAt);
+  });
+
+  it('새로 만든 티켓은 아직 저장 전이라 시각이 없다', () => {
+    const ticket = Ticket.create({ title: 't', position: Position.first() });
+    expect(ticket.createdAt).toBeUndefined();
+    expect(ticket.updatedAt).toBeUndefined();
+  });
+
+  it('저장된 값이 도메인 규칙에 어긋나면 거부한다', () => {
+    expect(() => Ticket.rehydrate({ ...stored, title: '   ' })).toThrow(
+      InvalidTitleError,
+    );
+  });
+});

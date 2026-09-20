@@ -48,3 +48,23 @@
 - **가정(사용자 확인 전, A1)**: 설명은 앞뒤 공백을 다듬지 않고 그대로 저장, 2000자 검사는 저장할 값 기준. 질문 도구가 거절되어 기본 제안으로 진행. 변경이 필요하면 `description.ts`와 테스트만 수정하면 됨. Phase 6에서 D-81 보완 여부 확인.
 - **가정**: 제목·설명 길이는 UTF-16 코드 유닛이 아니라 문자(코드 포인트) 수 기준(DB 문자 길이와 동일). 이모지 테스트로 고정.
 - **설계**: `Position`은 머리 문자(a-z) + 정수 자릿수 + 소수부 형식(fractional-indexing 계열). 이번 범위는 `first()`, `after()`, `from()`만. 소수부 키 뒤 계산도 테스트. 두 키 사이 계산·길이 상한은 카드 이동 기능에서 확정.
+
+### T022~T026 (2026-09-21) — RED: persistence 테스트
+- 사전 작업(tasks에 없던 항목, TDD로 처리): 매퍼가 저장된 값에서 도메인 `Ticket`을 복원하려면 `Ticket.rehydrate()`와 `createdAt`·`updatedAt`이 필요. domain 테스트 4개를 먼저 추가해 Red(3개 실패: `rehydrate` 없음) 확인 후 구현, domain 59개 통과.
+- 작성: `test/helpers/postgres.ts`(Testcontainers, `postgres:18`), `ticket.mapper.spec.ts`, `migration.int-spec.ts`, `ticket.repository.int-spec.ts`.
+- 실행: `NODE_OPTIONS=--experimental-vm-modules jest`(packages/persistence)
+- 결과(Red): `Test Suites: 3 failed, 3 total` — `Cannot find module '../src/ticket.mapper'`, `'../src/mikro-orm-ticket.repository'`, `'../../src/orm.config'`.
+- Docker Desktop이 꺼져 있어 `open -a Docker`로 실행(6초, server 28.4.0).
+
+### T027~T031 (2026-09-21) — GREEN·REFACTOR: application 포트, persistence 구현
+- 결과: persistence `Test Suites: 3 passed, Tests: 25 passed`(이미지 다운로드 포함 64초, 이후 실행은 더 빠름). domain 59개, 전체 `pnpm typecheck`·`lint`·`test`(7/7)·`prettier --check` 통과.
+- 구현 결정(구현 중 확정, Phase 6에서 문서 반영):
+  - 엔티티는 MikroORM 7 `defineEntity`(데코레이터·메타데이터 제공자 불필요)로 정의하고 `setClass`로 구체 클래스를 연결. 스키마의 정본은 손으로 쓴 마이그레이션(`snapshot: false`).
+  - `@mikro-orm/nestjs`는 도입하지 않음(불필요). `PersistenceModule.forRoot()`가 `MikroORM.init`과 `TICKET_REPOSITORY` 어댑터를 제공. 확정 스택 밖 패키지를 추가하지 않음.
+  - 시각 컬럼은 `timestamptz`(UTC 순간 저장). `data_model.md`는 "timestamp"로만 적혀 있어 갱신 필요.
+  - `status`·`position`은 길이를 지어내지 않고 `text`. `position`만 `COLLATE "C"`. 순서 키 길이 상한은 미결로 유지.
+  - 우선순위 숫자: LOW=1, MEDIUM=2, HIGH=3, URGENT=4(매퍼 테스트로 고정). `data_model.md`의 "정확한 값은 구현 시 확정" 해소 필요.
+  - 유니크 제약 이름을 명시(`ticket_status_position_key`)하고 그 이름으로 `PositionConflictError`를 판별. `public_id` 중복 등 다른 유니크 위반은 충돌 오류로 바꾸지 않음.
+  - 마이그레이션은 파일 탐색 대신 `migrationsList`로 등록(Jest·번들과 무관하게 동작).
+  - `persistence` 공개 표면은 `PersistenceModule`, `DatabaseSettings`만(MikroORM 타입 비노출, TRD 04). 기동 시 마이그레이션 실행용 래퍼는 T035에서 추가.
+  - `application`은 단위 테스트를 만들지 않으므로 `jest --passWithNoTests`. 검증은 Phase E API 테스트가 맡음.

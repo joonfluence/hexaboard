@@ -5,13 +5,23 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@mikro-orm/core": "^7.2.1",
+    "@mikro-orm/migrations": "^7.2.1",
+    "@mikro-orm/postgresql": "^7.2.1",
+    "@nestjs/common": "^12.0.3",
+    "@todo/application": "workspace:*",
     "@todo/domain": "workspace:*",
-    "@todo/application": "workspace:*"
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+  },
+  "devDependencies": {
+    "@testcontainers/postgresql": "^12.1.0",
+    "testcontainers": "^12.1.0"
   }
 }

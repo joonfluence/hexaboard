@@ -59,16 +59,16 @@
 
 ### persistence (Testcontainers Postgres 통합 테스트)
 
-- [ ] T022 [P] RED 테스트 헬퍼: Testcontainers로 Postgres를 띄우고 MikroORM을 초기화·마이그레이션 적용·정리하는 헬퍼를 만든다. Docker가 없는 환경에서는 명확히 실패해야 한다 (packages/persistence/test/helpers/postgres.ts)
-- [ ] T023 [P] RED 매퍼 테스트(DB 없음): 도메인 `Ticket` ↔ 영속성 엔티티 변환에서 `ticketId` ↔ `public_id` 대응, 우선순위 문자열 ↔ 숫자(`smallint`) 변환이 왕복해서 같은 값, 순서가 `LOW` < `MEDIUM` < `HIGH` < `URGENT`. 정확한 숫자 값은 이 테스트로 고정하고 지어내지 않는다. 도메인 타입에 내부 PK가 없음 (packages/persistence/test/ticket.mapper.spec.ts)
-- [ ] T024 [P] RED 마이그레이션 테스트: 적용 후 `ticket` 테이블이 다음 제약을 가진다 — `id` bigint 자동 증가 PK, `public_id` UUID 유니크, `title` 최대 100자 컬럼, `description` text 널 허용, `status` 문자열 + CHECK(`TODO`/`IN_PROGRESS`/`DONE`) 위반 시 거부, `priority` smallint, `due_at` timestamp 널 허용, `position` 문자열 `COLLATE "C"`(대문자 키가 소문자 키보다 앞에 정렬되는 바이트 순서로 검증), (`status`, `position`) 유니크 위반 시 거부, `created_at`·`updated_at`은 ORM 훅이 채움 (packages/persistence/test/migration.int-spec.ts)
-- [ ] T025 [P] RED 리포지토리 통합 테스트: (a) 저장 후 `ticketId`로 조회하면 도메인 `Ticket`이 같은 값(G1의 기반), (b) 없는 `ticketId`는 `null`, (c) 컬럼(상태)별 마지막 순서 키 조회(빈 컬럼은 없음), (d) 같은 (상태, 순서 키) 저장은 도메인/애플리케이션이 이해하는 충돌 오류로 변환됨, (e) 새 티켓을 이어서 저장하면 순서 키가 생성 순으로 증가(D-79), (f) 조회 결과 어디에도 내부 PK가 없음 (packages/persistence/test/ticket.repository.int-spec.ts)
-- [ ] T026 RED T022~T025를 실행해 **모듈 미존재 또는 스키마 없음으로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
-- [ ] T027 [P] GREEN 애플리케이션 포트를 정의한다: `TicketRepository` 인터페이스(저장, `ticketId`로 조회, 상태별 마지막 순서 키 조회)와 Symbol 토큰, 순서 키 충돌 오류 `PositionConflictError`. `application`은 `@nestjs/common`만 허용하고 웹 의존성은 없다 (packages/application/src/ticket.repository.ts, packages/application/src/tokens.ts, packages/application/src/errors.ts)
-- [ ] T028 [P] GREEN 영속성 엔티티와 매퍼를 구현한다. 내부 PK는 이 엔티티에만 두고 `persistence` 밖으로 MikroORM 타입을 노출하지 않는다 (packages/persistence/src/ticket.entity.ts, packages/persistence/src/ticket.mapper.ts)
-- [ ] T029 GREEN 첫 마이그레이션을 작성한다(T024 제약 전부, `position`에만 `COLLATE "C"` 명시). 마이그레이션은 로컬·테스트 DB에서만 실행한다 (packages/persistence/src/migrations/)
-- [ ] T030 GREEN 리포지토리 어댑터를 구현한다: 유니크 위반을 T027의 `PositionConflictError`로 변환. 어댑터를 `TicketRepository` 토큰에 바인딩해 제공하는 Nest 모듈과 ORM 설정 export를 함께 만든다(`bootstrap-http`는 이 모듈을 조립만 한다). T027~T029에 의존 (packages/persistence/src/mikro-orm-ticket.repository.ts, packages/persistence/src/persistence.module.ts, packages/persistence/src/index.ts)
-- [ ] T031 REFACTOR persistence 정리. `persistence`가 `bootstrap-http`를 import하지 않고 MikroORM 타입이 밖으로 새지 않음을 확인해 커밋한다 (packages/persistence/src/)
+- [X] T022 [P] RED 테스트 헬퍼: Testcontainers로 Postgres를 띄우고 MikroORM을 초기화·마이그레이션 적용·정리하는 헬퍼를 만든다. Docker가 없는 환경에서는 명확히 실패해야 한다 (packages/persistence/test/helpers/postgres.ts)
+- [X] T023 [P] RED 매퍼 테스트(DB 없음): 도메인 `Ticket` ↔ 영속성 엔티티 변환에서 `ticketId` ↔ `public_id` 대응, 우선순위 문자열 ↔ 숫자(`smallint`) 변환이 왕복해서 같은 값, 순서가 `LOW` < `MEDIUM` < `HIGH` < `URGENT`. 정확한 숫자 값은 이 테스트로 고정하고 지어내지 않는다. 도메인 타입에 내부 PK가 없음 (packages/persistence/test/ticket.mapper.spec.ts)
+- [X] T024 [P] RED 마이그레이션 테스트: 적용 후 `ticket` 테이블이 다음 제약을 가진다 — `id` bigint 자동 증가 PK, `public_id` UUID 유니크, `title` 최대 100자 컬럼, `description` text 널 허용, `status` 문자열 + CHECK(`TODO`/`IN_PROGRESS`/`DONE`) 위반 시 거부, `priority` smallint, `due_at` timestamp 널 허용, `position` 문자열 `COLLATE "C"`(대문자 키가 소문자 키보다 앞에 정렬되는 바이트 순서로 검증), (`status`, `position`) 유니크 위반 시 거부, `created_at`·`updated_at`은 ORM 훅이 채움 (packages/persistence/test/migration.int-spec.ts)
+- [X] T025 [P] RED 리포지토리 통합 테스트: (a) 저장 후 `ticketId`로 조회하면 도메인 `Ticket`이 같은 값(G1의 기반), (b) 없는 `ticketId`는 `null`, (c) 컬럼(상태)별 마지막 순서 키 조회(빈 컬럼은 없음), (d) 같은 (상태, 순서 키) 저장은 도메인/애플리케이션이 이해하는 충돌 오류로 변환됨, (e) 새 티켓을 이어서 저장하면 순서 키가 생성 순으로 증가(D-79), (f) 조회 결과 어디에도 내부 PK가 없음 (packages/persistence/test/ticket.repository.int-spec.ts)
+- [X] T026 RED T022~T025를 실행해 **모듈 미존재 또는 스키마 없음으로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
+- [X] T027 [P] GREEN 애플리케이션 포트를 정의한다: `TicketRepository` 인터페이스(저장, `ticketId`로 조회, 상태별 마지막 순서 키 조회)와 Symbol 토큰, 순서 키 충돌 오류 `PositionConflictError`. `application`은 `@nestjs/common`만 허용하고 웹 의존성은 없다 (packages/application/src/ticket.repository.ts, packages/application/src/tokens.ts, packages/application/src/errors.ts)
+- [X] T028 [P] GREEN 영속성 엔티티와 매퍼를 구현한다. 내부 PK는 이 엔티티에만 두고 `persistence` 밖으로 MikroORM 타입을 노출하지 않는다 (packages/persistence/src/ticket.entity.ts, packages/persistence/src/ticket.mapper.ts)
+- [X] T029 GREEN 첫 마이그레이션을 작성한다(T024 제약 전부, `position`에만 `COLLATE "C"` 명시). 마이그레이션은 로컬·테스트 DB에서만 실행한다 (packages/persistence/src/migrations/)
+- [X] T030 GREEN 리포지토리 어댑터를 구현한다: 유니크 위반을 T027의 `PositionConflictError`로 변환. 어댑터를 `TicketRepository` 토큰에 바인딩해 제공하는 Nest 모듈과 ORM 설정 export를 함께 만든다(`bootstrap-http`는 이 모듈을 조립만 한다). T027~T029에 의존 (packages/persistence/src/mikro-orm-ticket.repository.ts, packages/persistence/src/persistence.module.ts, packages/persistence/src/index.ts)
+- [X] T031 REFACTOR persistence 정리. `persistence`가 `bootstrap-http`를 import하지 않고 MikroORM 타입이 밖으로 새지 않음을 확인해 커밋한다 (packages/persistence/src/)
 
 ### API 하네스와 기동 (bootstrap-http)
 
