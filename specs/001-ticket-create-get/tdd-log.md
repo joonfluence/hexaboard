@@ -100,3 +100,12 @@
 - RED(T046): `tickets.get.api-spec.ts` 6개 모두 `Expected 200|400 / Received 404`(GET 엔드포인트 없음)로 실패.
 - GREEN(T047~T048): `application`의 `GetTicket`·`TicketNotFoundError`, `bootstrap-http`의 `GET /v1/tickets/:ticketId`, `ParseTicketIdPipe`(UUID 형식 검사, 존재 여부는 유스케이스 몫), `InvalidTicketIdError`, `DomainErrorFilter`에 `404 TICKET_NOT_FOUND`·`400 INVALID_TICKET_ID` 추가. 6개 통과.
 - 결정: UUID 형식은 버전을 가리지 않고 8-4-4-4-12 16진수(대소문자 무관)로 검사. 생성은 v4지만 조회는 형식 검사만 한다.
+
+### T050~T057 (2026-09-21) — US3 생성 요청 검증
+- 사전 정의: TC-API-018~027, 테스트 이름에 TC ID 포함.
+- RED(T053): 검증 미구현으로 실패(`VALIDATION_FAILED` 기대인데 오류 응답 형식 없음). **프레임워크 기본 동작 확인(V8)**: `Content-Type: text/plain`이면 `415`가 아니라 `500`(본문이 비어 도메인 오류가 처리되지 않음). 그래서 api_spec에 정한 `415 UNSUPPORTED_MEDIA_TYPE`을 가드로 직접 구현.
+- GREEN(T054~T056): `CreateTicketDto`(class-validator: 형식·타입만, 한국어 메시지), `createBodyValidationPipe`(`whitelist`로 미지 필드 제거, 실패는 `ValidationFailedException`), `RejectFieldsPipe`(본문이 JSON 객체인지 확인, 서버 지정 값 5종과 `tags`는 무시하지 않고 거부하며 여러 개면 모두 `details`에 담음), `JsonContentTypeGuard`(415), `AllExceptionsFilter`(기존 `DomainErrorFilter`를 대체하는 catch-all: 도메인 오류 → `400 VALIDATION_FAILED`, 본문 파싱 오류 → `400 INVALID_REQUEST_BODY`, 없는 경로 등 프레임워크 오류는 기본 응답 유지, 모르는 오류는 로그 후 `500`).
+- 발견: Nest가 JSON 파싱 오류를 `BadRequestException`(`Unexpected end of JSON input`)으로 감싸서 던진다. 이 API에서 프레임워크가 던지는 400은 본문 파싱뿐이라 그 경우를 `INVALID_REQUEST_BODY`로 변환.
+- 역할 분담: 형식·타입 검증은 DTO, 제목·설명 내용 규칙은 `domain` 값 객체, 오류 코드 변환은 필터(웹 계층). 우선순위 `null`은 DTO의 `ValidateIf(!== undefined) + IsIn`으로 거부.
+- 결과: bootstrap-http `Tests: 62 passed`(RUN 13 + 생성 16 + 조회 6 + 검증 27).
+- 테스트 결함 수정: `it.each([['a'], []])`의 빈 배열 케이스가 `tags` 없이 전송되어 201이 나오던 것을 객체 매개변수로 수정(RED 단계의 테스트 자체 결함, 구현과 무관).

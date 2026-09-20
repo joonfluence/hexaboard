@@ -126,14 +126,14 @@
 
 **Independent Test**: 검증 규칙을 하나씩 위반하는 요청을 보내 모두 오류 응답을 받고 저장된 티켓이 없음을 확인한다.
 
-- [ ] T050 [P] [US3] RED 검증 실패 API 테스트(TC-API-018~021, 026, 027): V1(제목 없음·`null`·`""`·공백뿐 → `400` `VALIDATION_FAILED`, `details`에 `title`), V2(제목 101자·설명 2001자), V3(우선순위가 허용 값 밖, `null`), V4(`dueAt`이 ISO 8601 아님) — 모두 `400` `VALIDATION_FAILED`이며 실패 뒤 DB에 티켓이 0건 (apps/bootstrap-http/test/tickets.create-validation.api-spec.ts)
-- [ ] T051 [P] [US3] RED 서버 지정 값·범위 밖 필드 API 테스트(TC-API-022, 023): V5(`ticketId`·`status`·`position`·`createdAt`·`updatedAt` 포함 → `400` `VALIDATION_FAILED`, 무시하지 않고 거부), V6(`tags` 포함 → `400` `VALIDATION_FAILED`, 이 슬라이스 한정 임시 규칙) (apps/bootstrap-http/test/tickets.create-rejected-fields.api-spec.ts)
-- [ ] T052 [P] [US3] RED 본문·미디어 타입 API 테스트(TC-API-024, 025): V7(올바르지 않은 JSON → `400` `INVALID_REQUEST_BODY`), V8(`Content-Type`이 JSON이 아님 → `415` `UNSUPPORTED_MEDIA_TYPE`). 프레임워크 기본 동작이 다르면 기대값을 지어내지 말고 실제 동작을 확인해 사용자에게 보고한다 (apps/bootstrap-http/test/tickets.create-body.api-spec.ts)
-- [ ] T053 [US3] RED T050~T052를 실행해 **검증 미구현으로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
-- [ ] T054 [P] [US3] GREEN 요청 형식 검증: DTO 검증 규칙(형식·타입·enum·`dueAt` ISO 8601), 검증 실패를 오류 응답 형식(`statusCode`, `code`=`VALIDATION_FAILED`, `message`, 필드별 `details`)으로 변환, 정의되지 않은 필드는 제거해 무시 (apps/bootstrap-http/src/tickets/dto/create-ticket.dto.ts, apps/bootstrap-http/src/common/validation.ts)
-- [ ] T055 [US3] GREEN 서버 지정 값과 `tags`를 거부하는 검사를 추가한다. 미지 필드 무시(D-81)와 충돌하지 않게 이름 목록 기반으로 처리한다 (apps/bootstrap-http/src/tickets/dto/create-ticket.dto.ts, apps/bootstrap-http/src/common/validation.ts)
-- [ ] T056 [US3] GREEN 도메인 검증 오류(`Title`·설명·`Priority` 위반)를 `400 VALIDATION_FAILED`로 변환하는 필터 규칙, 본문 파싱 오류 → `INVALID_REQUEST_BODY`, 미디어 타입 오류 → `415` `UNSUPPORTED_MEDIA_TYPE`. T054·T055에 의존 (apps/bootstrap-http/src/common/domain-error.filter.ts, apps/bootstrap-http/src/common/error-codes.ts)
-- [ ] T057 [US3] REFACTOR 검증·오류 변환 코드를 정리한다. 도메인 규칙은 `domain`에, 형식 검증과 오류 코드 변환은 `bootstrap-http`에만 있는지 확인하고 전체 게이트 통과 후 커밋 (apps/bootstrap-http/src/, packages/domain/src/)
+- [X] T050 [P] [US3] RED 검증 실패 API 테스트(TC-API-018~021, 026, 027): V1(제목 없음·`null`·`""`·공백뿐 → `400` `VALIDATION_FAILED`, `details`에 `title`), V2(제목 101자·설명 2001자), V3(우선순위가 허용 값 밖, `null`), V4(`dueAt`이 ISO 8601 아님) — 모두 `400` `VALIDATION_FAILED`이며 실패 뒤 DB에 티켓이 0건 (apps/bootstrap-http/test/tickets.create-validation.api-spec.ts)
+- [X] T051 [P] [US3] RED 서버 지정 값·범위 밖 필드 API 테스트(TC-API-022, 023): V5(`ticketId`·`status`·`position`·`createdAt`·`updatedAt` 포함 → `400` `VALIDATION_FAILED`, 무시하지 않고 거부), V6(`tags` 포함 → `400` `VALIDATION_FAILED`, 이 슬라이스 한정 임시 규칙) (apps/bootstrap-http/test/tickets.create-rejected-fields.api-spec.ts)
+- [X] T052 [P] [US3] RED 본문·미디어 타입 API 테스트(TC-API-024, 025): V7(올바르지 않은 JSON → `400` `INVALID_REQUEST_BODY`), V8(`Content-Type`이 JSON이 아님 → `415` `UNSUPPORTED_MEDIA_TYPE`). 프레임워크 기본 동작이 다르면 기대값을 지어내지 말고 실제 동작을 확인해 사용자에게 보고한다 (apps/bootstrap-http/test/tickets.create-body.api-spec.ts)
+- [X] T053 [US3] RED T050~T052를 실행해 **검증 미구현으로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
+- [X] T054 [P] [US3] GREEN 요청 형식 검증: DTO 검증 규칙(형식·타입·enum·`dueAt` ISO 8601), 검증 실패를 오류 응답 형식(`statusCode`, `code`=`VALIDATION_FAILED`, `message`, 필드별 `details`)으로 변환, 정의되지 않은 필드는 제거해 무시 (apps/bootstrap-http/src/tickets/dto/create-ticket.dto.ts, apps/bootstrap-http/src/common/validation.ts)
+- [X] T055 [US3] GREEN 서버 지정 값과 `tags`를 거부하는 검사를 추가한다. 미지 필드 무시(D-81)와 충돌하지 않게 이름 목록 기반으로 처리한다 (apps/bootstrap-http/src/tickets/dto/create-ticket.dto.ts, apps/bootstrap-http/src/common/validation.ts)
+- [X] T056 [US3] GREEN 도메인 검증 오류(`Title`·설명·`Priority` 위반)를 `400 VALIDATION_FAILED`로 변환하는 필터 규칙, 본문 파싱 오류 → `INVALID_REQUEST_BODY`, 미디어 타입 오류 → `415` `UNSUPPORTED_MEDIA_TYPE`. T054·T055에 의존 (apps/bootstrap-http/src/common/domain-error.filter.ts, apps/bootstrap-http/src/common/error-codes.ts)
+- [X] T057 [US3] REFACTOR 검증·오류 변환 코드를 정리한다. 도메인 규칙은 `domain`에, 형식 검증과 오류 코드 변환은 `bootstrap-http`에만 있는지 확인하고 전체 게이트 통과 후 커밋 (apps/bootstrap-http/src/, packages/domain/src/)
 
 **Checkpoint**: 모든 사용자 스토리가 독립적으로 동작하고 contracts의 모든 케이스가 테스트로 검증된다.
 

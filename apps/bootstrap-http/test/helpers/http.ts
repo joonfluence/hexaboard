@@ -36,6 +36,23 @@ export async function postTicket(
   };
 }
 
+/** 본문을 직렬화하지 않고 그대로 보낸다(잘못된 JSON, 다른 Content-Type 시험용). */
+export async function postRaw(
+  baseUrl: string,
+  rawBody: string,
+  contentType: string,
+): Promise<ApiResponse> {
+  const response = await fetch(`${baseUrl}/v1/tickets`, {
+    method: 'POST',
+    headers: { 'content-type': contentType },
+    body: rawBody,
+  });
+  return {
+    status: response.status,
+    json: () => response.json() as Promise<TicketBody>,
+  };
+}
+
 /** 티켓 한 건 조회 요청. */
 export async function getTicket(
   baseUrl: string,

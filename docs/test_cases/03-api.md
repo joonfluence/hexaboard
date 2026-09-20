@@ -47,13 +47,13 @@
 
 | ID | 시나리오 | 기대 결과 | 근거 | 상태 |
 |----|----------|-----------|------|------|
-| TC-API-018 | V1: 제목 없음·`null`·`""`·공백뿐 | `400` `VALIDATION_FAILED`, `details`에 `title` | FR-01 | ⏳ |
-| TC-API-019 | V2: 제목 101자·설명 2001자 | `400` `VALIDATION_FAILED` | D-51 | ⏳ |
-| TC-API-020 | V3: 우선순위 허용 값 밖·`null` | `400` `VALIDATION_FAILED` | FR-06 | ⏳ |
-| TC-API-021 | V4: `dueAt`이 ISO 8601이 아님 | `400` `VALIDATION_FAILED` | api_spec | ⏳ |
-| TC-API-022 | V5: `ticketId`·`status`·`position`·`createdAt`·`updatedAt` 포함 | `400`으로 거부(무시하지 않음) | D-51 | ⏳ |
-| TC-API-023 | V6: `tags` 포함 | `400`(이 기능 한정 임시 규칙, 태그 기능에서 폐기) | 기능 명세 FR-006 | ⏳ |
-| TC-API-024 | V7: 올바르지 않은 JSON | `400` `INVALID_REQUEST_BODY` | api_spec | ⏳ |
-| TC-API-025 | V8: JSON이 아닌 `Content-Type` | `415` `UNSUPPORTED_MEDIA_TYPE`(프레임워크 동작 확인 필요) | api_spec | ⏳ |
-| TC-API-026 | 검증 실패 응답 형식 | `statusCode`·`code`·`message`, 필드별 `details` | api_spec | ⏳ |
-| TC-API-027 | 모든 검증 실패 뒤 | 저장된 티켓 0건 | 기능 명세 SC-002 | ⏳ |
+| TC-API-018 | V1: 제목 없음·`null`·`""`·공백뿐 | `400` `VALIDATION_FAILED`, `details`에 `title` | FR-01 | ✅ |
+| TC-API-019 | V2: 제목 101자·설명 2001자 | `400` `VALIDATION_FAILED` | D-51 | ✅ |
+| TC-API-020 | V3: 우선순위 허용 값 밖·`null` | `400` `VALIDATION_FAILED` | FR-06 | ✅ |
+| TC-API-021 | V4: `dueAt`이 ISO 8601이 아님 | `400` `VALIDATION_FAILED` | api_spec | ✅ |
+| TC-API-022 | V5: `ticketId`·`status`·`position`·`createdAt`·`updatedAt` 포함 | `400`으로 거부(무시하지 않음) | D-51 | ✅ |
+| TC-API-023 | V6: `tags` 포함 | `400`(이 기능 한정 임시 규칙, 태그 기능에서 폐기) | 기능 명세 FR-006 | ✅ |
+| TC-API-024 | V7: 올바르지 않은 JSON | `400` `INVALID_REQUEST_BODY` | api_spec | ✅ |
+| TC-API-025 | V8: JSON이 아닌 `Content-Type` | `415` `UNSUPPORTED_MEDIA_TYPE`(프레임워크 기본은 `500`이라 가드로 구현) | api_spec | ✅ |
+| TC-API-026 | 검증 실패 응답 형식 | `statusCode`·`code`·`message`, 필드별 `details` | api_spec | ✅ |
+| TC-API-027 | 모든 검증 실패 뒤 | 저장된 티켓 0건 | 기능 명세 SC-002 | ✅ |
