@@ -1,10 +1,13 @@
 import type { INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { TICKET_REPOSITORY, type TicketRepository } from '@todo/application';
 import {
   PostgreSqlContainer,
   type StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
 import type { DatabaseSettings } from '@todo/persistence';
-import { createApp } from '../../src/app.factory';
+import { AppModule } from '../../src/app.module';
+import { configureApp, createApp } from '../../src/app.factory';
 
 /** 로컬 docker-compose.yml의 이미지와 같은 메이저 버전을 쓴다. */
 export const POSTGRES_IMAGE = 'postgres:18';
@@ -49,10 +52,31 @@ export interface TestApp {
   stop(): Promise<void>;
 }
 
+export interface TestAppOptions {
+  /** 저장소를 테스트 대역으로 바꾼다(예: 동시 생성 충돌을 재현). 생략하면 실제 저장소를 쓴다. */
+  repository?: TicketRepository;
+}
+
 /** Testcontainers Postgres 위에 실제 Nest 앱을 띄운다. Docker가 없으면 시작 단계에서 실패한다. */
-export async function startTestApp(): Promise<TestApp> {
+export async function startTestApp(
+  options: TestAppOptions = {},
+): Promise<TestApp> {
   const container = await new PostgreSqlContainer(POSTGRES_IMAGE).start();
-  const app = await createApp(settingsOf(container));
+  const settings = settingsOf(container);
+  let app: INestApplication;
+  if (options.repository) {
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule.forRoot(settings)],
+    })
+      .overrideProvider(TICKET_REPOSITORY)
+      .useValue(options.repository)
+      .compile();
+    app = moduleRef.createNestApplication({ logger: ['error', 'warn'] });
+    configureApp(app);
+    await app.init();
+  } else {
+    app = await createApp(settings);
+  }
   await app.listen(0, '127.0.0.1');
   const baseUrl = await app.getUrl();
 

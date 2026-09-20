@@ -1,0 +1,51 @@
+/** 응답 본문. 티켓 응답과 오류 응답의 필드를 모두 담는다. */
+export interface TicketBody {
+  ticketId: string;
+  title: string;
+  description: string | null;
+  status: string;
+  priority: string;
+  dueAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  statusCode?: number;
+  code?: string;
+  message?: string;
+}
+
+export interface ApiResponse {
+  status: number;
+  json(): Promise<TicketBody>;
+}
+
+/** 티켓 생성 요청. 본문은 JSON으로 직렬화한다. */
+export async function postTicket(
+  baseUrl: string,
+  body: unknown,
+): Promise<ApiResponse> {
+  const response = await fetch(`${baseUrl}/v1/tickets`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return {
+    status: response.status,
+    // fetch의 json()은 unknown이다. 테스트 하네스 경계에서 한 번만 응답 타입을 지정한다.
+    json: () => response.json() as Promise<TicketBody>,
+  };
+}
+
+export const UUID_V4 =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+/** 티켓 응답이 가져야 하는 필드 전체. 내부 PK(id), position, tags는 없어야 한다. */
+export const TICKET_RESPONSE_KEYS = [
+  'createdAt',
+  'description',
+  'dueAt',
+  'priority',
+  'status',
+  'ticketId',
+  'title',
+  'updatedAt',
+];

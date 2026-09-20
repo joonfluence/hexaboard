@@ -81,3 +81,16 @@
 - **의도적으로 미룬 것**: T035에 적힌 `mikro-orm.config.ts`(MikroORM CLI용 설정)는 이번 기능에서 CLI를 쓰지 않아(첫 마이그레이션은 직접 작성) 만들지 않음. 이후 마이그레이션 생성이 필요한 기능에서 `@mikro-orm/cli`와 함께 도입.
 - 의존성: `@nestjs/core|platform-express|swagger|testing` 12.x, `class-validator` 0.15.1, `class-transformer` 0.5.1 (Nest 12 peer 확인). `supertest`는 쓰지 않고 Node 내장 `fetch`로 실제 포트에 요청. `@scarf/scarf`(텔레메트리) 빌드 스크립트는 거부.
 - `dev` 스크립트: `tsc` 빌드 후 `node --env-file=../../.env dist/main.js`(루트 `.env` 사용).
+
+### T037~T040 (2026-09-21) — RED: US1 생성 API 테스트
+- 작성: `tickets.create.api-spec.ts`(C1~C7), `tickets.create-order.api-spec.ts`(D-79·FR-009), `tickets.create-conflict.api-spec.ts`(V9·FR-013, 저장소 대역으로 충돌 재현: 4번 시도 후 409, 1~3번 충돌 뒤 성공은 201, 시도마다 마지막 키 재조회).
+- 선행 리팩터링(동작 보존): `configureApp`을 분리해 테스트 앱과 실제 앱이 같은 설정을 쓰게 함. 기존 13개 테스트 그대로 통과.
+- 결과(Red): `Test Suites: 3 failed, Tests: 16 failed` — `Expected: 201 / Received: 404`(엔드포인트 없음), 저장소 호출 횟수 0.
+
+### T041~T044 (2026-09-21) — GREEN·REFACTOR: US1 티켓 생성
+- 결과: bootstrap-http `Tests: 29 passed`(US1 API 16개 포함), domain 59, persistence 25. typecheck·lint·test·build·prettier 통과.
+- 구현: `application`의 `CreateTicket`(TODO 컬럼 마지막 키 뒤에 추가, `PositionConflictError` 시 최초 후 최대 3회 재시도, 시도마다 마지막 키 재조회, `MAX_POSITION_RETRIES` 상수 하나), `bootstrap-http`의 `CreateTicketDto`(Swagger 데코레이터), `TicketResponse`(내부 PK·position 비노출), `TicketsController` `POST /v1/tickets`, `DomainErrorFilter`(`PositionConflictError` → `409 POSITION_CONFLICT`).
+- 결정: `ApplicationModule`은 만들지 않음. `AppModule`이 `CreateTicket`을 직접 provider로 등록(YAGNI).
+- 하네스 결정: TS 6에서 `fetch().json()`이 `unknown`이라 `any` 없이 쓰려고 테스트 하네스 경계(`test/helpers/http.ts`)에서 응답 본문 타입을 한 번만 지정.
+- **과정상 실수 기록**: T036 커밋(`e28e984`)이 lint 실패 상태로 만들어졌다(게이트 결과와 무관하게 커밋하도록 명령을 이어 붙임). `4f1d7bb`에서 수정. 이후 커밋은 모든 게이트를 `&&`로 묶어 통과 시에만 실행.
+- 의도된 상태: 입력 검증은 US3 범위라 US1에서는 유효한 입력만 다룸. 잘못된 요청은 지금은 `400`으로 변환되지 않음.

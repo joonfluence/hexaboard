@@ -5,8 +5,10 @@ import {
   type DynamicModule,
   type OnModuleInit,
 } from '@nestjs/common';
+import { CreateTicket } from '@todo/application';
 import { DatabaseMigrator, PersistenceModule } from '@todo/persistence';
 import type { DatabaseSettings } from '@todo/persistence';
+import { TicketsController } from './tickets/tickets.controller';
 
 /** 기동 시 마이그레이션을 적용한다. 실패하면 예외가 전파되어 기동이 중단된다(D-72). */
 @Injectable()
@@ -27,7 +29,8 @@ export class AppModule {
     return {
       module: AppModule,
       imports: [PersistenceModule.forRoot(settings)],
-      providers: [StartupMigration],
+      controllers: [TicketsController],
+      providers: [StartupMigration, CreateTicket],
     };
   }
 }
