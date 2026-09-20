@@ -94,3 +94,9 @@
 - 하네스 결정: TS 6에서 `fetch().json()`이 `unknown`이라 `any` 없이 쓰려고 테스트 하네스 경계(`test/helpers/http.ts`)에서 응답 본문 타입을 한 번만 지정.
 - **과정상 실수 기록**: T036 커밋(`e28e984`)이 lint 실패 상태로 만들어졌다(게이트 결과와 무관하게 커밋하도록 명령을 이어 붙임). `4f1d7bb`에서 수정. 이후 커밋은 모든 게이트를 `&&`로 묶어 통과 시에만 실행.
 - 의도된 상태: 입력 검증은 US3 범위라 US1에서는 유효한 입력만 다룸. 잘못된 요청은 지금은 `400`으로 변환되지 않음.
+
+### T045~T049 (2026-09-21) — US2 티켓 조회
+- 사전 정의: TC-API-014~017(`docs/test_cases/03-api.md`), 테스트 이름에 TC ID 포함.
+- RED(T046): `tickets.get.api-spec.ts` 6개 모두 `Expected 200|400 / Received 404`(GET 엔드포인트 없음)로 실패.
+- GREEN(T047~T048): `application`의 `GetTicket`·`TicketNotFoundError`, `bootstrap-http`의 `GET /v1/tickets/:ticketId`, `ParseTicketIdPipe`(UUID 형식 검사, 존재 여부는 유스케이스 몫), `InvalidTicketIdError`, `DomainErrorFilter`에 `404 TICKET_NOT_FOUND`·`400 INVALID_TICKET_ID` 추가. 6개 통과.
+- 결정: UUID 형식은 버전을 가리지 않고 8-4-4-4-12 16진수(대소문자 무관)로 검사. 생성은 v4지만 조회는 형식 검사만 한다.

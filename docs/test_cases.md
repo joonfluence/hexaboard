@@ -32,10 +32,10 @@
 | domain (TC-DOM) | 37 | 0 | 59 |
 | persistence (TC-PER) | 22 | 0 | 25 |
 | 설정·기동 (TC-RUN) | 9 | 0 | 13 |
-| API (TC-API) | 13 | 14 | 16 (생성) |
+| API (TC-API) | 17 | 10 | 22 (생성 16, 조회 6) |
 | UI (TC-UI) | 0 | 35 | 0 |
 
-- ⏳ API 14건은 조회(US2, TC-API-014~017)와 생성 요청 검증(US3, TC-API-018~027)이다. `specs/001-ticket-create-get/tasks.md`의 T045~T057이 대응한다.
+- ⏳ API 10건은 생성 요청 검증(US3, TC-API-018~027)이다. `specs/001-ticket-create-get/tasks.md`의 T050~T057이 대응한다.
 - 이동·정렬·필터·태그·수정·삭제의 백엔드 테스트 케이스는 해당 기능을 만들 때 정의한다.
 
 ## 기능 요구사항 추적

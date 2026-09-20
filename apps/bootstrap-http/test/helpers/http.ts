@@ -11,6 +11,7 @@ export interface TicketBody {
   statusCode?: number;
   code?: string;
   message?: string;
+  details?: { field: string; reason: string }[];
 }
 
 export interface ApiResponse {
@@ -31,6 +32,18 @@ export async function postTicket(
   return {
     status: response.status,
     // fetch의 json()은 unknown이다. 테스트 하네스 경계에서 한 번만 응답 타입을 지정한다.
+    json: () => response.json() as Promise<TicketBody>,
+  };
+}
+
+/** 티켓 한 건 조회 요청. */
+export async function getTicket(
+  baseUrl: string,
+  ticketId: string,
+): Promise<ApiResponse> {
+  const response = await fetch(`${baseUrl}/v1/tickets/${ticketId}`);
+  return {
+    status: response.status,
     json: () => response.json() as Promise<TicketBody>,
   };
 }

@@ -38,10 +38,10 @@
 
 | ID | 시나리오 | 기대 결과 | 근거 | 상태 |
 |----|----------|-----------|------|------|
-| TC-API-014 | G1: 존재하는 `ticketId` | `200`, 생성 시 값과 일치 | FR-01 | ⏳ |
-| TC-API-015 | G1: 응답 필드 | 내부 PK·`position` 없음 | D-80 | ⏳ |
-| TC-API-016 | G2: UUID 형식이나 없는 티켓 | `404` `TICKET_NOT_FOUND` | api_spec | ⏳ |
-| TC-API-017 | G3: UUID가 아닌 값 | `400` `INVALID_TICKET_ID` | api_spec | ⏳ |
+| TC-API-014 | G1: 존재하는 `ticketId` | `200`, 생성 시 값과 일치 | FR-01 | ✅ |
+| TC-API-015 | G1: 응답 필드 | 내부 PK·`position` 없음 | D-80 | ✅ |
+| TC-API-016 | G2: UUID 형식이나 없는 티켓 | `404` `TICKET_NOT_FOUND` | api_spec | ✅ |
+| TC-API-017 | G3: UUID가 아닌 값 | `400` `INVALID_TICKET_ID` | api_spec | ✅ |
 
 ## 생성 요청 검증 — `POST /v1/tickets` (US3)
 

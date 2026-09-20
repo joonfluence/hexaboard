@@ -110,11 +110,11 @@
 
 **Independent Test**: 티켓을 만들고 응답의 `ticketId`로 조회해 같은 값이 돌아오는지 확인한다.
 
-- [ ] T045 [P] [US2] RED 조회 API 테스트(TC-API-014~017): G1(존재하는 `ticketId` → `200`, 생성 시 값과 일치, 내부 PK·`position` 없음), G2(UUID 형식이나 없는 티켓 → `404`, `TICKET_NOT_FOUND`), G3(UUID 형식이 아닌 값 → `400`, `INVALID_TICKET_ID`). 오류 응답 형식 확인 (apps/bootstrap-http/test/tickets.get.api-spec.ts)
-- [ ] T046 [US2] RED T045를 실행해 **GET 엔드포인트 미존재로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
-- [ ] T047 [P] [US2] GREEN `GetTicket` 유스케이스: `ticketId`로 조회, 없으면 `TicketNotFoundError`. 오류 클래스는 `application`에 둔다 (packages/application/src/get-ticket.use-case.ts, packages/application/src/errors.ts)
-- [ ] T048 [US2] GREEN `GET /tickets/:ticketId`: 경로 값이 UUID 형식이 아니면 `INVALID_TICKET_ID`(`400`), `TicketNotFoundError` → `404 TICKET_NOT_FOUND`로 변환하는 필터 규칙 추가. T047에 의존 (apps/bootstrap-http/src/tickets/tickets.controller.ts, apps/bootstrap-http/src/common/domain-error.filter.ts)
-- [ ] T049 [US2] REFACTOR 조회 경로와 오류 변환 정리, 전체 게이트 통과 후 커밋 (packages/application/src/, apps/bootstrap-http/src/)
+- [X] T045 [P] [US2] RED 조회 API 테스트(TC-API-014~017): G1(존재하는 `ticketId` → `200`, 생성 시 값과 일치, 내부 PK·`position` 없음), G2(UUID 형식이나 없는 티켓 → `404`, `TICKET_NOT_FOUND`), G3(UUID 형식이 아닌 값 → `400`, `INVALID_TICKET_ID`). 오류 응답 형식 확인 (apps/bootstrap-http/test/tickets.get.api-spec.ts)
+- [X] T046 [US2] RED T045를 실행해 **GET 엔드포인트 미존재로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
+- [X] T047 [P] [US2] GREEN `GetTicket` 유스케이스: `ticketId`로 조회, 없으면 `TicketNotFoundError`. 오류 클래스는 `application`에 둔다 (packages/application/src/get-ticket.use-case.ts, packages/application/src/errors.ts)
+- [X] T048 [US2] GREEN `GET /tickets/:ticketId`: 경로 값이 UUID 형식이 아니면 `INVALID_TICKET_ID`(`400`), `TicketNotFoundError` → `404 TICKET_NOT_FOUND`로 변환하는 필터 규칙 추가. T047에 의존 (apps/bootstrap-http/src/tickets/tickets.controller.ts, apps/bootstrap-http/src/common/domain-error.filter.ts)
+- [X] T049 [US2] REFACTOR 조회 경로와 오류 변환 정리, 전체 게이트 통과 후 커밋 (packages/application/src/, apps/bootstrap-http/src/)
 
 **Checkpoint**: US1과 US2가 각각 독립적으로 동작한다.
 

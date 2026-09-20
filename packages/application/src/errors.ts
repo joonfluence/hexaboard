@@ -5,3 +5,11 @@ export class PositionConflictError extends Error {
     this.name = 'PositionConflictError';
   }
 }
+
+/** 공개 식별자에 해당하는 티켓이 없다. */
+export class TicketNotFoundError extends Error {
+  constructor(readonly ticketId: string) {
+    super(`티켓을 찾을 수 없습니다: ${ticketId}`);
+    this.name = 'TicketNotFoundError';
+  }
+}
