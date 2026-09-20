@@ -23,7 +23,8 @@ describe('환경변수 설정', () => {
   it.each(Object.keys(env).filter((key) => key !== 'PORT'))(
     '%s가 없으면 어떤 변수가 빠졌는지 알려 주며 실패한다',
     (name) => {
-      const { [name]: _removed, ...rest } = env as Record<string, string>;
+      const rest: Record<string, string> = { ...env };
+      delete rest[name];
       expect(() => readDatabaseSettings(rest)).toThrow(name);
     },
   );
