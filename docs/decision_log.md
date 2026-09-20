@@ -106,3 +106,4 @@
 | D-83 | 필수 가드레일을 헌법 원칙 VII로 명문화: 로컬 품질 게이트(타입·린트·테스트) 통과 후 커밋, 비밀값 diff 확인, 파괴적 작업은 승인 후, 적용된 마이그레이션 수정 금지, 확정 스택 밖 의존성은 확인, tasks 범위 고정 | 공개 저장소 + AI 협업에서 비밀값 유출·데이터 손실·검사 우회처럼 되돌리기 어려운 사고를 규칙으로 예방. CI는 best-effort(NFR-08)라 로컬 게이트를 우선 필수로 둠 |
 | D-84 | 티켓 생성 시 (상태, 순서 키) 충돌도 동시 이동과 같은 재시도 상수(최대 3회, D-69)를 쓰고, 초과하면 `409 POSITION_CONFLICT` | 동시 생성도 같은 유니크 제약에 걸리므로 이미 정한 충돌 처리와 오류 코드를 재사용하면 새 규칙이 없음 |
 | D-85 | 품질 게이트 스크립트는 Turborepo 태스크 `typecheck`, `lint`, `test`, `build`, `dev` | 관례적인 이름이라 학습 비용이 없고 CI에서도 그대로 씀. 실패 원인을 분리해서 볼 수 있음 |
+| D-86 | `persistence` 패키지는 ORM·DB 드라이버·마이그레이션 도구·`@nestjs/common`(DI 모듈)을 자체 `dependencies`로 가지고 어댑터를 포트 토큰에 바인딩하는 Nest 모듈을 제공한다. 웹 의존성은 없다. `bootstrap-http`는 조립만 한다 | 포트(`TicketRepository`)는 `application`의 인터페이스이고 구현은 `persistence`가 맡으므로 ORM은 그 패키지에 있어야 함. 참조 프로젝트(weave-server)도 persistence 모듈이 domain·application에 의존하며 JPA·Flyway·DB 드라이버를 직접 가짐. 웹 계층 분리는 유지 |

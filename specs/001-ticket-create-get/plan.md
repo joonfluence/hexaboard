@@ -58,6 +58,8 @@
 
 1. **생성 시 순서 키 충돌 처리** (D-84): 두 생성 요청이 동시에 같은 "마지막 카드 뒤" 키를 계산하면 (상태, 순서 키) 유니크 제약에 걸린다. 동시 이동과 같은 재시도 상수(D-69, 최대 3회)를 재사용하고 초과 시 `409 POSITION_CONFLICT`를 돌려준다.
 2. **품질 게이트 스크립트 이름** (D-85): Turborepo 태스크 `typecheck`, `lint`, `test`, `build`, `dev`.
+3. **작업 브랜치**: `development`에서 작업하고 `main`은 PR로만 반영한다 (D-62).
+4. **persistence의 의존성** (D-86): `persistence`는 ORM·DB 드라이버·마이그레이션 도구·`@nestjs/common`(DI 모듈)을 자체 `dependencies`로 가지며 웹 의존성은 없다. `bootstrap-http`는 이 모듈을 조립만 한다.
 
 ## Project Structure
 
@@ -92,7 +94,7 @@ packages/
 │   └── test/
 ├── application/              # 유스케이스(CreateTicket, GetTicket), Repository 포트 + Symbol 토큰
 │   └── src/
-├── persistence/              # MikroORM 엔티티, 매퍼, 리포지토리 어댑터, 마이그레이션
+├── persistence/              # MikroORM 엔티티, 매퍼, 리포지토리 어댑터, Nest 모듈, 마이그레이션
 │   ├── src/
 │   └── test/                 # Testcontainers 통합 테스트
 apps/
@@ -105,7 +107,7 @@ apps/
 
 ## 구현 순서 (TDD)
 
-각 Phase의 모든 태스크는 **Red(실패 확인) → Green → Refactor** 순서이며, 태스크는 타입 검사·린트·테스트가 통과한 상태로 완료·커밋한다 (헌법 III, VII). 상세 태스크는 `/speckit-tasks`에서 만든다.
+각 Phase의 모든 태스크는 **Red(실패 확인) → Green → Refactor** 순서이며, 태스크는 타입 검사·린트·테스트가 통과한 상태로 완료·커밋한다 (헌법 III, VII). 상세 태스크는 [tasks.md](tasks.md)가 정본이며 이 표는 개요다.
 
 | Phase | 내용 | 먼저 쓰는 테스트 (Red) |
 |-------|------|-----------------------|

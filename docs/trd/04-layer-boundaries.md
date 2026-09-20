@@ -31,6 +31,7 @@ domain  ←  application  ←  persistence
 ### persistence
 
 - MikroORM 영속성 엔티티, 매퍼, 리포지토리 어댑터, **마이그레이션 파일**을 둔다.
+- ORM(MikroORM), DB 드라이버, 마이그레이션 도구는 이 패키지의 `dependencies`다. 어댑터를 포트 토큰에 바인딩하는 Nest 모듈을 제공하므로 `@nestjs/common`에 의존한다. 웹 의존성(`@nestjs/platform-express` 등)은 없다.
 - 영속성 엔티티는 도메인 모델과 별개 클래스이며 매퍼가 양방향으로 변환한다.
 - 이 패키지 밖으로 MikroORM 타입을 노출하지 않는다. 밖에는 도메인 타입만 보인다.
 - 우선순위 숫자 ↔ 문자열 변환은 매퍼에서 한다.

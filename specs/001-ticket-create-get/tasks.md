@@ -12,6 +12,9 @@
 - 태스크 유형 접두어: **RED**(테스트 작성 + 실행해 실패 확인), **GREEN**(최소 구현으로 통과), **REFACTOR**(동작 유지 정리), **CHECK**(확인·검증), **DOC**(문서 갱신).
 - **RED 태스크**: 테스트를 쓰고 실행해 **기대한 이유로 실패**함을 확인한다 (예: 모듈 없음, 미구현으로 인한 assertion 실패). 실패 출력 요약을 [tdd-log.md](tdd-log.md)에 기록한다 (SC-004). RED 상태는 게이트를 통과하지 못하므로 **커밋하지 않고**, 대응하는 GREEN 태스크에서 테스트와 구현을 함께 커밋한다.
 - **GREEN·REFACTOR·DOC 태스크 완료 조건 (헌법 VII)**: `pnpm typecheck`, `pnpm lint`, `pnpm test`가 모두 통과하고 Conventional Commits 형식으로 커밋한다. `--no-verify`로 우회하지 않는다.
+- **작업 브랜치**: `development`에서 작업하고 커밋한다. `main`으로는 PR로만 반영한다 (D-62). 커밋은 사용자가 완료 조건으로 요청한 것이며 **push는 하지 않는다** (헌법 VII).
+- **커밋 전 비밀값 확인**: 스테이징된 diff에 비밀값(접속 문자열, 토큰, `.env`)이 없는지 확인한다 (헌법 VII).
+- **의존성**: [tech_stack.md](../../docs/tech_stack.md)의 확정 스택 밖 패키지는 추가 전에 사용자에게 확인한다. 패키지 버전은 도입 시 공식 문서로 확인한다 (헌법 VII).
 - 테스트를 통과시키려고 테스트를 약화·삭제하지 않는다 (헌법 III). 미결 항목을 만나면 값을 지어내지 않고 멈춰 보고한다 (헌법 I, VII).
 - 결정이 생기면 해당 문서를 갱신한다 (Phase 6 DOC 태스크, 헌법 I).
 
@@ -25,8 +28,8 @@
 - [ ] T002 루트 워크스페이스를 만든다: `.nvmrc`와 `package.json`의 `engines`에 T001에서 확인한 버전을 기록, pnpm `engine-strict` 설정, `pnpm-workspace.yaml`(`apps/*`, `packages/*`), Turborepo `turbo.json`(태스크 `typecheck`, `lint`, `test`, `build`, `dev`, D-85). 패키지 버전은 공식 문서로 확인 (package.json, pnpm-workspace.yaml, turbo.json, .nvmrc, .npmrc)
 - [ ] T003 [P] `.gitignore`(`.env`, `node_modules`, 빌드 산출물 포함)와 값 없는 `.env.example`(필요한 변수 이름만: DB 접속 정보, 서버 포트)을 만든다. 비밀값은 커밋하지 않는다 (.gitignore, .env.example)
 - [ ] T004 [P] 로컬 개발용 PostgreSQL을 Docker Compose로 정의한다. 접속 정보는 비밀값이 아닌 로컬 전용 값만 쓴다 (docker-compose.yml)
-- [ ] T005 네 패키지 골격을 만든다. 각 `package.json`은 의존 방향 `domain ← application ← persistence / bootstrap-http`만 `dependencies`로 선언하고, `persistence`는 `bootstrap-http`를 참조하지 않는다 (packages/domain/package.json, packages/application/package.json, packages/persistence/package.json, apps/bootstrap-http/package.json)
-- [ ] T006 RED 게이트가 위반을 잡는지 보는 위반 픽스처를 만든다: `any` 사용, `@ts-ignore` 사용, 암묵적 any 파라미터, `domain`이 `application`을 import하는 파일. typecheck·lint를 실행해 **설정 전에는 위반이 잡히지 않음**(Red)을 확인하고 기록한다 (packages/domain/src/__gate_fixture__.ts)
+- [ ] T005 네 패키지 골격을 만든다. 각 `package.json`은 의존 방향 `domain ← application ← persistence / bootstrap-http`만 `dependencies`로 선언하고, `persistence`는 `bootstrap-http`를 참조하지 않는다. `persistence`는 자체 `dependencies`로 ORM(MikroORM)·PostgreSQL 드라이버·마이그레이션 도구와 DI 모듈용 `@nestjs/common`을 가지며 웹 의존성(`@nestjs/platform-express` 등)은 없다. MikroORM의 Nest 통합 패키지가 필요한지는 공식 문서로 확인한다 (packages/domain/package.json, packages/application/package.json, packages/persistence/package.json, apps/bootstrap-http/package.json)
+- [ ] T006 RED 게이트가 위반을 잡는지 보는 위반 픽스처를 만든다: `any` 사용, `@ts-ignore` 사용, 암묵적 any 파라미터, `domain`이 `application`을 import하는 파일. typecheck·lint를 실행해 **위반을 잡는 검사가 아직 없음**(설정 전이라 typecheck·lint가 없거나 위반을 통과시킴, Red)을 확인하고 기록한다 (packages/domain/src/__gate_fixture__.ts)
 - [ ] T007 GREEN 공통 `tsconfig.base.json`(`strict: true`, 완화 금지)을 만들어 네 패키지가 상속하게 하고, ESLint를 구성한다(`@typescript-eslint/no-explicit-any` 오류, `@ts-ignore`·`@ts-nocheck` 금지, Prettier 연동). 규칙 이름과 설정 형식은 설치한 버전의 공식 문서로 확인. 루트 스크립트가 Turborepo 태스크를 호출한다. T006 픽스처가 이제 typecheck·lint에서 **실패**함을 확인해 기록한다 (tsconfig.base.json, eslint.config.*, packages/*/tsconfig.json, apps/bootstrap-http/tsconfig.json)
 - [ ] T008 CHECK 계층 역방향 의존이 실제로 차단되는지 검증한다: (a) `domain`이 선언하지 않은 패키지를 import하면 pnpm 엄격 모드에서 실패하는지, (b) 역방향 `dependencies` 추가 시 Turborepo가 순환으로 실패하는지 확인한다. 차단되지 않는 경우가 있으면 ESLint `no-restricted-imports`로 보완하고 방식을 기록한다 (specs/001-ticket-create-get/tdd-log.md, eslint.config.*)
 - [ ] T009 [P] Jest를 패키지별로 설정한다(TypeScript 변환 방식과 Nest·MikroORM 데코레이터 메타데이터 동작은 공식 문서로 확인). 각 패키지에 자명한 테스트 하나로 `pnpm test`가 동작함을 확인한다. 통합·API 테스트 파일 이름 규칙을 정한다 (packages/*/jest.config.*, apps/bootstrap-http/jest.config.*)
@@ -43,13 +46,13 @@
 ### domain (프레임워크 없음, 순수 단위 테스트)
 
 - [ ] T011 [P] RED `Title` 테스트: 앞뒤 공백을 제거한 값을 보관, 제거 후 빈 값·공백뿐·`null`은 도메인 오류, **100자 허용·101자 거부**(제거 후 기준), 앞뒤 공백 때문에 100자를 넘긴 제목도 제거 후 100자 이하면 허용. C3·C5·V1·V2에 대응 (packages/domain/test/title.spec.ts)
-- [ ] T012 [P] RED 설명 정규화 테스트: 생략·`null`·`""`·공백뿐이면 `null`, **2000자 허용·2001자 거부**. C4·C5·V2에 대응 (packages/domain/test/description.spec.ts)
+- [ ] T012 [P] RED 설명 정규화 테스트: 생략·`null`·`""`·공백뿐이면 `null`, **2000자 허용·2001자 거부**. C4·C5·V2에 대응. 설명 앞뒤 공백을 보존하는지와 2000자 검사 기준(정규화 전/후)은 문서에 없으므로 구현 전 사용자에게 확인하고 D-81에 반영한다 (packages/domain/test/description.spec.ts)
 - [ ] T013 [P] RED `Priority` 테스트: 값은 `LOW`/`MEDIUM`/`HIGH`/`URGENT`만 허용, 생략 시 `MEDIUM`, `null`·그 외 값은 도메인 오류. C1·V3에 대응 (packages/domain/test/priority.spec.ts)
 - [ ] T014 [P] RED `Position` 테스트: 컬럼 첫 카드의 키를 만든다, 마지막 키 뒤의 키는 항상 바이트 순서로 마지막 키보다 크다, 반복해도 단조 증가, 문자열 순서 키는 사전순(바이트 순서) 비교. 두 키 사이 계산과 키 길이 상한은 이 기능 범위 밖이다 (구현 시 확정) (packages/domain/test/position.spec.ts)
 - [ ] T015 [P] RED `Ticket.create()` 테스트: 공개 식별자 `ticketId`가 UUID v4 형식, 호출마다 다른 값(C6), 상태는 항상 `TODO`, 우선순위 기본 `MEDIUM`, 마감일 선택, 내부 PK를 갖지 않음. UUID 생성 방식(내장 기능 또는 라이브러리)은 공식 문서로 확인하며 `domain`에 프레임워크 의존을 넣지 않는다. 새 라이브러리가 필요하면 추가 전 사용자에게 확인 (packages/domain/test/ticket.spec.ts)
 - [ ] T016 RED T011~T015를 실행해 **모든 테스트가 모듈 미존재로 실패**함을 확인하고 tdd-log.md에 기록한다 (specs/001-ticket-create-get/tdd-log.md)
 - [ ] T017 [P] GREEN `Title`과 설명 정규화, 도메인 오류를 구현한다: 도메인 오류는 프레임워크를 모르는 클래스로 정의한다 (packages/domain/src/title.ts, packages/domain/src/description.ts, packages/domain/src/errors.ts)
-- [ ] T018 [P] GREEN `Priority`를 구현한다: 문자열 enum 값과 기본값 `MEDIUM` (packages/domain/src/priority.ts)
+- [ ] T018 GREEN `Priority`를 구현한다: 문자열 enum 값과 기본값 `MEDIUM` (packages/domain/src/priority.ts)
 - [ ] T019 [P] GREEN `Position`을 구현한다: 첫 키와 마지막 키 뒤 키. 경계 조건 테스트를 통과시킨다 (packages/domain/src/position.ts)
 - [ ] T020 GREEN `Ticket.create()`와 `index.ts` export를 구현한다. T017~T019에 의존한다 (packages/domain/src/ticket.ts, packages/domain/src/index.ts)
 - [ ] T021 REFACTOR domain 패키지의 중복·명명을 정리한다. 테스트는 그대로 통과해야 하고, `domain`이 어떤 프레임워크도 import하지 않음을 확인해 커밋한다 (packages/domain/src/)
@@ -64,7 +67,7 @@
 - [ ] T027 [P] GREEN 애플리케이션 포트를 정의한다: `TicketRepository` 인터페이스(저장, `ticketId`로 조회, 상태별 마지막 순서 키 조회)와 Symbol 토큰, 순서 키 충돌 오류 `PositionConflictError`. `application`은 `@nestjs/common`만 허용하고 웹 의존성은 없다 (packages/application/src/ticket.repository.ts, packages/application/src/tokens.ts, packages/application/src/errors.ts)
 - [ ] T028 [P] GREEN 영속성 엔티티와 매퍼를 구현한다. 내부 PK는 이 엔티티에만 두고 `persistence` 밖으로 MikroORM 타입을 노출하지 않는다 (packages/persistence/src/ticket.entity.ts, packages/persistence/src/ticket.mapper.ts)
 - [ ] T029 GREEN 첫 마이그레이션을 작성한다(T024 제약 전부, `position`에만 `COLLATE "C"` 명시). 마이그레이션은 로컬·테스트 DB에서만 실행한다 (packages/persistence/src/migrations/)
-- [ ] T030 GREEN 리포지토리 어댑터를 구현한다: 유니크 위반을 T027의 `PositionConflictError`로 변환. T027~T029에 의존 (packages/persistence/src/mikro-orm-ticket.repository.ts, packages/persistence/src/index.ts)
+- [ ] T030 GREEN 리포지토리 어댑터를 구현한다: 유니크 위반을 T027의 `PositionConflictError`로 변환. 어댑터를 `TicketRepository` 토큰에 바인딩해 제공하는 Nest 모듈과 ORM 설정 export를 함께 만든다(`bootstrap-http`는 이 모듈을 조립만 한다). T027~T029에 의존 (packages/persistence/src/mikro-orm-ticket.repository.ts, packages/persistence/src/persistence.module.ts, packages/persistence/src/index.ts)
 - [ ] T031 REFACTOR persistence 정리. `persistence`가 `bootstrap-http`를 import하지 않고 MikroORM 타입이 밖으로 새지 않음을 확인해 커밋한다 (packages/persistence/src/)
 
 ### API 하네스와 기동 (bootstrap-http)
@@ -88,8 +91,8 @@
 > `application` 유스케이스 단위 테스트는 만들지 않는다 (2차 범위). API 테스트가 전체 경로를 검증한다. 입력 검증 실패 케이스(V1~V8)는 US3에서 다룬다.
 
 - [ ] T037 [P] [US1] RED 생성 성공 API 테스트: C1(제목만 → `201`, `status`=`TODO`, `priority`=`MEDIUM`, 새 `ticketId`, 응답에 내부 PK·`position` 없음), C2(제목·설명·우선순위 `HIGH`·마감일 → 입력값 그대로), C3(제목 앞뒤 공백 → 제거된 제목), C4(설명 `""`·공백뿐 → `description`=`null`), C5(제목 정확히 100자·설명 정확히 2000자 → `201`), C6(같은 내용 두 번 → 서로 다른 `ticketId` 두 건), C7(이름이 다른 미지 필드 포함 → 무시하고 `201`). 응답 형태는 [contracts/tickets-api.md](contracts/tickets-api.md) (apps/bootstrap-http/test/tickets.create.api-spec.ts)
-- [ ] T038 [P] [US1] RED 새 티켓 위치 API 테스트: 티켓을 여러 개 만든 뒤 DB에서 같은 `TODO` 컬럼의 순서 키가 생성 순으로 증가하는지 확인(D-79) (apps/bootstrap-http/test/tickets.create-order.api-spec.ts)
-- [ ] T039 [P] [US1] RED 생성 충돌 API 테스트: V9 — 순서 키 충돌이 재시도 상수(최초 시도 후 최대 3회, D-84)만큼 반복돼도 계속되면 `409`, `code`=`POSITION_CONFLICT`, 오류 응답 형식(`statusCode`, `code`, `message`). 충돌 상황은 리포지토리 프로바이더를 테스트에서 대체해 만든다. 재시도 후 성공하는 경우(1~3회째 충돌 뒤 성공)도 검증 (apps/bootstrap-http/test/tickets.create-conflict.api-spec.ts)
+- [ ] T038 [P] [US1] RED 새 티켓 위치 API 테스트: 티켓을 여러 개 만든 뒤 DB에서 같은 `TODO` 컬럼의 순서 키가 생성 순으로 증가하고 **기존 카드의 키는 바뀌지 않는지** 확인(D-79, FR-009) (apps/bootstrap-http/test/tickets.create-order.api-spec.ts)
+- [ ] T039 [P] [US1] RED 생성 충돌 API 테스트: FR-013·V9 — 순서 키 충돌이 재시도 상수(최초 시도 후 최대 3회, D-84)만큼 반복돼도 계속되면 `409`, `code`=`POSITION_CONFLICT`, 오류 응답 형식(`statusCode`, `code`, `message`). 충돌 상황은 리포지토리 프로바이더를 테스트에서 대체해 만든다. 재시도 후 성공하는 경우(1~3회째 충돌 뒤 성공)도 검증 (apps/bootstrap-http/test/tickets.create-conflict.api-spec.ts)
 - [ ] T040 [US1] RED T037~T039를 실행해 **엔드포인트 미존재(404)로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
 - [ ] T041 [P] [US1] GREEN `CreateTicket` 유스케이스: 도메인으로 티켓 생성, 상태별 마지막 순서 키를 조회해 `Position`으로 맨 뒤 키를 계산, 저장, `PositionConflictError` 시 재시도(재시도 횟수는 상수 하나, D-69·D-84), 초과하면 오류를 그대로 전달. 유스케이스 토큰 정의 (packages/application/src/create-ticket.use-case.ts, packages/application/src/application.module.ts, packages/application/src/index.ts)
 - [ ] T042 [P] [US1] GREEN 응답 표현: 도메인 `Ticket` → 응답(`ticketId`, `title`, `description`, `status`, `priority`, `dueAt`, `createdAt`, `updatedAt`). 내부 PK와 `position`은 포함하지 않는다(D-80). camelCase, 시각은 UTC ISO 8601. 서버 스키마 상세는 구현하며 OpenAPI로 확정 (apps/bootstrap-http/src/tickets/dto/ticket-response.dto.ts)
@@ -127,7 +130,7 @@
 - [ ] T052 [P] [US3] RED 본문·미디어 타입 API 테스트: V7(올바르지 않은 JSON → `400` `INVALID_REQUEST_BODY`), V8(`Content-Type`이 JSON이 아님 → `415` `UNSUPPORTED_MEDIA_TYPE`). 프레임워크 기본 동작이 다르면 기대값을 지어내지 말고 실제 동작을 확인해 사용자에게 보고한다 (apps/bootstrap-http/test/tickets.create-body.api-spec.ts)
 - [ ] T053 [US3] RED T050~T052를 실행해 **검증 미구현으로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
 - [ ] T054 [P] [US3] GREEN 요청 형식 검증: DTO 검증 규칙(형식·타입·enum·`dueAt` ISO 8601), 검증 실패를 오류 응답 형식(`statusCode`, `code`=`VALIDATION_FAILED`, `message`, 필드별 `details`)으로 변환, 정의되지 않은 필드는 제거해 무시 (apps/bootstrap-http/src/tickets/dto/create-ticket.dto.ts, apps/bootstrap-http/src/common/validation.ts)
-- [ ] T055 [P] [US3] GREEN 서버 지정 값과 `tags`를 거부하는 검사를 추가한다. 미지 필드 무시(D-81)와 충돌하지 않게 이름 목록 기반으로 처리한다 (apps/bootstrap-http/src/tickets/dto/create-ticket.dto.ts, apps/bootstrap-http/src/common/validation.ts)
+- [ ] T055 [US3] GREEN 서버 지정 값과 `tags`를 거부하는 검사를 추가한다. 미지 필드 무시(D-81)와 충돌하지 않게 이름 목록 기반으로 처리한다 (apps/bootstrap-http/src/tickets/dto/create-ticket.dto.ts, apps/bootstrap-http/src/common/validation.ts)
 - [ ] T056 [US3] GREEN 도메인 검증 오류(`Title`·설명·`Priority` 위반)를 `400 VALIDATION_FAILED`로 변환하는 필터 규칙, 본문 파싱 오류 → `INVALID_REQUEST_BODY`, 미디어 타입 오류 → `415` `UNSUPPORTED_MEDIA_TYPE`. T054·T055에 의존 (apps/bootstrap-http/src/common/domain-error.filter.ts, apps/bootstrap-http/src/common/error-codes.ts)
 - [ ] T057 [US3] REFACTOR 검증·오류 변환 코드를 정리한다. 도메인 규칙은 `domain`에, 형식 검증과 오류 코드 변환은 `bootstrap-http`에만 있는지 확인하고 전체 게이트 통과 후 커밋 (apps/bootstrap-http/src/, packages/domain/src/)
 
@@ -140,7 +143,7 @@
 - [ ] T058 CHECK 케이스 커버리지를 확인한다: C1~C7, V1~V9, G1~G3가 각각 하나 이상의 통과하는 테스트에 대응하는지 표로 tdd-log.md에 기록한다. 빠진 케이스는 RED부터 다시 진행한다 (specs/001-ticket-create-get/tdd-log.md)
 - [ ] T059 CHECK 응답 어디에도 내부 PK와 `position`이 없는지(SC-003), `domain`이 프레임워크를 import하지 않는지(SC-005), 모든 RED 실패 기록이 tdd-log.md에 있는지(SC-004)를 확인한다 (specs/001-ticket-create-get/tdd-log.md)
 - [ ] T060 CHECK [quickstart.md](quickstart.md)의 품질 게이트와 수동 시나리오 1~6을 실제로 실행해 결과를 기록한다. 로컬 DB는 Docker Compose로 띄운다 (specs/001-ticket-create-get/tdd-log.md)
-- [ ] T061 [P] DOC 구현 중 확정한 값을 정본 문서에 반영한다: Node 버전(`docs/trd/05-dev-environment.md`의 미결과 `docs/open_questions.md`의 해당 항목 삭제), ESLint 설정 형식·규칙 이름(`docs/trd/05-dev-environment.md`), 계층 역방향 검사 방식(`docs/trd/04-layer-boundaries.md`), 우선순위 숫자 매핑(`docs/data_model.md`), `415` 동작(`docs/api_spec.md`) (docs/)
+- [ ] T061 [P] DOC 구현 중 확정한 값을 정본 문서에 반영한다: Node 버전(`docs/trd/05-dev-environment.md`의 미결과 `docs/open_questions.md`의 해당 항목 삭제), ESLint 설정 형식·규칙 이름(`docs/trd/05-dev-environment.md`), 계층 역방향 검사 방식(`docs/trd/04-layer-boundaries.md`), 우선순위 숫자 매핑(`docs/data_model.md`), `415` 동작과 서버 지정 값·`tags` 거부의 오류 코드(`docs/api_spec.md`) (docs/)
 - [ ] T062 DOC 위 변경과 구현 중 생긴 결정을 `docs/decision_log.md`에 근거와 함께 추가하고 `docs/changelog.md`에 기록한다. 문서 한 개는 200줄을 넘기지 않는다. `docs/open_questions.md`에서 해소된 항목을 지운다 (docs/decision_log.md, docs/changelog.md, docs/open_questions.md)
 - [ ] T063 DOC `spec.md`의 Status를 갱신하고 `tags` 거부 임시 규칙(태그 기능에서 폐기)을 spec 또는 문서에 다음 기능 이월 항목으로 남긴다 (specs/001-ticket-create-get/spec.md)
 - [ ] T064 최종 `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build`를 실행해 모두 통과함을 확인하고 커밋한다 (전체)
@@ -158,7 +161,7 @@
 
 ```text
 Phase 2 domain RED:    T011, T012, T013, T014, T015 (서로 다른 테스트 파일)
-Phase 2 domain GREEN:  T017, T018, T019 (T020은 이들 뒤)
+Phase 2 domain GREEN:  T017과 T019 병렬 (T018은 T017의 오류 클래스 뒤, T020은 이들 뒤)
 Phase 2 persistence:   T022, T023, T024, T025 (RED 작성), T027, T028 (GREEN 일부)
 Phase 3 RED:           T037, T038, T039
 Phase 5 RED:           T050, T051, T052

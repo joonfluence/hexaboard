@@ -83,3 +83,4 @@
 | v0.77 | 2026-09-21 | 헌법 v1.1.0: 원칙 VI(TS strict, any 금지, API 계약 준수) 추가, 개발환경 문서에 반영 | joonfluence (with Claude) |
 | v0.78 | 2026-09-21 | 헌법 v1.2.0: 원칙 VII(필수 가드레일) 추가 | joonfluence (with Claude) |
 | v0.79 | 2026-09-21 | 생성 시 순서 키 충돌 처리(D-84)와 품질 게이트 스크립트 이름(D-85) 확정 | joonfluence (with Claude) |
+| v0.80 | 2026-09-21 | `persistence`의 의존성 범위(ORM·드라이버·마이그레이션·Nest DI 모듈) 확정(D-86), 001 작업 브랜치를 `development`로 결정, spec에 생성 충돌 요구(FR-013) 추가 | joonfluence (with Claude) |
