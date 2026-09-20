@@ -23,7 +23,7 @@
 | V6 | `tags` 포함 (이 슬라이스 한정) | 400 | `VALIDATION_FAILED` |
 | V7 | 본문이 올바른 JSON이 아님 | 400 | `INVALID_REQUEST_BODY` |
 | V8 | `Content-Type`이 JSON이 아님 | 415 | `UNSUPPORTED_MEDIA_TYPE` (프레임워크 동작은 구현 시 확인) |
-| V9 | 동시 생성 충돌이 재시도 후에도 지속 | 409 | `POSITION_CONFLICT` (plan "확인이 필요한 결정" 1번 확정 시) |
+| V9 | 동시 생성 충돌이 재시도 후에도 지속 | 409 | `POSITION_CONFLICT` (D-84) |
 
 부가 검증: 새 티켓은 `TODO` 컬럼 맨 뒤에 놓인다 (D-79). 응답이 아니라 저장소 통합 테스트로 확인한다.
 

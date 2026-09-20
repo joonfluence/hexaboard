@@ -26,12 +26,12 @@
 
 ## Decision: 생성 시 순서 키 충돌
 
-- **Decision (제안, 사용자 확인 필요)**: 생성에도 동시 이동과 같은 재시도 상수(최초 시도 후 최대 3회)를 재사용하고, 초과하면 `409 POSITION_CONFLICT`.
+- **Decision (확정, D-84)**: 생성에도 동시 이동과 같은 재시도 상수(최초 시도 후 최대 3회)를 재사용하고, 초과하면 `409 POSITION_CONFLICT`.
 - **Rationale**: (상태, 순서 키) 유니크 제약 때문에 동시 생성이 같은 키를 만들 수 있고, 이미 정한 충돌 처리(D-69)와 응답 코드를 재사용하면 새 규칙이 없다.
 - **Alternatives considered**: (a) 충돌 시 즉시 `409` — 재시도 정책과 어긋나 일관성이 떨어짐. (b) 순서 키 유니크 제약 완화 — 동시 충돌을 (상태, 순서 키) 유니크 제약으로 막기로 한 확정 결정(changelog v0.44)을 뒤집음.
 
 ## Decision: 스크립트 이름
 
-- **Decision (제안)**: Turborepo 태스크 `typecheck`, `lint`, `test`, `build`, `dev`.
+- **Decision (확정, D-85)**: Turborepo 태스크 `typecheck`, `lint`, `test`, `build`, `dev`.
 - **Rationale**: 관례적인 이름이라 학습 비용이 없고 CI에서도 그대로 쓴다.
 - **Alternatives considered**: `check`로 묶기 — 실패 원인을 분리해서 보기 어려움.

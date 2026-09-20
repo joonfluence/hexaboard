@@ -92,6 +92,7 @@ REST API 명세다. 리소스 이름은 `tickets`(복수 명사)다. 서버 DTO�
 - `priority`가 `LOW` / `MEDIUM` / `HIGH` / `URGENT`가 아님 → `400`
 - `dueAt`이 시각 형식(ISO 8601)이 아님 → `400`
 - `tags`가 문자열 배열이 아니거나, 11개 이상이거나, 이름이 30자를 넘음 → `400`
+- 같은 컬럼에 동시에 생성되어 순서 키가 충돌하고 서버 재시도(최대 3회) 후에도 실패 → `409` `POSITION_CONFLICT`
 - 서버가 정하는 값(`ticketId`, `status`, `position`, `createdAt`, `updatedAt`)을 본문에 보냄 → `400` (거부. 무시하지 않는다)
 
 **`GET /tickets`**

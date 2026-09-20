@@ -1,6 +1,6 @@
 # Quickstart: 티켓 생성과 단건 조회 검증
 
-구현이 끝났을 때 처음부터 끝까지 동작하는지 확인하는 절차다. 명령 이름은 [plan](plan.md)의 제안(Turborepo 태스크 `typecheck`/`lint`/`test`/`dev`)이며 확정 전이다. 케이스별 기대 응답은 [contracts/tickets-api.md](contracts/tickets-api.md)를 본다.
+구현이 끝났을 때 처음부터 끝까지 동작하는지 확인하는 절차다. 명령 이름은 [plan](plan.md)에서 확정한 Turborepo 태스크(`typecheck`/`lint`/`test`/`dev`, D-85)다. 케이스별 기대 응답은 [contracts/tickets-api.md](contracts/tickets-api.md)를 본다.
 
 ## 사전 준비
 
