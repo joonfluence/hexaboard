@@ -3,8 +3,10 @@ packages:
   - 'packages/*'
 # 의존성의 빌드 스크립트는 기본 거부한다(최소 권한).
 # Jest(@parcel/watcher, unrs-resolver)는 사전 빌드 바이너리를 쓰고, Testcontainers(ssh2, cpu-features, protobufjs)는 SSH 원격 Docker 기능이라 쓰지 않는다.
+# @scarf/scarf는 사용 통계를 전송하는 텔레메트리(swagger-ui 의존성)라 거부한다.
 allowBuilds:
   '@parcel/watcher': false
+  '@scarf/scarf': false
   cpu-features: false
   protobufjs: false
   ssh2: false

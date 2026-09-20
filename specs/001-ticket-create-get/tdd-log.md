@@ -68,3 +68,16 @@
   - 마이그레이션은 파일 탐색 대신 `migrationsList`로 등록(Jest·번들과 무관하게 동작).
   - `persistence` 공개 표면은 `PersistenceModule`, `DatabaseSettings`만(MikroORM 타입 비노출, TRD 04). 기동 시 마이그레이션 실행용 래퍼는 T035에서 추가.
   - `application`은 단위 테스트를 만들지 않으므로 `jest --passWithNoTests`. 검증은 Phase E API 테스트가 맡음.
+
+### T032~T034 (2026-09-21) — RED: 기동 마이그레이션·API 하네스
+- 작성: `test/startup.int-spec.ts`(정상 기동 시 ticket 테이블 생성 / 마이그레이션 실패 시 기동 중단), `test/smoke.api-spec.ts`(없는 경로 404, 접두사 없는 경로 404), `test/helpers/app.ts`(Testcontainers + 실제 Nest 앱 + Node 내장 fetch).
+- 결과(Red): `Test Suites: 2 failed` — `Cannot find module '../src/app.factory'`.
+- 추가 작업(tasks에 없던 항목, TDD로 처리): 환경변수 파싱 `src/config.ts`. `test/config.spec.ts`(9개)를 먼저 작성해 Red(`Cannot find module '../src/config'`) 확인 후 구현.
+
+### T035~T036 (2026-09-21) — GREEN·REFACTOR: Nest 앱 뼈대
+- 결과: bootstrap-http `Test Suites: 3 passed, Tests: 13 passed`. 전체 typecheck·lint·test(7/7)·build·prettier 통과.
+- 구현: `AppModule.forRoot(settings)`(PersistenceModule 조립 + `StartupMigration`이 `onModuleInit`에서 마이그레이션 적용, 실패 시 기동 중단), `createApp`(전역 접두사 `/v1`), `main.ts`(환경변수로 설정, 없으면 어떤 변수가 빠졌는지 알려 주며 실패).
+- `persistence`에 `DatabaseMigrator`(마이그레이션 실행 래퍼) 추가·export. 웹 계층이 MikroORM 타입을 알지 않도록 함.
+- **의도적으로 미룬 것**: T035에 적힌 `mikro-orm.config.ts`(MikroORM CLI용 설정)는 이번 기능에서 CLI를 쓰지 않아(첫 마이그레이션은 직접 작성) 만들지 않음. 이후 마이그레이션 생성이 필요한 기능에서 `@mikro-orm/cli`와 함께 도입.
+- 의존성: `@nestjs/core|platform-express|swagger|testing` 12.x, `class-validator` 0.15.1, `class-transformer` 0.5.1 (Nest 12 peer 확인). `supertest`는 쓰지 않고 Node 내장 `fetch`로 실제 포트에 요청. `@scarf/scarf`(텔레메트리) 빌드 스크립트는 거부.
+- `dev` 스크립트: `tsc` 빌드 후 `node --env-file=../../.env dist/main.js`(루트 `.env` 사용).

@@ -72,11 +72,11 @@
 
 ### API 하네스와 기동 (bootstrap-http)
 
-- [ ] T032 [P] RED 기동 마이그레이션 테스트: 정상 DB에서는 서버 기동 시 마이그레이션이 적용되고, 마이그레이션이 실패하면 **기동이 중단**된다(D-72, 스키마 자동 롤백은 하지 않음) (apps/bootstrap-http/test/startup.int-spec.ts)
-- [ ] T033 [P] RED API 테스트 하네스와 스모크 테스트: Testcontainers DB로 Nest 앱을 만드는 헬퍼, 전역 접두사 `/v1` 확인(`/v1` 아래 없는 경로는 프레임워크 기본 404, 접두사 없는 경로는 404) (apps/bootstrap-http/test/helpers/app.ts, apps/bootstrap-http/test/smoke.api-spec.ts)
-- [ ] T034 RED T032·T033 실행 후 **앱 모듈 미존재로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
-- [ ] T035 GREEN Nest 앱 뼈대를 구현한다: `AppModule`, 전역 접두사 `/v1`, 환경변수 기반 DB 설정(값은 `.env`, 커밋 금지), 마이그레이션 CLI 설정(파일은 `persistence`를 가리킴), 기동 시 마이그레이션 실행, 실패 시 기동 중단. 웹 계층은 이 앱에만 둔다 (apps/bootstrap-http/src/main.ts, apps/bootstrap-http/src/app.module.ts, apps/bootstrap-http/src/mikro-orm.config.ts)
-- [ ] T036 REFACTOR 하네스·기동 코드를 정리하고 게이트 통과 후 커밋한다 (apps/bootstrap-http/src/, apps/bootstrap-http/test/helpers/)
+- [X] T032 [P] RED 기동 마이그레이션 테스트: 정상 DB에서는 서버 기동 시 마이그레이션이 적용되고, 마이그레이션이 실패하면 **기동이 중단**된다(D-72, 스키마 자동 롤백은 하지 않음) (apps/bootstrap-http/test/startup.int-spec.ts)
+- [X] T033 [P] RED API 테스트 하네스와 스모크 테스트: Testcontainers DB로 Nest 앱을 만드는 헬퍼, 전역 접두사 `/v1` 확인(`/v1` 아래 없는 경로는 프레임워크 기본 404, 접두사 없는 경로는 404) (apps/bootstrap-http/test/helpers/app.ts, apps/bootstrap-http/test/smoke.api-spec.ts)
+- [X] T034 RED T032·T033 실행 후 **앱 모듈 미존재로 실패**함을 확인하고 기록한다 (specs/001-ticket-create-get/tdd-log.md)
+- [X] T035 GREEN Nest 앱 뼈대를 구현한다: `AppModule`, 전역 접두사 `/v1`, 환경변수 기반 DB 설정(값은 `.env`, 커밋 금지), 마이그레이션 CLI 설정(파일은 `persistence`를 가리킴), 기동 시 마이그레이션 실행, 실패 시 기동 중단. 웹 계층은 이 앱에만 둔다 (apps/bootstrap-http/src/main.ts, apps/bootstrap-http/src/app.module.ts, apps/bootstrap-http/src/mikro-orm.config.ts)
+- [X] T036 REFACTOR 하네스·기동 코드를 정리하고 게이트 통과 후 커밋한다 (apps/bootstrap-http/src/, apps/bootstrap-http/test/helpers/)
 
 **Checkpoint**: domain 단위 테스트, persistence 통합 테스트, 앱 기동 테스트가 통과한다. 이제 스토리를 시작할 수 있다.
 

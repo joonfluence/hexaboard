@@ -2,17 +2,30 @@
   "name": "@todo/bootstrap-http",
   "version": "0.0.0",
   "private": true,
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/main.js",
   "dependencies": {
-    "@todo/domain": "workspace:*",
+    "@nestjs/common": "^12.0.3",
+    "@nestjs/core": "^12.0.3",
+    "@nestjs/platform-express": "^12.0.3",
+    "@nestjs/swagger": "^12.0.1",
     "@todo/application": "workspace:*",
-    "@todo/persistence": "workspace:*"
+    "@todo/domain": "workspace:*",
+    "@todo/persistence": "workspace:*",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "dev": "tsc -p tsconfig.build.json && node --env-file=../../.env dist/main.js"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^12.0.3",
+    "@testcontainers/postgresql": "^12.1.0",
+    "testcontainers": "^12.1.0"
   }
 }
