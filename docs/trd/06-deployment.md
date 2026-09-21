@@ -24,7 +24,7 @@
 | 서버 | Render 서비스 `todo-server`(싱가포르, 무료), `todo-server-g3ud.onrender.com` | 브랜치 `main`, Docker 런타임, 헬스체크 `/health` |
 | DB | Neon 프로젝트 `todo-app`(싱가포르, PG 18) | 접속 정보는 Render 환경변수로만 둔다 |
 
-- Render 자동 배포가 동작하지 않는다(푸시해도 새 배포가 생기지 않음). 저장소를 URL로 연결해 GitHub 앱 웹훅이 없는 것으로 추정한다. 당분간 `render deploys create <서비스ID> --commit <전체 SHA>`로 수동 배포한다.
+- Render 자동 배포는 Render GitHub 앱이 저장소에 설치돼 있어야 동작한다. 처음에는 앱이 없어 푸시해도 배포가 생기지 않았고(서비스 이벤트에 푸시 트리거 없음), 수동으로 `render deploys create <서비스ID> --commit <전체 SHA>`를 썼다. 앱 설치 후의 동작은 아래 검증으로 확인한다.
 - Render는 환경변수를 바꿔도 재배포하지 않으므로 값을 바꾼 뒤 수동 배포한다.
 - 웹의 `NEXT_PUBLIC_API_BASE_URL`(Vercel 프로덕션 환경변수)은 서버 주소, 서버의 `CORS_ALLOWED_ORIGINS`는 웹 도메인이다.
 - DB SSL은 `DATABASE_SSL=true`다. MikroORM v7은 `driverOptions`를 `pg` 풀에 그대로 넘기므로 `driverOptions.ssl`로 준다(`connection` 키를 쓰면 기동이 실패한다).
