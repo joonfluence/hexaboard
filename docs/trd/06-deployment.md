@@ -16,6 +16,19 @@
 | 서버 (`apps/bootstrap-http`) | Render 무료 플랜 | 확정 | 15분 무트래픽이면 잠들고, 깨어나는 데 약 1분. 월 750 인스턴스 시간(워크스페이스 단위), 인스턴스 1개, 디스크 없음 |
 | DB | Neon (Postgres) | 확정 | 5분 유휴 시 자동 중지(끌 수 없음), 프로젝트당 저장 0.5GB, 월 100 CU-hours, 전송 5GB. 만료·비활성 삭제 없음 |
 
+## 실제 배포 구성 (2026-09-21)
+
+| 대상 | 주소·리소스 | 메모 |
+|------|-------------|------|
+| 웹 | Vercel 프로젝트 `todo-web`, `todo-web-alpha-three.vercel.app` | GitHub 연결됨. `main` 푸시가 프로덕션 자동 배포를 일으킨다 |
+| 서버 | Render 서비스 `todo-server`(싱가포르, 무료), `todo-server-g3ud.onrender.com` | 브랜치 `main`, Docker 런타임, 헬스체크 `/health` |
+| DB | Neon 프로젝트 `todo-app`(싱가포르, PG 18) | 접속 정보는 Render 환경변수로만 둔다 |
+
+- Render 자동 배포가 동작하지 않는다(푸시해도 새 배포가 생기지 않음). 저장소를 URL로 연결해 GitHub 앱 웹훅이 없는 것으로 추정한다. 당분간 `render deploys create <서비스ID> --commit <전체 SHA>`로 수동 배포한다.
+- Render는 환경변수를 바꿔도 재배포하지 않으므로 값을 바꾼 뒤 수동 배포한다.
+- 웹의 `NEXT_PUBLIC_API_BASE_URL`(Vercel 프로덕션 환경변수)은 서버 주소, 서버의 `CORS_ALLOWED_ORIGINS`는 웹 도메인이다.
+- DB SSL은 `DATABASE_SSL=true`다. MikroORM v7은 `driverOptions`를 `pg` 풀에 그대로 넘기므로 `driverOptions.ssl`로 준다(`connection` 키를 쓰면 기동이 실패한다).
+
 ## 유휴 지연
 
 - 서버는 15분, DB는 5분 유휴 후 잠든다. 오래 안 쓰다 접속하면 서버와 DB가 차례로 깨어나며 첫 로딩이 느리다. 이를 **허용**한다. ([NFR-01](../non_functional_requirements.md))
