@@ -11,3 +11,5 @@ specs/
 
 packages/api-client/src/schema.ts
 packages/api-client/openapi.json
+.next/
+next-env.d.ts

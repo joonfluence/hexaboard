@@ -20,18 +20,18 @@
 
 | ID | 컴포넌트 | FSD 배치(예정) | 관련 기능 | 문서 | 상태 |
 |----|----------|----------------|-----------|------|------|
-| UI-C01 | BoardView | `views/board` | FR-03 | [01-board](component_spec/01-board.md) | ⏳ |
-| UI-C02 | BoardColumn | `widgets/board-column` | FR-03 | [01-board](component_spec/01-board.md) | ⏳ |
-| UI-C03 | TicketCard | `entities/ticket` | FR-03, FR-05~07 | [01-board](component_spec/01-board.md) | ⏳ |
-| UI-C04 | PriorityBadge | `entities/ticket` | FR-06 | [01-board](component_spec/01-board.md) | ⏳ |
-| UI-C05 | DueDateBadge | `entities/ticket` | FR-05 | [01-board](component_spec/01-board.md) | ⏳ |
+| UI-C01 | BoardView | `views/board` | FR-03 | [01-board](component_spec/01-board.md) | ✅ |
+| UI-C02 | BoardColumn | `widgets/board-column` | FR-03 | [01-board](component_spec/01-board.md) | ✅ |
+| UI-C03 | TicketCard | `entities/ticket` | FR-03, FR-05~07 | [01-board](component_spec/01-board.md) | ✅ |
+| UI-C04 | PriorityBadge | `entities/ticket` | FR-06 | [01-board](component_spec/01-board.md) | ✅ |
+| UI-C05 | DueDateBadge | `entities/ticket` | FR-05 | [01-board](component_spec/01-board.md) | ✅ |
 | UI-C06 | TagBadge | `entities/ticket` | FR-07 | [01-board](component_spec/01-board.md) | ⏸ |
-| UI-C07 | InlineTicketForm | `features/create-ticket` | FR-01 | [02-ticket-editing](component_spec/02-ticket-editing.md) | ⏳ |
-| UI-C08 | TicketDetailModal | `features/edit-ticket` | FR-01, FR-05~07 | [02-ticket-editing](component_spec/02-ticket-editing.md) | ⏳ |
+| UI-C07 | InlineTicketForm | `features/create-ticket` | FR-01 | [02-ticket-editing](component_spec/02-ticket-editing.md) | ✅ |
+| UI-C08 | TicketDetailModal | `features/edit-ticket` | FR-01, FR-05~07 | [02-ticket-editing](component_spec/02-ticket-editing.md) | ✅ |
 | UI-C09 | FilterBar | `features/filter-tickets` | FR-08 | [03-board-controls](component_spec/03-board-controls.md) | ⏸ |
 | UI-C10 | ColumnSortMenu | `features/sort-column` | FR-09 | [03-board-controls](component_spec/03-board-controls.md) | ⏸ |
-| UI-C11 | MoveTicket (드래그 조립) | `features/move-ticket` | FR-04 | [03-board-controls](component_spec/03-board-controls.md) | ⏳ |
-| UI-C12 | Toast | `shared/ui` | FR-04(실패 알림) | [03-board-controls](component_spec/03-board-controls.md) | ⏳ |
+| UI-C11 | MoveTicket (드래그 조립) | `features/move-ticket` | FR-04 | [03-board-controls](component_spec/03-board-controls.md) | ✅ |
+| UI-C12 | Toast | `shared/ui` | FR-04(실패 알림) | [03-board-controls](component_spec/03-board-controls.md) | ✅ |
 
 ## 미결
 

@@ -64,7 +64,7 @@ export interface components {
              * @default MEDIUM
              * @enum {string}
              */
-            priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+            priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
             /** Format: date-time */
             dueAt?: string | null;
         };

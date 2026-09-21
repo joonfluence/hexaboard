@@ -9,6 +9,8 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/coverage/**',
       'packages/api-client/src/schema.ts',
+      '**/.next/**',
+      '**/next-env.d.ts',
     ],
   },
   js.configs.recommended,

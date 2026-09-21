@@ -1,4 +1,4 @@
-import createClient from 'openapi-fetch';
+import createClient, { type Client } from 'openapi-fetch';
 import type { components, paths } from './schema';
 
 export type { components, paths };
@@ -23,8 +23,11 @@ export interface ApiErrorBody {
 export type FetchLike = (request: Request) => Promise<Response>;
 
 /** 생성된 스키마 위의 타입 안전한 클라이언트. `baseUrl`에는 서버 주소를 준다(경로에 `/v1`이 이미 있다). */
-export function createApiClient(baseUrl: string, fetchImpl?: FetchLike) {
+export function createApiClient(
+  baseUrl: string,
+  fetchImpl?: FetchLike,
+): Client<paths> {
   return createClient<paths>({ baseUrl, fetch: fetchImpl });
 }
 
-export type ApiClient = ReturnType<typeof createApiClient>;
+export type ApiClient = Client<paths>;

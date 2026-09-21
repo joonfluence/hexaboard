@@ -89,3 +89,5 @@
 | v0.83 | 2026-09-21 | 002 기능(티켓 목록 조회·삭제) 구현과 D-93 확정, 테스트 케이스 TC-DOM-038·TC-PER-023~026·TC-API-028~037 완료 | joonfluence (with Claude) |
 | v0.84 | 2026-09-21 | 003 기능(티켓 부분 수정 PATCH) 구현과 D-94 확정, 테스트 케이스 TC-DOM-039~046·TC-PER-027~029·TC-API-038~051 완료 | joonfluence (with Claude) |
 | v0.85 | 2026-09-21 | 004 기능(카드 이동 PUT position) 구현과 D-95 확정(순서 키 알고리즘·이동 규칙·키 길이 상한 미도입), 미결 "순서 키 길이 상한" 해소, 테스트 케이스 TC-DOM-047~056·TC-PER-030~034·TC-API-052~070 완료 | joonfluence (with Claude) |
+| v0.86 | 2026-09-21 | 005 기능(웹 보드: Next·FSD·TanStack Query·dnd-kit) 구현, CORS·OpenAPI·api-client 추가, D-96·D-97 확정, UI 미결 4건 해소, TC-UI 35건 완료·11건 보류 | joonfluence (with Claude) |
+
