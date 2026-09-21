@@ -19,7 +19,7 @@
 | 마이그레이션 분리 ✅ | 기본은 기동 시 자동 실행(D-72)이다. `MIGRATE_ON_START=false`로 끄고 `node dist/migrate.js`를 배포 전 단계로 실행할 수 있다(다중 인스턴스 경합 대비) |
 | DB SSL 연결 ✅ | `DATABASE_SSL=true`로 SSL을 켠다 |
 | 선언 파일 ✅ | `render.yaml` 등 플랫폼 선언 파일과 환경변수 목록 문서 |
-| 웹 배포(Vercel) 설정 ✅ | [apps/web/vercel.json](../../apps/web/vercel.json). 프로젝트 Root Directory를 `apps/web`으로, "Include files outside root"를 켠다. `main` 외 브랜치는 `ignoreCommand`로 빌드를 건너뛴다. `NEXT_PUBLIC_API_BASE_URL`은 빌드 전에 Vercel 환경변수로 넣는다(서버 Render 주소). 서버 `CORS_ALLOWED_ORIGINS`에는 Vercel 프로덕션 도메인을 넣는다. Vercel 프로젝트 `todo-web`은 CLI로 만들었고 Root Directory 등은 설정했다. GitHub 저장소 연결은 Vercel GitHub 앱의 저장소 접근 권한이 있어야 하므로 사람이 한다 |
+| 웹 배포(Vercel) 설정 ✅ | [apps/web/vercel.json](../../apps/web/vercel.json). 프로젝트 Root Directory를 `apps/web`으로, "Include files outside root"를 켠다. `main` 외 브랜치는 `ignoreCommand`로 빌드를 건너뛴다. `NEXT_PUBLIC_API_BASE_URL`은 빌드 전에 Vercel 환경변수로 넣는다(서버 Render 주소). 서버 `CORS_ALLOWED_ORIGINS`에는 Vercel 프로덕션 도메인을 넣는다. Vercel 프로젝트 `todo-web`은 CLI로 만들었고 Root Directory 등은 설정했다. GitHub 저장소(`main`이 프로덕션 브랜치)도 연결했다. 남은 것은 `NEXT_PUBLIC_API_BASE_URL` 설정이다(서버 배포 후) |
 | CI (워크플로 작성, GitHub Actions 실행 미확인) | GitHub Actions: PR에서 typecheck·lint·test·build, 이미지 빌드 확인, OpenAPI 어긋남은 기존 테스트가 잡음. Testcontainers가 Docker 부하에 민감하므로 동시성을 낮게 둔다 |
 | 배포 | `main` 머지 시 자동 배포. 이미지에 커밋 SHA 태그를 남겨 롤백을 "이전 이미지"로 한다 |
 
