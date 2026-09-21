@@ -35,7 +35,6 @@
 ## 인프라
 
 - [ ] Phase 1 PaaS 선택: 현재 문서는 Render(서버)·Vercel(웹)·Neon(DB)로 확정했으나 Railway 등도 검토 중이다. 회사 정책(데이터 위치·접근 통제)과 가격 확인 뒤 정한다
-- [ ] 웹 소스맵 업로드 방식: Next.js 16은 기본이 Turbopack이라 webpack 플러그인 대신 `faro-cli`를 Vercel 빌드나 CI에서 쓰는 쪽을 검토한다. 실제로 붙여 보고 정한다
 - [ ] Grafana Cloud 대시보드·알림 항목 (서버 로그·트레이스·메트릭 전송은 D-104로 확정)
 - [ ] Phase 2 대상 클라우드(AWS/GCP 등), 컨테이너 서비스(ECS Fargate/Cloud Run), 예산 상한, 가용성 목표(SLA)
 - [ ] 다중 인스턴스 동시 기동 시 마이그레이션 경합 (무료 플랜은 인스턴스 1개라 낮은 우선순위)
