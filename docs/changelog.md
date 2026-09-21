@@ -98,3 +98,4 @@
 
 | v0.92 | 2026-09-21 | 인프라 Phase 1 서버 측 구현: Dockerfile, `GET /health`, `migrate` 진입점과 `MIGRATE_ON_START`, `DATABASE_SSL`, `render.yaml`, GitHub Actions CI 워크플로. TRD 07 상태 갱신 | joonfluence (with Claude) |
 | v0.93 | 2026-09-21 | 웹 검증(typecheck·lint·vitest 59·next build 통과), Vercel 배포 설정(`apps/web/vercel.json`, `NEXT_PUBLIC_API_BASE_URL`) 추가 | joonfluence (with Claude) |
+| v0.94 | 2026-09-21 | 서버 접근 로그(JSON)와 요청 ID(`X-Request-Id`) 구현. 쿼리스트링·본문은 기록하지 않음 | joonfluence (with Claude) |

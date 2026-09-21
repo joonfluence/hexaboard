@@ -7,7 +7,11 @@ import {
 } from '@testcontainers/postgresql';
 import type { DatabaseSettings } from '@todo/persistence';
 import { AppModule } from '../../src/app.module';
-import { configureApp, createApp } from '../../src/app.factory';
+import {
+  configureApp,
+  createApp,
+  type AppOptions,
+} from '../../src/app.factory';
 
 /** 로컬 docker-compose.yml의 이미지와 같은 메이저 버전을 쓴다. */
 export const POSTGRES_IMAGE = 'postgres:18';
@@ -57,6 +61,8 @@ export interface TestAppOptions {
   repository?: TicketRepository;
   /** CORS로 허용할 오리진. 생략하면 허용하지 않는다. */
   corsOrigins?: string[];
+  /** 접근 로그를 받을 곳. 생략하면 기록하지 않는다. */
+  accessLog?: AppOptions['accessLog'];
 }
 
 /** Testcontainers Postgres 위에 실제 Nest 앱을 띄운다. Docker가 없으면 시작 단계에서 실패한다. */
@@ -74,10 +80,16 @@ export async function startTestApp(
       .useValue(options.repository)
       .compile();
     app = moduleRef.createNestApplication({ logger: ['error', 'warn'] });
-    configureApp(app, { corsOrigins: options.corsOrigins });
+    configureApp(app, {
+      corsOrigins: options.corsOrigins,
+      accessLog: options.accessLog,
+    });
     await app.init();
   } else {
-    app = await createApp(settings, { corsOrigins: options.corsOrigins });
+    app = await createApp(settings, {
+      corsOrigins: options.corsOrigins,
+      accessLog: options.accessLog,
+    });
   }
   await app.listen(0, '127.0.0.1');
   const baseUrl = await app.getUrl();
