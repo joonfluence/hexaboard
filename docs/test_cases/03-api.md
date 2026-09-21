@@ -123,3 +123,13 @@
 | TC-API-068 | 기준 카드 없음 | `404` `ANCHOR_TICKET_NOT_FOUND` | api_spec | ✅ |
 | TC-API-069 | 순서 충돌 | 1~3번 뒤 성공이면 `200`(시도마다 이웃 다시 읽음), 4번 실패면 `409` `POSITION_CONFLICT` | D-69, D-95 | ✅ |
 | TC-API-070 | 올바르지 않은 JSON·JSON 아닌 `Content-Type` | `400` `INVALID_REQUEST_BODY`·`415` | api_spec | ✅ |
+
+## OpenAPI 계약 — `apps/bootstrap-http/test/openapi.spec.ts` (005)
+
+| ID | 시나리오 | 기대 결과 | 근거 | 상태 |
+|----|----------|-----------|------|------|
+| TC-API-071 | 생성한 OpenAPI 문서의 경로 | `/v1/tickets`(GET·POST), `/v1/tickets/{ticketId}`(GET·PATCH·DELETE), `/v1/tickets/{ticketId}/position`(PUT) | api_spec | ✅ |
+| TC-API-072 | 티켓 응답 스키마 | 정해진 8개 필드만, 내부 PK(`id`)·`position` 없음 | D-80, 헌법 IV | ✅ |
+| TC-API-073 | 이동 요청 스키마 | `status`·`anchorTicketId`·`placement`만 있고 `position` 없음 | FR-04, 헌법 IV | ✅ |
+| TC-API-074 | 커밋된 `packages/api-client/openapi.json` | 서버 DTO에서 지금 생성한 문서와 같음(어긋남 감지) | TRD 03 | ✅ |
+

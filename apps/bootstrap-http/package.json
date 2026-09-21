@@ -21,7 +21,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "dev": "tsc -p tsconfig.build.json && node --env-file=../../.env dist/main.js"
+    "dev": "tsc -p tsconfig.build.json && node --env-file=../../.env dist/main.js",
+    "openapi": "node dist/openapi/generate.js ../../packages/api-client/openapi.json"
   },
   "devDependencies": {
     "@nestjs/testing": "^12.0.3",

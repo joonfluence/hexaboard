@@ -10,7 +10,8 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "build": "turbo run build",
-    "dev": "turbo run dev"
+    "dev": "turbo run dev",
+    "generate:api": "turbo run build --filter=@todo/bootstrap-http && pnpm --filter @todo/bootstrap-http openapi && pnpm --filter @todo/api-client generate"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

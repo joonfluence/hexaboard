@@ -8,3 +8,6 @@ specs/
 .claude/
 .specify/
 *.md
+
+packages/api-client/src/schema.ts
+packages/api-client/openapi.json
