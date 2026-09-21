@@ -101,3 +101,4 @@
 | v0.94 | 2026-09-21 | 서버 접근 로그(JSON)와 요청 ID(`X-Request-Id`) 구현. 쿼리스트링·본문은 기록하지 않음 | joonfluence (with Claude) |
 | v0.95 | 2026-09-21 | Neon·Render·Vercel 실제 배포 완료(서버 `/health`·CORS 확인). 배포 구성, Render 자동 배포 미동작, DB SSL 옵션 주의를 TRD 06에 기록 | joonfluence (with Claude) |
 | v0.96 | 2026-09-21 | 에러 추적·모니터링을 Grafana Cloud 단독으로 확정(D-103). 무료 구간·소스맵 방식 조사 반영, 인프라 미결 항목 갱신 | joonfluence (with Claude) |
+| v0.97 | 2026-09-21 | 관측성 이식 조건(수집기 경유, 환경변수화, 벤더 SDK 비확산) 기록 | joonfluence (with Claude) |
