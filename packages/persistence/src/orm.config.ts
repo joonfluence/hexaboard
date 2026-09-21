@@ -19,7 +19,7 @@ export function createOrmConfig(settings: DatabaseSettings) {
   const { ssl, ...connection } = settings;
   return defineConfig({
     ...connection,
-    ...(ssl ? { driverOptions: { connection: { ssl: true } } } : {}),
+    ...(ssl ? { driverOptions: { ssl: true } } : {}),
     entities: [TicketSchema],
     extensions: [Migrator],
     forceUtcTimezone: true,
