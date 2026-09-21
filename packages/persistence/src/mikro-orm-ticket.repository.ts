@@ -72,6 +72,23 @@ export class MikroOrmTicketRepository implements TicketRepository {
       .map((entity) => this.mapper.toDomain(entity));
   }
 
+  async update(ticket: Ticket): Promise<Ticket | null> {
+    const em = this.orm.em.fork();
+    const entity = await em.findOne(TicketSchema, {
+      publicId: ticket.ticketId,
+    });
+    if (!entity) {
+      return null;
+    }
+    // 내용 필드만 덮어쓴다. 상태와 순서 키는 카드 이동만 바꾼다.
+    entity.title = ticket.title.value;
+    entity.description = ticket.description;
+    entity.priority = this.mapper.priorityToNumber(ticket.priority.value);
+    entity.dueAt = ticket.dueAt;
+    await em.flush();
+    return this.mapper.toDomain(entity);
+  }
+
   async deleteByTicketId(ticketId: string): Promise<boolean> {
     const deleted = await this.orm.em
       .fork()

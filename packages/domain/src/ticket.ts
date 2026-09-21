@@ -29,6 +29,14 @@ export interface RehydrateTicketProps {
   updatedAt: Date;
 }
 
+/** 수정할 값. 생략(undefined)한 필드는 그대로 둔다. `description`·`dueAt`은 null로 비울 수 있다. */
+export interface TicketChanges {
+  title?: unknown;
+  description?: unknown;
+  priority?: unknown;
+  dueAt?: Date | null;
+}
+
 export class Ticket {
   private constructor(
     readonly ticketId: string,
@@ -68,6 +76,25 @@ export class Ticket {
       Position.from(props.position),
       props.createdAt,
       props.updatedAt,
+    );
+  }
+
+  /** 제목·설명·우선순위·마감일을 고친 새 티켓을 돌려준다(불변). 식별자·상태·순서 키·시각은 그대로다. */
+  update(changes: TicketChanges): Ticket {
+    return new Ticket(
+      this.ticketId,
+      changes.title === undefined ? this.title : Title.of(changes.title),
+      changes.description === undefined
+        ? this.description
+        : normalizeDescription(changes.description),
+      this.status,
+      changes.priority === undefined
+        ? this.priority
+        : Priority.of(changes.priority),
+      changes.dueAt === undefined ? this.dueAt : changes.dueAt,
+      this.position,
+      this.createdAt,
+      this.updatedAt,
     );
   }
 }

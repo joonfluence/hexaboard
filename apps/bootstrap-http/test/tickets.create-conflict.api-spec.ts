@@ -37,6 +37,9 @@ function conflictingRepository(conflicts: number) {
     async findAll() {
       return [];
     },
+    async update() {
+      return null;
+    },
     async deleteByTicketId() {
       return false;
     },

@@ -6,6 +6,7 @@ import {
   HttpCode,
   Inject,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -19,11 +20,14 @@ import {
   DeleteTicket,
   GetTicket,
   ListTickets,
+  UpdateTicket,
 } from '@todo/application';
 import { JsonContentTypeGuard } from '../common/json-content-type.guard';
 import { RejectFieldsPipe } from '../common/reject-fields.pipe';
 import { createBodyValidationPipe } from '../common/validation';
+import { ValidationFailedException } from '../common/http-errors';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketResponse, toTicketResponse } from './dto/ticket-response.dto';
 import { ParseTicketIdPipe } from './parse-ticket-id.pipe';
 
@@ -54,6 +58,7 @@ export class TicketsController {
     @Inject(GetTicket) private readonly getTicket: GetTicket,
     @Inject(ListTickets) private readonly listTickets: ListTickets,
     @Inject(DeleteTicket) private readonly deleteTicket: DeleteTicket,
+    @Inject(UpdateTicket) private readonly updateTicket: UpdateTicket,
   ) {}
 
   @Post()
@@ -84,6 +89,34 @@ export class TicketsController {
     @Param('ticketId', ParseTicketIdPipe) ticketId: string,
   ): Promise<TicketResponse> {
     return toTicketResponse(await this.getTicket.execute(ticketId));
+  }
+
+  @Patch(':ticketId')
+  @UseGuards(JsonContentTypeGuard)
+  @ApiOkResponse({ type: TicketResponse })
+  async update(
+    @Param('ticketId', ParseTicketIdPipe) ticketId: string,
+    @Body(new RejectFieldsPipe(REJECTED_FIELDS), createBodyValidationPipe())
+    dto: UpdateTicketDto,
+  ): Promise<TicketResponse> {
+    const { title, description, priority, dueAt } = dto;
+    if (
+      title === undefined &&
+      description === undefined &&
+      priority === undefined &&
+      dueAt === undefined
+    ) {
+      throw new ValidationFailedException([
+        { field: 'body', reason: '수정할 필드가 하나도 없습니다.' },
+      ]);
+    }
+    const ticket = await this.updateTicket.execute(ticketId, {
+      title,
+      description,
+      priority,
+      dueAt: dueAt === undefined || dueAt === null ? dueAt : new Date(dueAt),
+    });
+    return toTicketResponse(ticket);
   }
 
   @Delete(':ticketId')

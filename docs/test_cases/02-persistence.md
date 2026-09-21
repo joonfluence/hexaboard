@@ -42,3 +42,6 @@
 | TC-PER-024 | 세 상태에 섞어 저장한 뒤 전체 조회 | 상태 순서(`TODO`→`IN_PROGRESS`→`DONE`), 같은 상태는 순서 키 오름차순 | 002 FR-001 | ✅ |
 | TC-PER-025 | `ticketId`로 삭제 | `true`, 이후 조회 `null`, 다른 티켓은 그대로 | 002 FR-002 | ✅ |
 | TC-PER-026 | 없는 `ticketId` 삭제 | `false` | 002 FR-002 | ✅ |
+| TC-PER-027 | 수정한 티켓 저장 | 재조회에 값 반영, `updatedAt` 갱신, `createdAt`·상태·순서 키·`ticketId` 불변 | 003 | ✅ |
+| TC-PER-028 | 없는 `ticketId` 수정 | `null` | 003 | ✅ |
+| TC-PER-029 | 한 티켓 수정 | 다른 티켓은 그대로 | 003 | ✅ |

@@ -166,4 +166,60 @@ describe('MikroOrmTicketRepository (Testcontainers Postgres)', () => {
       ).toBe(false);
     });
   });
+  describe('수정 (003)', () => {
+    it('TC-PER-027: 수정한 티켓을 저장하면 값이 반영되고 시각 외 불변 필드는 그대로다', async () => {
+      const saved = await repository.save(
+        Ticket.create({
+          title: '원래',
+          description: '설명',
+          priority: 'LOW',
+          position: Position.first(),
+        }),
+      );
+
+      const updated = await repository.update(
+        saved.update({
+          title: '바뀜',
+          description: null,
+          priority: 'URGENT',
+          dueAt: new Date('2027-01-01T00:00:00.000Z'),
+        }),
+      );
+
+      const found = await repository.findByTicketId(saved.ticketId);
+      expect(updated).not.toBeNull();
+      expect(found!.title.value).toBe('바뀜');
+      expect(found!.description).toBeNull();
+      expect(found!.priority.value).toBe('URGENT');
+      expect(found!.dueAt).toEqual(new Date('2027-01-01T00:00:00.000Z'));
+      expect(found!.status).toBe('TODO');
+      expect(found!.position.value).toBe('a0');
+      expect(found!.createdAt).toEqual(saved.createdAt);
+      expect(found!.updatedAt!.getTime()).toBeGreaterThanOrEqual(
+        saved.updatedAt!.getTime(),
+      );
+      expect(updated!.updatedAt).toEqual(found!.updatedAt);
+    });
+
+    it('TC-PER-028: 없는 ticketId를 수정하면 null이다', async () => {
+      const ghost = Ticket.create({
+        title: '없는 티켓',
+        position: Position.first(),
+      });
+      expect(await repository.update(ghost)).toBeNull();
+    });
+
+    it('TC-PER-029: 한 티켓을 수정해도 다른 티켓은 그대로다', async () => {
+      const a = await repository.save(newTicket(Position.first(), 'a'));
+      const b = await repository.save(
+        newTicket(Position.after(Position.first()), 'b'),
+      );
+
+      await repository.update(a.update({ title: 'a2' }));
+
+      const other = await repository.findByTicketId(b.ticketId);
+      expect(other!.title.value).toBe('b');
+      expect(other!.updatedAt).toEqual(b.updatedAt);
+    });
+  });
 });

@@ -77,3 +77,22 @@
 | TC-API-035 | 없는 티켓·이미 삭제된 티켓 | `404` `TICKET_NOT_FOUND` | api_spec | ✅ |
 | TC-API-036 | UUID 형식이 아님 | `400` `INVALID_TICKET_ID` | api_spec | ✅ |
 | TC-API-037 | 삭제 뒤 새 티켓 생성 | `201`, `TODO` 맨 뒤 | D-79 | ✅ |
+
+## 티켓 수정 — `PATCH /v1/tickets/{ticketId}` (003)
+
+| ID | 시나리오 | 기대 결과 | 근거 | 상태 |
+|----|----------|-----------|------|------|
+| TC-API-038 | 제목만 수정 | `200`, 제목 반영·나머지 그대로, 단건 조회와 일치 | FR-01 | ✅ |
+| TC-API-039 | 여러 필드 수정 | 모두 반영 | FR-01 | ✅ |
+| TC-API-040 | `description`이 `null`·`""`·공백뿐(3종) | `null`로 저장 | D-94 | ✅ |
+| TC-API-041 | `dueAt: null` | 마감일 해제 | D-94 | ✅ |
+| TC-API-042 | 수정 응답 | 정해진 8개 필드, `createdAt` 불변, `updatedAt` 갱신 | D-80, D-50 | ✅ |
+| TC-API-043 | 수정 후 목록 | 상태와 컬럼 안 순서 불변 | api_spec | ✅ |
+| TC-API-044 | 빈 본문 `{}`·미지 필드만(2종) | `400` `VALIDATION_FAILED` | api_spec | ✅ |
+| TC-API-045 | 서버 지정 값 5종(`status` 포함) | `400`으로 거부, 여러 개면 모두 `details` | api_spec, D-92 | ✅ |
+| TC-API-046 | `tags` 포함 | `400`(태그 기능에서 폐기할 임시 규칙) | 003 | ✅ |
+| TC-API-047 | 제목 빈 값·`null`·101자, 설명 2001자, 우선순위 허용 밖·`null`, `dueAt` 형식 오류(8종) | `400` `VALIDATION_FAILED` | api_spec | ✅ |
+| TC-API-048 | 없는 티켓 | `404` `TICKET_NOT_FOUND` | api_spec | ✅ |
+| TC-API-049 | UUID 형식이 아님 | `400` `INVALID_TICKET_ID` | api_spec | ✅ |
+| TC-API-050 | 올바르지 않은 JSON·JSON 아닌 `Content-Type` | `400` `INVALID_REQUEST_BODY`·`415` | api_spec | ✅ |
+| TC-API-051 | 검증에 실패한 수정 뒤 | 저장된 값 그대로 | 003 | ✅ |

@@ -9,6 +9,8 @@ export interface TicketRepository {
   findLastPosition(status: TicketStatus): Promise<Position | null>;
   /** 모든 티켓. 상태 순서(`TICKET_STATUSES`), 같은 상태 안에서는 순서 키 오름차순. */
   findAll(): Promise<Ticket[]>;
+  /** 수정한 티켓의 내용을 저장하고 저장소가 채운 값이 담긴 티켓을 돌려준다. 없으면 null. 상태·순서 키는 바꾸지 않는다. */
+  update(ticket: Ticket): Promise<Ticket | null>;
   /** 공개 식별자로 삭제한다. 지웠으면 true, 없으면 false. */
   deleteByTicketId(ticketId: string): Promise<boolean>;
 }

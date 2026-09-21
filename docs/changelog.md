@@ -87,3 +87,4 @@
 | v0.81 | 2026-09-21 | `test_cases.md`(4개 하위 문서, 완료 81건·예정 49건)와 `component_spec.md`(3개 하위 문서, 컴포넌트 12개) 추가. 이미 구현된 domain·persistence·설정·생성 API 테스트를 사후 정의해 ✅로 표시. 인라인 생성 위치·모달 저장 방식·삭제 UI를 미결에 추가 | joonfluence (with Claude) |
 | v0.82 | 2026-09-21 | 001 티켓 생성·조회 구현 중 확정한 값 반영: Node 24.21.0·pnpm·TypeScript 6.0.3(D-88), Jest `--experimental-vm-modules`(D-89), 영속성 구현 결정(D-90), Postgres 18·compose 포트(D-91), API 오류 처리(D-92). data_model 컬럼 타입·우선순위 숫자, api_spec 415, TRD 02·04·05 갱신, Node 버전 미결 해소 | joonfluence (with Claude) |
 | v0.83 | 2026-09-21 | 002 기능(티켓 목록 조회·삭제) 구현과 D-93 확정, 테스트 케이스 TC-DOM-038·TC-PER-023~026·TC-API-028~037 완료 | joonfluence (with Claude) |
+| v0.84 | 2026-09-21 | 003 기능(티켓 부분 수정 PATCH) 구현과 D-94 확정, 테스트 케이스 TC-DOM-039~046·TC-PER-027~029·TC-API-038~051 완료 | joonfluence (with Claude) |

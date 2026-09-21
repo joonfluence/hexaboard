@@ -64,3 +64,11 @@
 | TC-DOM-036 | 저장 전 새 티켓 | 시각 없음(도메인은 시계를 모름) | D-50 | ✅ |
 | TC-DOM-037 | 저장된 값이 규칙에 어긋남 | 거부 | 헌법 IV | ✅ |
 | TC-DOM-038 | 상태 목록 상수 | `TODO`·`IN_PROGRESS`·`DONE` 순서로 노출 | FR-02, 002 | ✅ |
+| TC-DOM-039 | 변경 없이 수정 | 값이 그대로인 티켓 | 003 | ✅ |
+| TC-DOM-040 | 제목 수정 | 앞뒤 공백을 제거해 반영 | D-81, 003 | ✅ |
+| TC-DOM-041 | 제목이 빈 값·공백뿐·`null`·101자(4종) | `InvalidTitleError` | FR-01 | ✅ |
+| TC-DOM-042 | 설명 수정 | 새 값. `""`·공백뿐·`null`은 `null`, 생략은 유지 | D-94 | ✅ |
+| TC-DOM-043 | 설명 2001자 | `InvalidDescriptionError` | FR-01 | ✅ |
+| TC-DOM-044 | 우선순위 수정 | 새 값. `null`·허용 값 밖은 `InvalidPriorityError` | FR-06 | ✅ |
+| TC-DOM-045 | 마감일 수정 | 새 값, `null`은 해제, 생략은 유지 | FR-05, D-94 | ✅ |
+| TC-DOM-046 | 수정 결과 | `ticketId`·상태·순서 키·생성 시각 불변, 원본 티켓 불변 | 헌법 IV | ✅ |

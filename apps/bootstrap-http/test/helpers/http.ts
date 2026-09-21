@@ -92,6 +92,41 @@ export async function deleteTicket(
   };
 }
 
+/** 티켓 부분 수정 요청. */
+export async function patchTicket(
+  baseUrl: string,
+  ticketId: string,
+  body: unknown,
+): Promise<ApiResponse> {
+  const response = await fetch(`${baseUrl}/v1/tickets/${ticketId}`, {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return {
+    status: response.status,
+    json: () => response.json() as Promise<TicketBody>,
+  };
+}
+
+/** 본문을 직렬화하지 않고 그대로 보내는 수정 요청(잘못된 JSON, 다른 Content-Type 시험용). */
+export async function patchRaw(
+  baseUrl: string,
+  ticketId: string,
+  rawBody: string,
+  contentType: string,
+): Promise<ApiResponse> {
+  const response = await fetch(`${baseUrl}/v1/tickets/${ticketId}`, {
+    method: 'PATCH',
+    headers: { 'content-type': contentType },
+    body: rawBody,
+  });
+  return {
+    status: response.status,
+    json: () => response.json() as Promise<TicketBody>,
+  };
+}
+
 export const UUID_V4 =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
