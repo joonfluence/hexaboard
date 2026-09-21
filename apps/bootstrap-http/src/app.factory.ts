@@ -28,7 +28,8 @@ export function configureApp(
     app.enableCors({
       origin: [...options.corsOrigins],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      allowedHeaders: ['Content-Type'],
+      allowedHeaders: ['Content-Type', 'X-Request-Id'],
+      exposedHeaders: ['X-Request-Id'],
     });
   }
 }

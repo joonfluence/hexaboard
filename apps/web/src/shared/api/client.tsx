@@ -2,6 +2,8 @@
 
 import { createApiClient, type ApiClient } from '@todo/api-client';
 import { createContext, useContext, type ReactNode } from 'react';
+import { reportApiFailure } from '@/shared/observability/faro';
+import { withRequestId } from './request-id';
 
 const ApiClientContext = createContext<ApiClient | null>(null);
 
@@ -34,5 +36,13 @@ export function createBrowserApiClient(): ApiClient {
   if (!baseUrl) {
     throw new Error('환경변수 NEXT_PUBLIC_API_BASE_URL이 필요합니다.');
   }
-  return createApiClient(baseUrl);
+  return createApiClient(
+    baseUrl,
+    withRequestId(
+      (request) => fetch(request),
+      (failure) => {
+        void reportApiFailure(failure);
+      },
+    ),
+  );
 }
