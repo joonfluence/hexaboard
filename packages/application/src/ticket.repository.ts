@@ -37,4 +37,14 @@ export interface TicketRepository {
     status: TicketStatus,
     position: Position,
   ): Promise<Ticket | null>;
+  /** 그 상태 컬럼의 카드를 순서 키 오름차순으로. */
+  findByStatus(status: TicketStatus): Promise<Ticket[]>;
+  /**
+   * 컬럼 카드의 순서 키를 한 번에 다시 쓴다(한 트랜잭션, 다른 카드의 기존 키와 겹쳐도 성공).
+   * 동시 변경으로 (상태, 순서 키)가 충돌하면 PositionConflictError.
+   */
+  reorder(
+    status: TicketStatus,
+    assignments: readonly { ticketId: string; position: Position }[],
+  ): Promise<void>;
 }

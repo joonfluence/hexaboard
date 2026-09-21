@@ -54,6 +54,30 @@
         ]
       }
     },
+    "/v1/tickets/sort": {
+      "post": {
+        "operationId": "TicketsController_sort",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SortColumnDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tickets"
+        ]
+      }
+    },
     "/v1/tickets/{ticketId}": {
       "get": {
         "operationId": "TicketsController_get",
@@ -281,6 +305,38 @@
           "dueAt",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "SortColumnDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "TODO",
+              "IN_PROGRESS",
+              "DONE"
+            ]
+          },
+          "sortBy": {
+            "type": "string",
+            "enum": [
+              "PRIORITY",
+              "DUE_AT"
+            ]
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "sortBy",
+          "direction"
         ]
       },
       "UpdateTicketDto": {

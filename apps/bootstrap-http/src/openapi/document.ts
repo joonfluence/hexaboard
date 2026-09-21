@@ -12,6 +12,7 @@ import {
   GetTicket,
   ListTickets,
   MoveTicket,
+  SortColumn,
   UpdateTicket,
 } from '@todo/application';
 import { configureApp } from '../app.factory';
@@ -26,6 +27,7 @@ import { TicketsController } from '../tickets/tickets.controller';
     GetTicket,
     ListTickets,
     MoveTicket,
+    SortColumn,
     UpdateTicket,
   ].map((useCase) => ({ provide: useCase, useValue: {} })),
 })

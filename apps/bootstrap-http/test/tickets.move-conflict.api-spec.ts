@@ -36,6 +36,12 @@ function conflictingRepository(conflicts: number) {
     async findLastPosition() {
       return null;
     },
+    async findByStatus() {
+      return [];
+    },
+    async reorder() {
+      return;
+    },
     async findAll() {
       return [mover, anchor];
     },

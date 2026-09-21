@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/tickets/sort": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["TicketsController_sort"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/tickets/{ticketId}": {
         parameters: {
             query?: never;
@@ -83,6 +99,14 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+        };
+        SortColumnDto: {
+            /** @enum {string} */
+            status: "TODO" | "IN_PROGRESS" | "DONE";
+            /** @enum {string} */
+            sortBy: "PRIORITY" | "DUE_AT";
+            /** @enum {string} */
+            direction: "ASC" | "DESC";
         };
         UpdateTicketDto: {
             /** @description 앞뒤 공백은 제거된다. */
@@ -162,6 +186,27 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TicketResponse"];
                 };
+            };
+        };
+    };
+    TicketsController_sort: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SortColumnDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

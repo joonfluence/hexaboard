@@ -348,4 +348,46 @@ describe('MikroOrmTicketRepository (Testcontainers Postgres)', () => {
       ).toBeNull();
     });
   });
+  describe('정렬 지원 (006)', () => {
+    it('TC-PER-035: 상태별 조회는 그 상태 카드만 순서 키 오름차순으로 돌려준다', async () => {
+      const a = await repository.save(newTicket(Position.first(), 'a'));
+      await repository.save(newTicket(Position.after(Position.first()), 'b'));
+      await db.orm.em
+        .getConnection()
+        .execute(
+          `UPDATE ticket SET status = 'DONE' WHERE public_id = '${a.ticketId}'`,
+        );
+
+      expect(
+        (await repository.findByStatus('TODO')).map((x) => x.title.value),
+      ).toEqual(['b']);
+      expect(
+        (await repository.findByStatus('DONE')).map((x) => x.title.value),
+      ).toEqual(['a']);
+    });
+
+    it('TC-PER-036: 순서를 다시 써도 기존 키와 겹치지 않고 다른 상태·내용은 그대로다', async () => {
+      const a = await repository.save(newTicket(Position.first(), 'a'));
+      const b = await repository.save(
+        newTicket(Position.after(Position.first()), 'b'),
+      );
+      const c = await repository.save(
+        newTicket(Position.after(Position.after(Position.first())), 'c'),
+      );
+
+      // 순서를 뒤집으면 새 키(a0,a1,a2)가 다른 카드의 기존 키와 겹친다.
+      const first = Position.first();
+      const second = Position.after(first);
+      const third = Position.after(second);
+      await repository.reorder('TODO', [
+        { ticketId: c.ticketId, position: first },
+        { ticketId: b.ticketId, position: second },
+        { ticketId: a.ticketId, position: third },
+      ]);
+
+      const list = await repository.findByStatus('TODO');
+      expect(list.map((x) => x.title.value)).toEqual(['c', 'b', 'a']);
+      expect(list.map((x) => x.position.value)).toEqual(['a0', 'a1', 'a2']);
+    });
+  });
 });

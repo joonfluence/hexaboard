@@ -133,3 +133,16 @@
 | TC-API-073 | 이동 요청 스키마 | `status`·`anchorTicketId`·`placement`만 있고 `position` 없음 | FR-04, 헌법 IV | ✅ |
 | TC-API-074 | 커밋된 `packages/api-client/openapi.json` | 서버 DTO에서 지금 생성한 문서와 같음(어긋남 감지) | TRD 03 | ✅ |
 
+
+## 컬럼 정렬 — `POST /v1/tickets/sort` (006)
+
+| ID | 시나리오 | 기대 결과 | 근거 | 상태 |
+|----|----------|-----------|------|------|
+| TC-API-075 | 우선순위 오름·내림 | `204`, 목록에 정렬 결과 반영 | FR-09 | ✅ |
+| TC-API-076 | 마감일 오름·내림, 마감일 없는 카드 | 방향과 무관하게 없는 카드가 맨 뒤 | FR-09 | ✅ |
+| TC-API-077 | 다른 컬럼 | 순서·상태 불변 | FR-09 | ✅ |
+| TC-API-078 | 정렬 뒤 새 티켓 생성·이동 | `TODO` 맨 뒤 생성, 이동 정상 | D-79 | ✅ |
+| TC-API-079 | 빈 컬럼 | `204` | D-98 | ✅ |
+| TC-API-080 | `status`·`sortBy`·`direction` 누락·허용 밖(6종) | `400` `VALIDATION_FAILED` | api_spec | ✅ |
+| TC-API-081 | 올바르지 않은 JSON·JSON 아닌 `Content-Type` | `400`·`415` | api_spec | ✅ |
+| TC-API-082 | 정렬 뒤 내용 필드 | 제목 등 그대로 | FR-09 | ✅ |

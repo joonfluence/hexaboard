@@ -22,6 +22,7 @@ import {
   GetTicket,
   ListTickets,
   MoveTicket,
+  SortColumn,
   UpdateTicket,
 } from '@todo/application';
 import { JsonContentTypeGuard } from '../common/json-content-type.guard';
@@ -29,6 +30,7 @@ import { RejectFieldsPipe } from '../common/reject-fields.pipe';
 import { createBodyValidationPipe } from '../common/validation';
 import { ValidationFailedException } from '../common/http-errors';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { SortColumnDto } from './dto/sort-column.dto';
 import { MovePositionDto } from './dto/move-position.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketResponse, toTicketResponse } from './dto/ticket-response.dto';
@@ -63,6 +65,7 @@ export class TicketsController {
     @Inject(DeleteTicket) private readonly deleteTicket: DeleteTicket,
     @Inject(UpdateTicket) private readonly updateTicket: UpdateTicket,
     @Inject(MoveTicket) private readonly moveTicket: MoveTicket,
+    @Inject(SortColumn) private readonly sortColumn: SortColumn,
   ) {}
 
   @Post()
@@ -79,6 +82,17 @@ export class TicketsController {
       dueAt: dto.dueAt ? new Date(dto.dueAt) : null,
     });
     return toTicketResponse(ticket);
+  }
+
+  @Post('sort')
+  @HttpCode(204)
+  @UseGuards(JsonContentTypeGuard)
+  @ApiNoContentResponse()
+  async sort(
+    @Body(new RejectFieldsPipe({}), createBodyValidationPipe())
+    dto: SortColumnDto,
+  ): Promise<void> {
+    await this.sortColumn.execute(dto);
   }
 
   @Get()

@@ -17,6 +17,14 @@ import { TicketMapper } from './ticket.mapper';
 /** (상태, 순서 키) 유니크 제약의 이름. 마이그레이션이 정한다. */
 const POSITION_UNIQUE_CONSTRAINT = 'ticket_status_position_key';
 
+/** (상태, 순서 키) 유니크 제약 위반이면 PositionConflictError, 아니면 그대로. */
+function toConflict(error: unknown): unknown {
+  return error instanceof UniqueConstraintViolationException &&
+    (error as { constraint?: string }).constraint === POSITION_UNIQUE_CONSTRAINT
+    ? new PositionConflictError()
+    : error;
+}
+
 export class MikroOrmTicketRepository implements TicketRepository {
   constructor(
     private readonly orm: MikroORM,
@@ -37,14 +45,7 @@ export class MikroOrmTicketRepository implements TicketRepository {
     try {
       await em.flush();
     } catch (error) {
-      if (
-        error instanceof UniqueConstraintViolationException &&
-        (error as { constraint?: string }).constraint ===
-          POSITION_UNIQUE_CONSTRAINT
-      ) {
-        throw new PositionConflictError();
-      }
-      throw error;
+      throw toConflict(error);
     }
   }
 
@@ -146,5 +147,40 @@ export class MikroOrmTicketRepository implements TicketRepository {
     entity.position = position.value;
     await this.flushOrConflict(em);
     return this.mapper.toDomain(entity);
+  }
+
+  async findByStatus(status: TicketStatus): Promise<Ticket[]> {
+    const entities = await this.orm.em
+      .fork()
+      .find(TicketSchema, { status }, { orderBy: { position: 'asc' } });
+    return entities.map((entity) => this.mapper.toDomain(entity));
+  }
+
+  async reorder(
+    status: TicketStatus,
+    assignments: readonly { ticketId: string; position: Position }[],
+  ): Promise<void> {
+    try {
+      await this.orm.em.fork().transactional(async (tx) => {
+        // 1단계: 카드마다 유일한 임시 키로 옮겨 새 키가 다른 카드의 기존 키와 겹쳐도 충돌하지 않게 한다.
+        for (const { ticketId } of assignments) {
+          await tx.nativeUpdate(
+            TicketSchema,
+            { publicId: ticketId, status },
+            { position: `~${ticketId}` },
+          );
+        }
+        // 2단계: 최종 키를 쓴다.
+        for (const { ticketId, position } of assignments) {
+          await tx.nativeUpdate(
+            TicketSchema,
+            { publicId: ticketId, status },
+            { position: position.value },
+          );
+        }
+      });
+    } catch (error) {
+      throw toConflict(error);
+    }
   }
 }

@@ -10,6 +10,7 @@ describe('OpenAPI 계약 (005)', () => {
 
     expect(Object.keys(paths).sort()).toEqual([
       '/v1/tickets',
+      '/v1/tickets/sort',
       '/v1/tickets/{ticketId}',
       '/v1/tickets/{ticketId}/position',
     ]);
