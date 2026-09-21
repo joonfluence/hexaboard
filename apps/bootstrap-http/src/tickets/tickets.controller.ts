@@ -1,14 +1,25 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Inject,
   Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
-import { CreateTicket, GetTicket } from '@todo/application';
+import {
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger';
+import {
+  CreateTicket,
+  DeleteTicket,
+  GetTicket,
+  ListTickets,
+} from '@todo/application';
 import { JsonContentTypeGuard } from '../common/json-content-type.guard';
 import { RejectFieldsPipe } from '../common/reject-fields.pipe';
 import { createBodyValidationPipe } from '../common/validation';
@@ -41,6 +52,8 @@ export class TicketsController {
   constructor(
     @Inject(CreateTicket) private readonly createTicket: CreateTicket,
     @Inject(GetTicket) private readonly getTicket: GetTicket,
+    @Inject(ListTickets) private readonly listTickets: ListTickets,
+    @Inject(DeleteTicket) private readonly deleteTicket: DeleteTicket,
   ) {}
 
   @Post()
@@ -59,11 +72,26 @@ export class TicketsController {
     return toTicketResponse(ticket);
   }
 
+  @Get()
+  @ApiOkResponse({ type: TicketResponse, isArray: true })
+  async list(): Promise<TicketResponse[]> {
+    return (await this.listTickets.execute()).map(toTicketResponse);
+  }
+
   @Get(':ticketId')
   @ApiOkResponse({ type: TicketResponse })
   async get(
     @Param('ticketId', ParseTicketIdPipe) ticketId: string,
   ): Promise<TicketResponse> {
     return toTicketResponse(await this.getTicket.execute(ticketId));
+  }
+
+  @Delete(':ticketId')
+  @HttpCode(204)
+  @ApiNoContentResponse()
+  async remove(
+    @Param('ticketId', ParseTicketIdPipe) ticketId: string,
+  ): Promise<void> {
+    await this.deleteTicket.execute(ticketId);
   }
 }

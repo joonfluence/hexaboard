@@ -5,7 +5,12 @@ import {
   type DynamicModule,
   type OnModuleInit,
 } from '@nestjs/common';
-import { CreateTicket, GetTicket } from '@todo/application';
+import {
+  CreateTicket,
+  DeleteTicket,
+  GetTicket,
+  ListTickets,
+} from '@todo/application';
 import { DatabaseMigrator, PersistenceModule } from '@todo/persistence';
 import type { DatabaseSettings } from '@todo/persistence';
 import { TicketsController } from './tickets/tickets.controller';
@@ -30,7 +35,13 @@ export class AppModule {
       module: AppModule,
       imports: [PersistenceModule.forRoot(settings)],
       controllers: [TicketsController],
-      providers: [StartupMigration, CreateTicket, GetTicket],
+      providers: [
+        StartupMigration,
+        CreateTicket,
+        GetTicket,
+        ListTickets,
+        DeleteTicket,
+      ],
     };
   }
 }

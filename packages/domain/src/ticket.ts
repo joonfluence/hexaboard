@@ -4,7 +4,10 @@ import { Position } from './position';
 import { Priority } from './priority';
 import { Title } from './title';
 
-export type TicketStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
+/** 보드 컬럼 순서다. */
+export const TICKET_STATUSES = ['TODO', 'IN_PROGRESS', 'DONE'] as const;
+
+export type TicketStatus = (typeof TICKET_STATUSES)[number];
 
 export interface CreateTicketProps {
   title: string;

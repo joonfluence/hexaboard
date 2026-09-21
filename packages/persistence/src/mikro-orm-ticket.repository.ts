@@ -4,7 +4,12 @@ import {
   PositionConflictError,
   type TicketRepository,
 } from '@todo/application';
-import { Position, type Ticket, type TicketStatus } from '@todo/domain';
+import {
+  Position,
+  TICKET_STATUSES,
+  type Ticket,
+  type TicketStatus,
+} from '@todo/domain';
 import { TicketSchema } from './ticket.entity';
 import { TicketMapper } from './ticket.mapper';
 
@@ -53,5 +58,24 @@ export class MikroOrmTicketRepository implements TicketRepository {
         { orderBy: { position: 'desc' }, limit: 1 },
       );
     return last ? Position.from(last.position) : null;
+  }
+
+  async findAll(): Promise<Ticket[]> {
+    const entities = await this.orm.em
+      .fork()
+      .find(TicketSchema, {}, { orderBy: { position: 'asc' } });
+    // 순서 키(C collation) 순으로 읽은 뒤 상태로 안정 정렬해 컬럼 안 순서를 유지한다.
+    const rank = (status: string) =>
+      TICKET_STATUSES.indexOf(status as TicketStatus);
+    return entities
+      .toSorted((a, b) => rank(a.status) - rank(b.status))
+      .map((entity) => this.mapper.toDomain(entity));
+  }
+
+  async deleteByTicketId(ticketId: string): Promise<boolean> {
+    const deleted = await this.orm.em
+      .fork()
+      .nativeDelete(TicketSchema, { publicId: ticketId });
+    return deleted > 0;
   }
 }

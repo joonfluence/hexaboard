@@ -1,5 +1,7 @@
 export * from './create-ticket.use-case';
+export * from './delete-ticket.use-case';
 export * from './errors';
 export * from './get-ticket.use-case';
+export * from './list-tickets.use-case';
 export * from './ticket.repository';
 export * from './tokens';

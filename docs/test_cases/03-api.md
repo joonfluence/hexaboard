@@ -57,3 +57,23 @@
 | TC-API-025 | V8: JSON이 아닌 `Content-Type` | `415` `UNSUPPORTED_MEDIA_TYPE`(프레임워크 기본은 `500`이라 가드로 구현) | api_spec | ✅ |
 | TC-API-026 | 검증 실패 응답 형식 | `statusCode`·`code`·`message`, 필드별 `details` | api_spec | ✅ |
 | TC-API-027 | 모든 검증 실패 뒤 | 저장된 티켓 0건 | 기능 명세 SC-002 | ✅ |
+
+## 티켓 목록 조회 — `GET /v1/tickets` (002 US1)
+
+| ID | 시나리오 | 기대 결과 | 근거 | 상태 |
+|----|----------|-----------|------|------|
+| TC-API-028 | 티켓 없음 | `200`, 빈 배열 | api_spec | ✅ |
+| TC-API-029 | 여러 건 | `200`, 모두 포함하고 각 항목은 단건 조회 표현과 같음 | FR-01 | ✅ |
+| TC-API-030 | 상태가 섞인 티켓 | 상태 순서(`TODO`→`IN_PROGRESS`→`DONE`)이고 같은 상태는 컬럼 순서 | FR-03 | ✅ |
+| TC-API-031 | 응답 필드 | 내부 PK·`position` 없음, 정해진 8개 필드만 | D-80 | ✅ |
+
+## 티켓 삭제 — `DELETE /v1/tickets/{ticketId}` (002 US2)
+
+| ID | 시나리오 | 기대 결과 | 근거 | 상태 |
+|----|----------|-----------|------|------|
+| TC-API-032 | 존재하는 티켓 삭제 | `204`, 본문 없음 | api_spec | ✅ |
+| TC-API-033 | 삭제 뒤 단건 조회·목록 | 조회 `404`, 목록에서 사라짐 | FR-01 | ✅ |
+| TC-API-034 | 같은 컬럼의 다른 티켓 | 남은 티켓과 순서 그대로 | 002 US2 | ✅ |
+| TC-API-035 | 없는 티켓·이미 삭제된 티켓 | `404` `TICKET_NOT_FOUND` | api_spec | ✅ |
+| TC-API-036 | UUID 형식이 아님 | `400` `INVALID_TICKET_ID` | api_spec | ✅ |
+| TC-API-037 | 삭제 뒤 새 티켓 생성 | `201`, `TODO` 맨 뒤 | D-79 | ✅ |

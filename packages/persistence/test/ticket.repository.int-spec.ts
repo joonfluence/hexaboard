@@ -107,4 +107,63 @@ describe('MikroOrmTicketRepository (Testcontainers Postgres)', () => {
     expect(Object.keys(found!)).not.toContain('id');
     expect(JSON.stringify(found)).not.toMatch(/"id"/);
   });
+  describe('전체 조회와 삭제 (002)', () => {
+    const inStatus = async (
+      status: 'TODO' | 'IN_PROGRESS' | 'DONE',
+      title: string,
+      key: string,
+    ) => {
+      const saved = await repository.save(
+        Ticket.create({ title, position: Position.from(key) }),
+      );
+      await db.orm.em
+        .getConnection()
+        .execute(
+          `UPDATE ticket SET status = '${status}' WHERE public_id = '${saved.ticketId}'`,
+        );
+      return saved;
+    };
+
+    it('TC-PER-023: 빈 저장소를 전체 조회하면 빈 배열이다', async () => {
+      expect(await repository.findAll()).toEqual([]);
+    });
+
+    it('TC-PER-024: 상태 순서이고 같은 상태는 순서 키 오름차순이다', async () => {
+      await inStatus('DONE', 'done-2', 'a1');
+      await inStatus('TODO', 'todo-2', 'a1');
+      await inStatus('IN_PROGRESS', 'prog', 'a0');
+      await inStatus('DONE', 'done-1', 'a0');
+      await inStatus('TODO', 'todo-1', 'a0');
+
+      const all = await repository.findAll();
+
+      expect(all.map((ticket) => ticket.title.value)).toEqual([
+        'todo-1',
+        'todo-2',
+        'prog',
+        'done-1',
+        'done-2',
+      ]);
+    });
+
+    it('TC-PER-025: ticketId로 삭제하면 true이고 다른 티켓은 그대로다', async () => {
+      const a = await repository.save(newTicket(Position.first(), 'a'));
+      const b = await repository.save(
+        newTicket(Position.after(Position.first()), 'b'),
+      );
+
+      expect(await repository.deleteByTicketId(a.ticketId)).toBe(true);
+
+      expect(await repository.findByTicketId(a.ticketId)).toBeNull();
+      expect(await repository.findByTicketId(b.ticketId)).not.toBeNull();
+    });
+
+    it('TC-PER-026: 없는 ticketId를 삭제하면 false다', async () => {
+      expect(
+        await repository.deleteByTicketId(
+          '00000000-0000-4000-8000-000000000000',
+        ),
+      ).toBe(false);
+    });
+  });
 });

@@ -7,4 +7,8 @@ export interface TicketRepository {
   findByTicketId(ticketId: string): Promise<Ticket | null>;
   /** 상태(컬럼)에서 가장 뒤에 있는 카드의 순서 키. 비어 있으면 null. */
   findLastPosition(status: TicketStatus): Promise<Position | null>;
+  /** 모든 티켓. 상태 순서(`TICKET_STATUSES`), 같은 상태 안에서는 순서 키 오름차순. */
+  findAll(): Promise<Ticket[]>;
+  /** 공개 식별자로 삭제한다. 지웠으면 true, 없으면 false. */
+  deleteByTicketId(ticketId: string): Promise<boolean>;
 }

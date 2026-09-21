@@ -65,6 +65,33 @@ export async function getTicket(
   };
 }
 
+/** 목록 조회 요청. 본문은 티켓 배열이다. */
+export async function listTickets(baseUrl: string): Promise<{
+  status: number;
+  json(): Promise<TicketBody[]>;
+}> {
+  const response = await fetch(`${baseUrl}/v1/tickets`);
+  return {
+    status: response.status,
+    json: () => response.json() as Promise<TicketBody[]>,
+  };
+}
+
+/** 티켓 삭제 요청. 성공하면 본문이 없다. */
+export async function deleteTicket(
+  baseUrl: string,
+  ticketId: string,
+): Promise<ApiResponse & { text(): Promise<string> }> {
+  const response = await fetch(`${baseUrl}/v1/tickets/${ticketId}`, {
+    method: 'DELETE',
+  });
+  return {
+    status: response.status,
+    json: () => response.json() as Promise<TicketBody>,
+    text: () => response.text(),
+  };
+}
+
 export const UUID_V4 =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 

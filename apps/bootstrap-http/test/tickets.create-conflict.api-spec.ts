@@ -34,6 +34,12 @@ function conflictingRepository(conflicts: number) {
       calls.findLastPosition += 1;
       return null;
     },
+    async findAll() {
+      return [];
+    },
+    async deleteByTicketId() {
+      return false;
+    },
   };
   return { repository, calls };
 }

@@ -1,6 +1,6 @@
 import { InvalidTitleError } from '../src/errors';
 import { Position } from '../src/position';
-import { Ticket } from '../src/ticket';
+import { Ticket, TICKET_STATUSES } from '../src/ticket';
 
 const UUID_V4 =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -109,5 +109,11 @@ describe('Ticket.rehydrate', () => {
     expect(() => Ticket.rehydrate({ ...stored, title: '   ' })).toThrow(
       InvalidTitleError,
     );
+  });
+});
+
+describe('TICKET_STATUSES', () => {
+  it('TC-DOM-038: 상태 목록을 TODO, IN_PROGRESS, DONE 순서로 노출한다', () => {
+    expect(TICKET_STATUSES).toEqual(['TODO', 'IN_PROGRESS', 'DONE']);
   });
 });
