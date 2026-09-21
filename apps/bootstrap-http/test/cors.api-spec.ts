@@ -57,6 +57,21 @@ describe('CORS (api_spec, D-97)', () => {
       ).toContain('x-request-id');
     });
 
+    it('W3C 트레이스 헤더(traceparent, tracestate)를 허용한다(웹→서버 트레이스 연결)', async () => {
+      const pre = await fetch(`${t.baseUrl}/v1/tickets`, {
+        method: 'OPTIONS',
+        headers: {
+          origin: ALLOWED,
+          'access-control-request-method': 'GET',
+          'access-control-request-headers': 'traceparent,tracestate',
+        },
+      });
+      const allowed =
+        pre.headers.get('access-control-allow-headers')?.toLowerCase() ?? '';
+      expect(allowed).toContain('traceparent');
+      expect(allowed).toContain('tracestate');
+    });
+
     it('TC-RUN-012: 허용하지 않은 오리진에는 허용 헤더를 주지 않는다', async () => {
       const response = await preflight(t.baseUrl, 'https://evil.example.com');
 
