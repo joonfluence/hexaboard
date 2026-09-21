@@ -103,3 +103,4 @@
 | v0.96 | 2026-09-21 | 에러 추적·모니터링을 Grafana Cloud 단독으로 확정(D-103). 무료 구간·소스맵 방식 조사 반영, 인프라 미결 항목 갱신 | joonfluence (with Claude) |
 | v0.97 | 2026-09-21 | 관측성 이식 조건(수집기 경유, 환경변수화, 벤더 SDK 비확산) 기록 | joonfluence (with Claude) |
 | v0.98 | 2026-09-21 | 웹에 Grafana Faro SDK 연동(쿼리스트링 제거, 콘솔 미수집), API 요청 ID 전송과 5xx·네트워크 오류 이벤트, 서버 CORS의 `X-Request-Id` 허용·노출 | joonfluence (with Claude) |
+| v0.99 | 2026-09-21 | 서버에 OpenTelemetry(OTLP) 연동: 로그·트레이스·메트릭을 Grafana Cloud로 직접 전송, 접근 로그에 traceId·spanId 추가, 트레이스에 요청 ID 속성, 500 예외 기록(D-104) | joonfluence (with Claude) |
