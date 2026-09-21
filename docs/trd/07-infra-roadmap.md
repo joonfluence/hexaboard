@@ -30,9 +30,9 @@
 | 영역 | 내용 |
 |------|------|
 | 에러 추적 | Grafana Cloud 단독([D-103](../decision_log.md)). 웹은 Faro SDK로 예외를 수집하고 소스맵을 올려 원본 코드로 본다. 서버 예외는 로그·트레이스로 보낸다. 릴리스(커밋 SHA)를 붙여 배포별로 본다 |
-| 로그 (서버 접근 로그·요청 ID ✅) | 서버는 요청마다 JSON 한 줄(`requestId`, `method`, `path`, `status`, `durationMs`)을 표준 출력에 쓰고 `X-Request-Id` 응답 헤더를 돌려준다. 안전한 `X-Request-Id` 요청 헤더는 이어받는다. 쿼리스트링·본문은 남기지 않는다. 앱 오류 로그는 아직 Nest 기본 형식이다. 수집·조회는 Grafana 계열(Loki 등)을 우선 검토 |
-| 메트릭·대시보드 | 서버 요청 수·오류율·지연·DB 연결, 웹 Core Web Vitals. Grafana로 대시보드를 만든다 |
-| 트레이스 | 서버 요청을 OpenTelemetry로 계측하고 프런트→백엔드 요청 ID를 잇는다(2차 후보) |
+| 로그 (서버 접근 로그·요청 ID ✅) | 서버는 요청마다 JSON 한 줄(`requestId`, `method`, `path`, `status`, `durationMs`)을 표준 출력에 쓰고 `X-Request-Id` 응답 헤더를 돌려준다. 안전한 `X-Request-Id` 요청 헤더는 이어받는다. 쿼리스트링·본문은 남기지 않는다. `OTEL_EXPORTER_OTLP_ENDPOINT`가 있으면 같은 로그를 OTel 로그로도 보내 Grafana Cloud(Loki)에서 조회한다([D-104](../decision_log.md)). 앱 오류 로그는 아직 Nest 기본 형식이다 |
+| 메트릭·대시보드 (서버 메트릭 전송 ✅, 대시보드 ⏳) | 서버 요청 수·오류율·지연·DB 연결, 웹 Core Web Vitals. Grafana로 대시보드를 만든다 |
+| 트레이스 ✅ | 서버 요청·express·pg 쿼리를 OpenTelemetry로 계측한다(`/health` 제외). 트레이스에 `app.request_id` 속성을 남겨 웹(Faro)이 보낸 요청 ID로 찾고, 접근 로그의 `traceId`로 로그와 트레이스를 오간다. 500 오류는 스팬에 예외로 기록한다. 웹→서버 트레이스 컨텍스트(`traceparent`) 전파는 아직 없다 |
 | 알림 | 가동 확인(uptime), 오류율, 지연에 알림. 1인 운영이므로 과하지 않게 |
 | 웹 (Faro ✅) | 프론트 오류·성능은 Grafana Faro 브라우저 SDK로 수집한다. `NEXT_PUBLIC_FARO_URL`이 없으면 꺼진다(로컬·테스트). 콘솔 로그는 수집하지 않고, 페이지 주소의 쿼리스트링·해시(검색어)는 전송 직전에 제거한다. API 요청마다 `X-Request-Id`를 보내고(서버 CORS가 허용·노출) 5xx·네트워크 오류는 `api_failure` 이벤트로 요청 ID와 함께 남긴다. 릴리스는 `NEXT_PUBLIC_APP_VERSION`(Vercel 커밋 SHA). 소스맵 업로드는 미구현. 원래 항목: 프론트 오류·성능은 브라우저 SDK로 수집한다. 개인정보(제목·설명 본문)는 전송하지 않도록 마스킹 |
 
@@ -40,7 +40,7 @@
 
 Grafana Cloud로 시작하되([D-103](../decision_log.md)) 나중에 같은 스택을 직접 운영하는 환경으로 옮길 수 있게 다음을 지킨다.
 
-- 서버는 수집 서버에 직접 보내지 않고 **중간 수집기(Alloy 또는 OTel Collector)**를 거친다. 전환은 수집기 설정만 바꾼다.
+- 서버는 OTLP 표준으로 보내므로 대상 전환은 엔드포인트 환경변수만 바꾸면 된다. 무료 PaaS에서는 수집기를 따로 띄울 수 없어 지금은 Grafana Cloud로 직접 보내고([D-104](../decision_log.md)), 온프레미스로 옮길 때 **중간 수집기(Alloy 또는 OTel Collector)**를 둔다.
 - 엔드포인트·토큰은 전부 환경변수로 받고 코드에 두지 않는다. 웹은 Faro 수집 URL만 환경변수로 받는다.
 - 앱 계측은 OpenTelemetry와 표준 JSON 로그만 쓰고 벤더 전용 SDK API를 앱 코드에 퍼뜨리지 않는다.
 - 주의: Frontend Observability 화면과 소스맵 처리는 Cloud 기능일 수 있어 온프레미스에서는 일반 Grafana 대시보드로 대체될 수 있다(도입 전 공식 문서로 확인). 온프레미스 운영은 저장소·백업·업그레이드를 직접 맡으므로 필요(데이터 위치, 보안 정책, 비용)가 생길 때 옮긴다.

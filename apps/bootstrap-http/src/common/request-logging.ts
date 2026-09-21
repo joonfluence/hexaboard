@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { ROOT_CONTEXT, trace } from '@opentelemetry/api';
+import { SeverityNumber, logs } from '@opentelemetry/api-logs';
 
 interface RequestLike {
   method: string;
@@ -18,6 +20,9 @@ export interface AccessLogEntry {
   path: string;
   status: number;
   durationMs: number;
+  /** 계측이 켜져 있을 때만 있다. 로그와 트레이스를 잇는 키다. */
+  traceId?: string;
+  spanId?: string;
 }
 
 export const REQUEST_ID_HEADER = 'x-request-id';
@@ -41,6 +46,10 @@ export function requestLogging(write: (entry: AccessLogEntry) => void) {
     const requestId = pickRequestId(req.headers[REQUEST_ID_HEADER]);
     const startedAt = process.hrtime.bigint();
     res.setHeader('X-Request-Id', requestId);
+    // 트레이스에서도 웹(Faro)이 보낸 요청 ID로 찾을 수 있게 한다. 계측이 꺼져 있으면 아무 일도 하지 않는다.
+    const span = trace.getActiveSpan();
+    span?.setAttribute('app.request_id', requestId);
+    const spanContext = span?.spanContext();
     res.on('finish', () => {
       write({
         requestId,
@@ -48,6 +57,10 @@ export function requestLogging(write: (entry: AccessLogEntry) => void) {
         path: req.originalUrl.split('?')[0] ?? '',
         status: res.statusCode,
         durationMs: Number(process.hrtime.bigint() - startedAt) / 1e6,
+        ...(spanContext && {
+          traceId: spanContext.traceId,
+          spanId: spanContext.spanId,
+        }),
       });
     });
     next();
@@ -59,4 +72,24 @@ export function jsonLineSink(entry: AccessLogEntry): void {
   process.stdout.write(
     `${JSON.stringify({ level: 'info', msg: 'request', ...entry })}\n`,
   );
+}
+
+/** OTel 로그로 보내는 싱크. 트레이스 ID를 실어 Grafana에서 로그↔트레이스를 오갈 수 있게 한다. */
+export function otelLogSink(entry: AccessLogEntry): void {
+  const { traceId, spanId, ...attributes } = entry;
+  logs.getLogger('access').emit({
+    severityNumber:
+      entry.status >= 500 ? SeverityNumber.ERROR : SeverityNumber.INFO,
+    severityText: entry.status >= 500 ? 'ERROR' : 'INFO',
+    body: 'request',
+    attributes,
+    ...(traceId &&
+      spanId && {
+        context: trace.setSpanContext(ROOT_CONTEXT, {
+          traceId,
+          spanId,
+          traceFlags: 1,
+        }),
+      }),
+  });
 }

@@ -6,6 +6,7 @@ import {
   type ArgumentsHost,
   type ExceptionFilter,
 } from '@nestjs/common';
+import { SpanStatusCode, trace } from '@opentelemetry/api';
 import {
   AnchorTicketNotFoundError,
   InvalidPositionTargetError,
@@ -137,6 +138,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return;
     }
 
+    // 500은 트레이스에도 오류로 남긴다(계측이 꺼져 있으면 아무 일도 하지 않는다).
+    const span = trace.getActiveSpan();
+    span?.recordException(
+      exception instanceof Error ? exception : String(exception),
+    );
+    span?.setStatus({ code: SpanStatusCode.ERROR });
     this.logger.error(
       exception instanceof Error ? exception.stack : String(exception),
     );
