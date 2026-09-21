@@ -1,4 +1,4 @@
-import { readDatabaseSettings, readPort } from '../src/config';
+import { readCorsOrigins, readDatabaseSettings, readPort } from '../src/config';
 
 const env = {
   DATABASE_HOST: 'localhost',
@@ -44,5 +44,18 @@ describe('환경변수 설정', () => {
 
   it('서버 포트를 읽는다', () => {
     expect(readPort(env)).toBe(3000);
+  });
+});
+
+describe('CORS 허용 오리진 설정', () => {
+  it('TC-RUN-010: 쉼표로 나눠 공백을 제거해 읽고, 비어 있거나 없으면 빈 목록이다', () => {
+    expect(
+      readCorsOrigins({
+        CORS_ALLOWED_ORIGINS:
+          ' http://localhost:3100 , https://app.example.com ,',
+      }),
+    ).toEqual(['http://localhost:3100', 'https://app.example.com']);
+    expect(readCorsOrigins({ CORS_ALLOWED_ORIGINS: '' })).toEqual([]);
+    expect(readCorsOrigins({})).toEqual([]);
   });
 });

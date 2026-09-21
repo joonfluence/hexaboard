@@ -55,6 +55,8 @@ export interface TestApp {
 export interface TestAppOptions {
   /** 저장소를 테스트 대역으로 바꾼다(예: 동시 생성 충돌을 재현). 생략하면 실제 저장소를 쓴다. */
   repository?: TicketRepository;
+  /** CORS로 허용할 오리진. 생략하면 허용하지 않는다. */
+  corsOrigins?: string[];
 }
 
 /** Testcontainers Postgres 위에 실제 Nest 앱을 띄운다. Docker가 없으면 시작 단계에서 실패한다. */
@@ -72,10 +74,10 @@ export async function startTestApp(
       .useValue(options.repository)
       .compile();
     app = moduleRef.createNestApplication({ logger: ['error', 'warn'] });
-    configureApp(app);
+    configureApp(app, { corsOrigins: options.corsOrigins });
     await app.init();
   } else {
-    app = await createApp(settings);
+    app = await createApp(settings, { corsOrigins: options.corsOrigins });
   }
   await app.listen(0, '127.0.0.1');
   const baseUrl = await app.getUrl();

@@ -15,6 +15,9 @@
 | TC-RUN-007 | 마이그레이션 실패 | 기동 중단 | D-72 | ✅ |
 | TC-RUN-008 | `/v1` 아래 없는 경로 | 프레임워크 기본 `404` | api_spec | ✅ |
 | TC-RUN-009 | 접두사 없는 경로 | `404` | D-66 | ✅ |
+| TC-RUN-010 | `CORS_ALLOWED_ORIGINS` 읽기(쉼표 구분, 공백 제거, 비어 있으면 빈 목록) | 오리진 배열 | api_spec CORS, D-97 | ✅ |
+| TC-RUN-011 | 허용한 오리진의 사전 요청(`OPTIONS`) | `Access-Control-Allow-Origin`이 그 오리진이고 `PUT`·`PATCH`·`DELETE` 허용 | api_spec CORS | ✅ |
+| TC-RUN-012 | 허용하지 않은 오리진, 허용 목록이 빈 경우 | `Access-Control-Allow-Origin` 헤더 없음 | api_spec CORS | ✅ |
 
 ## 티켓 생성 — `POST /v1/tickets` (US1)
 

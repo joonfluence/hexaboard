@@ -1,6 +1,6 @@
 # 컴포넌트 명세 (프론트엔드 UI)
 
-`apps/web`의 UI 컴포넌트 명세다. 확정된 결정에서 옮긴 내용만 "확정"으로 적고, 문서에 근거가 없는 것은 **미정**으로 남긴다. 아직 `apps/web`은 구현 전이라 모든 컴포넌트가 ⏳ 미구현이다.
+`apps/web`의 UI 컴포넌트 명세다. 확정된 결정에서 옮긴 내용만 "확정"으로 적고, 문서에 근거가 없는 것은 **미정**으로 남긴다. `apps/web`은 기능 005에서 구현한다. 상태: ✅ 구현, ⏳ 미구현, ⏸ 보류(백엔드 기능이 아직 없음).
 
 ## 규칙
 
@@ -25,11 +25,11 @@
 | UI-C03 | TicketCard | `entities/ticket` | FR-03, FR-05~07 | [01-board](component_spec/01-board.md) | ⏳ |
 | UI-C04 | PriorityBadge | `entities/ticket` | FR-06 | [01-board](component_spec/01-board.md) | ⏳ |
 | UI-C05 | DueDateBadge | `entities/ticket` | FR-05 | [01-board](component_spec/01-board.md) | ⏳ |
-| UI-C06 | TagBadge | `entities/ticket` | FR-07 | [01-board](component_spec/01-board.md) | ⏳ |
+| UI-C06 | TagBadge | `entities/ticket` | FR-07 | [01-board](component_spec/01-board.md) | ⏸ |
 | UI-C07 | InlineTicketForm | `features/create-ticket` | FR-01 | [02-ticket-editing](component_spec/02-ticket-editing.md) | ⏳ |
 | UI-C08 | TicketDetailModal | `features/edit-ticket` | FR-01, FR-05~07 | [02-ticket-editing](component_spec/02-ticket-editing.md) | ⏳ |
-| UI-C09 | FilterBar | `features/filter-tickets` | FR-08 | [03-board-controls](component_spec/03-board-controls.md) | ⏳ |
-| UI-C10 | ColumnSortMenu | `features/sort-column` | FR-09 | [03-board-controls](component_spec/03-board-controls.md) | ⏳ |
+| UI-C09 | FilterBar | `features/filter-tickets` | FR-08 | [03-board-controls](component_spec/03-board-controls.md) | ⏸ |
+| UI-C10 | ColumnSortMenu | `features/sort-column` | FR-09 | [03-board-controls](component_spec/03-board-controls.md) | ⏸ |
 | UI-C11 | MoveTicket (드래그 조립) | `features/move-ticket` | FR-04 | [03-board-controls](component_spec/03-board-controls.md) | ⏳ |
 | UI-C12 | Toast | `shared/ui` | FR-04(실패 알림) | [03-board-controls](component_spec/03-board-controls.md) | ⏳ |
 

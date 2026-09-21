@@ -35,3 +35,11 @@ export function readDatabaseSettings(env: Env): DatabaseSettings {
 export function readPort(env: Env): number {
   return requiredPort(env, 'PORT');
 }
+
+/** CORS로 허용할 오리진(쉼표 구분). 비어 있거나 없으면 어떤 오리진도 허용하지 않는다. */
+export function readCorsOrigins(env: Env): string[] {
+  return (env['CORS_ALLOWED_ORIGINS'] ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+}
