@@ -93,3 +93,4 @@
 | v0.87 | 2026-09-21 | 006 기능(컬럼 정렬) 구현, D-98 확정, TC-DOM-057~060·TC-PER-035~036·TC-API-075~082 완료 | joonfluence (with Claude) |
 | v0.88 | 2026-09-21 | 007 기능(티켓 태그) 구현, D-99 확정, `tags` 임시 거부 TC-API-023·046 폐기(⛔), TC-DOM-061~067·TC-PER-037~042·TC-API-083~092 완료 | joonfluence (with Claude) |
 | v0.89 | 2026-09-21 | 008 기능(검색·필터) 구현, D-100 확정, 미결 "필터 파라미터 이름·형식" 해소, TC-PER-043~046·TC-API-093~100 완료 | joonfluence (with Claude) |
+| v0.90 | 2026-09-21 | 009 기능(웹 태그·필터·정렬 UI) 구현, D-101 확정, 보류했던 TC-UI-007·017~026 완료와 TC-UI-047~049 추가, UI 컴포넌트 12개 모두 구현 | joonfluence (with Claude) |

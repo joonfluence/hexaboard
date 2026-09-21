@@ -1,6 +1,7 @@
 import type { Ticket, TicketStatus } from '@todo/api-client';
 import { InlineTicketForm } from '@/features/create-ticket/ui/inline-ticket-form';
 import { ColumnDropZone } from '@/features/move-ticket/ui/column-drop-zone';
+import { ColumnSortMenu } from '@/features/sort-column/ui/column-sort-menu';
 import { SortableTicketCard } from '@/features/move-ticket/ui/sortable-ticket-card';
 
 /** 한 상태의 컬럼. 카드 목록(놓기 대상)과, 할 일 컬럼에는 하단 인라인 생성 입력이 있다. */
@@ -9,21 +10,27 @@ export function BoardColumn({
   title,
   tickets,
   onOpenTicket,
+  filterActive,
 }: {
   status: TicketStatus;
   title: string;
   tickets: readonly Ticket[];
   onOpenTicket: (ticketId: string) => void;
+  /** 필터가 적용 중이면 정렬 메뉴를 비활성화한다. */
+  filterActive: boolean;
 }) {
   return (
     <section
       aria-label={title}
       className="flex w-72 shrink-0 flex-col rounded-lg bg-slate-200 p-2"
     >
-      <h2 className="px-1 pb-2 text-sm font-semibold text-slate-700">
-        {title}{' '}
-        <span className="font-normal text-slate-500">{tickets.length}</span>
-      </h2>
+      <div className="flex items-center justify-between px-1 pb-2">
+        <h2 className="text-sm font-semibold text-slate-700">
+          {title}{' '}
+          <span className="font-normal text-slate-500">{tickets.length}</span>
+        </h2>
+        <ColumnSortMenu status={status} disabled={filterActive} />
+      </div>
       <ColumnDropZone status={status} tickets={tickets}>
         {tickets.map((ticket) => (
           <SortableTicketCard

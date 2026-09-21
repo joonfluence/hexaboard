@@ -1,6 +1,7 @@
 import type { Ticket } from '@todo/api-client';
 import { DueDateBadge } from './due-date-badge';
 import { PriorityBadge } from './priority-badge';
+import { TagBadge } from './tag-badge';
 
 /** 티켓 한 장. 제목과 우선순위·마감일 배지를 보여 주고 누르면 상세를 연다(D-56). */
 export function TicketCard({
@@ -20,6 +21,9 @@ export function TicketCard({
       <span className="flex flex-wrap items-center gap-1.5">
         <PriorityBadge priority={ticket.priority} />
         {ticket.dueAt ? <DueDateBadge dueAt={ticket.dueAt} /> : null}
+        {ticket.tags.map((name) => (
+          <TagBadge key={name} name={name} />
+        ))}
       </span>
     </button>
   );

@@ -13,6 +13,7 @@ import {
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useState, type ReactNode } from 'react';
+import type { TicketFilter } from '@/entities/ticket/api/queries';
 import { COLUMNS, type Board } from '@/entities/ticket/model/board';
 import { TicketCard } from '@/entities/ticket/ui/ticket-card';
 import { useMoveTicket } from '../model/use-move-ticket';
@@ -24,12 +25,15 @@ import { planMove } from '../model/plan-move';
  */
 export function BoardDnd({
   board,
+  filter,
   children,
 }: {
   board: Board;
+  /** 지금 표시 중인 목록의 조건. 낙관적 업데이트는 이 목록에 적용한다. */
+  filter: TicketFilter;
   children: ReactNode;
 }) {
-  const { move } = useMoveTicket();
+  const { move } = useMoveTicket(filter);
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),

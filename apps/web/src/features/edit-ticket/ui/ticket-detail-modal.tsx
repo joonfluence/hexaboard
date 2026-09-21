@@ -26,7 +26,7 @@ function toLocalInput(iso: string | null): string {
 }
 
 type FieldErrors = Partial<
-  Record<'title' | 'description' | 'priority' | 'dueAt', string>
+  Record<'title' | 'description' | 'priority' | 'dueAt' | 'tags', string>
 >;
 
 function EditForm({
@@ -41,6 +41,8 @@ function EditForm({
   const [description, setDescription] = useState(ticket.description ?? '');
   const [priority, setPriority] = useState<TicketPriority>(ticket.priority);
   const [dueAt, setDueAt] = useState(initialDue);
+  const [tags, setTags] = useState<string[]>([...ticket.tags]);
+  const [tagText, setTagText] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
   const [failure, setFailure] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -58,7 +60,20 @@ function EditForm({
     if (dueAt !== initialDue) {
       body.dueAt = dueAt === '' ? null : new Date(dueAt).toISOString();
     }
+    const nextTags = [...tags].sort();
+    if (JSON.stringify(nextTags) !== JSON.stringify(ticket.tags)) {
+      body.tags = nextTags;
+    }
     return body;
+  };
+
+  /** 화면에서 미리 정규화(공백 제거·소문자)해 추가한다. 최종 이름은 서버가 정한다. */
+  const addTag = () => {
+    const name = tagText.trim().toLowerCase();
+    if (name && !tags.includes(name)) {
+      setTags([...tags, name]);
+    }
+    setTagText('');
   };
 
   const save = () => {
@@ -141,6 +156,43 @@ function EditForm({
           aria-describedby={describedBy('dueAt')}
           onChange={(event) => setDueAt(event.target.value)}
         />
+      </Field>
+
+      <Field label="태그" htmlFor="tag-input" error={errors.tags}>
+        <div className="flex flex-wrap gap-1.5">
+          {tags.map((name) => (
+            <span
+              key={name}
+              className="inline-flex items-center gap-1 rounded bg-emerald-100 px-1.5 py-0.5 text-xs text-emerald-800"
+            >
+              {name}
+              <button
+                type="button"
+                aria-label={`${name} 제거`}
+                onClick={() => setTags(tags.filter((tag) => tag !== name))}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Input
+            id="tag-input"
+            value={tagText}
+            aria-invalid={errors.tags ? true : undefined}
+            onChange={(event) => setTagText(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                addTag();
+              }
+            }}
+          />
+          <Button variant="ghost" onClick={addTag}>
+            태그 추가
+          </Button>
+        </div>
       </Field>
 
       {failure ? (

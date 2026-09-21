@@ -3,7 +3,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Ticket } from '@todo/api-client';
 import { flattenBoard } from '@/entities/ticket/model/board';
-import { ticketKeys } from '@/entities/ticket/api/queries';
+import {
+  EMPTY_FILTER,
+  ticketKeys,
+  type TicketFilter,
+} from '@/entities/ticket/api/queries';
 import { useApiClient } from '@/shared/api/client';
 import { unwrap } from '@/shared/api/errors';
 import { useToast } from '@/shared/ui/toast';
@@ -16,10 +20,11 @@ export const MOVE_FAILED_MESSAGE =
  * 카드 이동. 응답을 기다리지 않고 순서를 먼저 바꾸고(낙관적 업데이트), 실패하면 원위치로 되돌리고
  * 토스트로 알린 뒤 서버 상태로 목록을 다시 조회한다. 자동 재시도는 하지 않는다(서버가 이미 재시도함, D-68).
  */
-export function useMoveTicket() {
+export function useMoveTicket(filter: TicketFilter = EMPTY_FILTER) {
   const client = useApiClient();
   const queryClient = useQueryClient();
   const toast = useToast();
+  const listKey = ticketKeys.list(filter);
 
   const mutation = useMutation({
     mutationFn: (plan: MovePlan) =>
@@ -31,19 +36,19 @@ export function useMoveTicket() {
       ),
     onMutate: async (plan) => {
       await queryClient.cancelQueries({ queryKey: ticketKeys.all });
-      const previous = queryClient.getQueryData<Ticket[]>(ticketKeys.all);
-      queryClient.setQueryData(ticketKeys.all, flattenBoard(plan.board));
+      const previous = queryClient.getQueryData<Ticket[]>(listKey);
+      queryClient.setQueryData(listKey, flattenBoard(plan.board));
       return { previous };
     },
     onError: (_error, _plan, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(ticketKeys.all, context.previous);
+        queryClient.setQueryData(listKey, context.previous);
       }
       toast.show(MOVE_FAILED_MESSAGE);
       void queryClient.invalidateQueries({ queryKey: ticketKeys.all });
     },
     onSuccess: (moved) => {
-      queryClient.setQueryData<Ticket[]>(ticketKeys.all, (list) =>
+      queryClient.setQueryData<Ticket[]>(listKey, (list) =>
         list?.map((ticket) =>
           ticket.ticketId === moved.ticketId ? moved : ticket,
         ),

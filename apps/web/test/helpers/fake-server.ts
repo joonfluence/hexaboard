@@ -5,6 +5,7 @@ const STATUS_ORDER: TicketStatus[] = ['TODO', 'IN_PROGRESS', 'DONE'];
 export interface RecordedCall {
   method: string;
   path: string;
+  search: string;
   body: unknown;
 }
 
@@ -15,6 +16,13 @@ interface Override {
   path: RegExp;
   respond: Responder;
 }
+
+const normalizeTags = (raw: unknown): string[] =>
+  [
+    ...new Set(
+      ((raw as string[] | undefined) ?? []).map((t) => t.trim().toLowerCase()),
+    ),
+  ].sort();
 
 export const errorResponse = (
   status: number,
@@ -38,13 +46,41 @@ export function createFakeServer(initial: Ticket[] = []) {
       tickets.filter((t) => t.status === status),
     );
 
-  const defaultRespond: Responder = ({ method, path, body }) => {
+  const defaultRespond: Responder = ({ method, path, search, body }) => {
     const single = /^\/v1\/tickets\/([^/]+)$/.exec(path);
     const position = /^\/v1\/tickets\/([^/]+)\/position$/.exec(path);
     const input = (body ?? {}) as Record<string, unknown>;
 
     if (path === '/v1/tickets' && method === 'GET') {
-      return Response.json(listed());
+      const params = new URLSearchParams(search);
+      const q = params.get('q')?.trim().toLowerCase();
+      const priorities = params.getAll('priority');
+      const wanted = params.getAll('tag').map((t) => t.trim().toLowerCase());
+      return Response.json(
+        listed().filter(
+          (t) =>
+            (!q ||
+              t.title.toLowerCase().includes(q) ||
+              (t.description ?? '').toLowerCase().includes(q)) &&
+            (priorities.length === 0 || priorities.includes(t.priority)) &&
+            (wanted.length === 0 || t.tags.some((tag) => wanted.includes(tag))),
+        ),
+      );
+    }
+    if (path === '/v1/tickets/sort' && method === 'POST') {
+      const status = input['status'] as TicketStatus;
+      const rank = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
+      const column = tickets.filter((t) => t.status === status);
+      const key = (t: Ticket) =>
+        input['sortBy'] === 'PRIORITY'
+          ? rank.indexOf(t.priority)
+          : (t.dueAt ?? '');
+      const sign = input['direction'] === 'ASC' ? 1 : -1;
+      const sorted = column.toSorted((a, b) =>
+        key(a) < key(b) ? -sign : key(a) > key(b) ? sign : 0,
+      );
+      tickets = [...tickets.filter((t) => t.status !== status), ...sorted];
+      return new Response(null, { status: 204 });
     }
     if (path === '/v1/tickets' && method === 'POST') {
       const title =
@@ -62,7 +98,7 @@ export function createFakeServer(initial: Ticket[] = []) {
         status: 'TODO',
         priority: 'MEDIUM',
         dueAt: null,
-        tags: [],
+        tags: normalizeTags(input['tags']),
         createdAt: '2026-09-21T00:00:00.000Z',
         updatedAt: '2026-09-21T00:00:00.000Z',
       };
@@ -89,7 +125,13 @@ export function createFakeServer(initial: Ticket[] = []) {
     if (single && method === 'PATCH') {
       const target = tickets.find((t) => t.ticketId === single[1]);
       if (!target) return errorResponse(404, 'TICKET_NOT_FOUND');
-      const patched = { ...target, ...input } as Ticket;
+      const patched = {
+        ...target,
+        ...input,
+        ...(input['tags'] !== undefined
+          ? { tags: normalizeTags(input['tags']) }
+          : {}),
+      } as Ticket;
       tickets = tickets.map((t) => (t === target ? patched : t));
       return Response.json(patched);
     }
@@ -109,6 +151,7 @@ export function createFakeServer(initial: Ticket[] = []) {
     const call: RecordedCall = {
       method: request.method,
       path: url.pathname,
+      search: url.search,
       body: text ? JSON.parse(text) : undefined,
     };
     calls.push(call);
