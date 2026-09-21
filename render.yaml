@@ -5,7 +5,7 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
-    branch: main
+    branch: development # 임시. 검증 후 main으로 되돌린다
     autoDeployTrigger: commit
     healthCheckPath: /health
     envVars:
