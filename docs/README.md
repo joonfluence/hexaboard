@@ -37,6 +37,7 @@ To-do-app 기획·설계 문서 모음이다. **한 문서는 200줄을 넘기�
 | 새 기능 구현 (예: 카드 이동) | [functional_requirements.md](functional_requirements.md), [data_model.md](data_model.md), [api_spec.md](api_spec.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md) |
 | API 추가·변경 | [api_spec.md](api_spec.md), [data_model.md](data_model.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md) |
 | DB 스키마·마이그레이션 | [data_model.md](data_model.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md), [trd/03-data-flow.md](trd/03-data-flow.md), [trd/06-deployment.md](trd/06-deployment.md) |
+| 배포·인프라·모니터링 | [trd/06-deployment.md](trd/06-deployment.md), [trd/07-infra-roadmap.md](trd/07-infra-roadmap.md), [trd/05-dev-environment.md](trd/05-dev-environment.md) |
 | 프론트 화면 구현 | [wireframe.md](wireframe.md), [component_spec.md](component_spec.md), [functional_requirements.md](functional_requirements.md), [api_spec.md](api_spec.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md) (FSD) |
 | 테스트 작성 (TDD) | [test_cases.md](test_cases.md)와 해당 영역의 [test_cases/](test_cases/) 문서 |
 | 패키지·모듈 구조 | [trd/01-system-architecture.md](trd/01-system-architecture.md), [trd/04-layer-boundaries.md](trd/04-layer-boundaries.md) |

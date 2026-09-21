@@ -18,6 +18,8 @@
 | 저장소 | 모노레포. pnpm + Turborepo | 확정 |
 | 배포 (FE) | Vercel | 확정 |
 | 배포 (BE) | Render 무료 플랜 | 확정 |
+| 인프라 관리 | Phase 1 PaaS → Phase 2 IaC(Terraform/OpenTofu). 이식 가능한 컨테이너 구조 | 확정(방향), 도구 세부는 [TRD 07](trd/07-infra-roadmap.md) |
+| 관측성 | 서버·웹 에러 추적 + Grafana 계열 모니터링, 계측은 OpenTelemetry 기준 | 확정(방향), 서비스 선택은 미결 |
 | CI | GitHub Actions (저장소는 GitHub 공개). PR 시 테스트 실행 | 확정 |
 | 테스트 (BE) | Jest | 확정 |
 | 테스트 (FE) | Vitest | 확정 |

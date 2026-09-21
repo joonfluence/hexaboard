@@ -10,6 +10,7 @@
 | [04. 계층 간 경계 규칙](trd/04-layer-boundaries.md) | 패키지 의존 방향, 계층별 허용·금지 규칙 |
 | [05. 개발환경 설정](trd/05-dev-environment.md) | 필요 도구, 환경변수, 스크립트 |
 | [06. 배포 전략](trd/06-deployment.md) | 환경, 배포 트리거, CI, 마이그레이션 실행 |
+| [07. 인프라 로드맵과 관측성](trd/07-infra-roadmap.md) | Phase 1 PaaS·이식 구조, 에러 추적·모니터링, Phase 2 IaC |
 
 ## 핵심 결정 요약
 

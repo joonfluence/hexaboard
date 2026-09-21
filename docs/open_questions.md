@@ -34,6 +34,10 @@
 
 ## 인프라
 
+- [ ] Phase 1 PaaS 선택: 현재 문서는 Render(서버)·Vercel(웹)·Neon(DB)로 확정했으나 Railway 등도 검토 중이다. 회사 정책(데이터 위치·접근 통제)과 가격 확인 뒤 정한다
+- [ ] 에러 추적 서비스 선택(예: Sentry)과 요금제, 웹·서버 SDK 범위
+- [ ] Grafana 구성: Grafana Cloud 무료 구간을 쓸지 자체 호스팅할지, 로그(Loki)·메트릭(Prometheus/Mimir) 수집 경로, 대시보드·알림 항목
+- [ ] Phase 2 대상 클라우드(AWS/GCP 등), 컨테이너 서비스(ECS Fargate/Cloud Run), 예산 상한, 가용성 목표(SLA)
 - [ ] 다중 인스턴스 동시 기동 시 마이그레이션 경합 (무료 플랜은 인스턴스 1개라 낮은 우선순위)
 
 ## 개발환경
