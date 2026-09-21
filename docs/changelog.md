@@ -92,3 +92,4 @@
 | v0.86 | 2026-09-21 | 005 기능(웹 보드: Next·FSD·TanStack Query·dnd-kit) 구현, CORS·OpenAPI·api-client 추가, D-96·D-97 확정, UI 미결 4건 해소, TC-UI 35건 완료·11건 보류 | joonfluence (with Claude) |
 | v0.87 | 2026-09-21 | 006 기능(컬럼 정렬) 구현, D-98 확정, TC-DOM-057~060·TC-PER-035~036·TC-API-075~082 완료 | joonfluence (with Claude) |
 | v0.88 | 2026-09-21 | 007 기능(티켓 태그) 구현, D-99 확정, `tags` 임시 거부 TC-API-023·046 폐기(⛔), TC-DOM-061~067·TC-PER-037~042·TC-API-083~092 완료 | joonfluence (with Claude) |
+| v0.89 | 2026-09-21 | 008 기능(검색·필터) 구현, D-100 확정, 미결 "필터 파라미터 이름·형식" 해소, TC-PER-043~046·TC-API-093~100 완료 | joonfluence (with Claude) |

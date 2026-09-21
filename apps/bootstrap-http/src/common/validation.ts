@@ -21,3 +21,13 @@ export function createBodyValidationPipe(): ValidationPipe {
       new ValidationFailedException(toFieldErrors(errors)),
   });
 }
+
+/** 쿼리 파라미터 검증 파이프. 변환(반복 값 → 배열)을 하고 정의되지 않은 파라미터는 무시한다. */
+export function createQueryValidationPipe(): ValidationPipe {
+  return new ValidationPipe({
+    whitelist: true,
+    transform: true,
+    exceptionFactory: (errors) =>
+      new ValidationFailedException(toFieldErrors(errors)),
+  });
+}

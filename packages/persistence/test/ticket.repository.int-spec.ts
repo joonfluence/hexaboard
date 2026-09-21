@@ -465,4 +465,90 @@ describe('MikroOrmTicketRepository (Testcontainers Postgres)', () => {
       expect(links[0]!.n).toBe('2');
     });
   });
+  describe('필터 (008)', () => {
+    const put = async (
+      title: string,
+      key: string,
+      extra: {
+        description?: string;
+        priority?: string;
+        tags?: string[];
+        status?: 'TODO' | 'IN_PROGRESS' | 'DONE';
+      } = {},
+    ) => {
+      const saved = await repository.save(
+        Ticket.create({
+          title,
+          description: extra.description,
+          priority: extra.priority,
+          tags: extra.tags,
+          position: Position.from(key),
+        }),
+      );
+      if (extra.status) {
+        await db.orm.em
+          .getConnection()
+          .execute(
+            `UPDATE ticket SET status = '${extra.status}' WHERE public_id = '${saved.ticketId}'`,
+          );
+      }
+      return saved;
+    };
+    const titles = async (filter: Parameters<typeof repository.findAll>[0]) =>
+      (await repository.findAll(filter)).map((t) => t.title.value);
+
+    it('TC-PER-043: 검색어는 제목·설명에서 대소문자 무시 부분 일치이고 %·_는 글자 그대로다', async () => {
+      await put('Fix Login', 'a0');
+      await put('문서', 'a1', { description: '로그인 화면 login' });
+      await put('100% done', 'a2');
+      await put('a_b', 'a3');
+      await put('axb', 'a4');
+
+      expect(await titles({ q: 'LOGIN' })).toEqual(['Fix Login', '문서']);
+      expect(await titles({ q: '100%' })).toEqual(['100% done']);
+      expect(await titles({ q: 'a_b' })).toEqual(['a_b']);
+    });
+
+    it('TC-PER-044: 상태·우선순위 필터는 같은 종류 여러 값이 OR이다', async () => {
+      await put('a', 'a0', { priority: 'LOW' });
+      await put('b', 'a1', { priority: 'HIGH', status: 'DONE' });
+      await put('c', 'a2', { priority: 'URGENT', status: 'IN_PROGRESS' });
+
+      expect(await titles({ priorities: ['LOW', 'URGENT'] })).toEqual([
+        'a',
+        'c',
+      ]);
+      expect(await titles({ statuses: ['DONE', 'IN_PROGRESS'] })).toEqual([
+        'c',
+        'b',
+      ]);
+    });
+
+    it('TC-PER-045: 태그 필터는 하나라도 가진 티켓이고 이름은 정규화해 비교한다', async () => {
+      await put('a', 'a0', { tags: ['x'] });
+      await put('b', 'a1', { tags: ['y', 'z'] });
+      await put('c', 'a2');
+
+      expect(await titles({ tags: ['x', 'z'] })).toEqual(['a', 'b']);
+      expect(await titles({ tags: [' X '] })).toEqual(['a']);
+      expect(await titles({ tags: ['none'] })).toEqual([]);
+    });
+
+    it('TC-PER-046: 여러 종류의 조건은 AND이고 순서는 필터 없는 목록과 같다', async () => {
+      await put('a fix', 'a0', { priority: 'HIGH', tags: ['x'] });
+      await put('b fix', 'a1', { priority: 'LOW', tags: ['x'] });
+      await put('c fix', 'a2', {
+        priority: 'HIGH',
+        tags: ['x'],
+        status: 'DONE',
+      });
+      await put('d', 'a3', { priority: 'HIGH', tags: ['x'] });
+
+      expect(
+        await titles({ q: 'fix', priorities: ['HIGH'], tags: ['x'] }),
+      ).toEqual(['a fix', 'c fix']);
+      expect(await titles({})).toEqual(['a fix', 'b fix', 'd', 'c fix']);
+      expect(await titles(undefined)).toEqual(['a fix', 'b fix', 'd', 'c fix']);
+    });
+  });
 });

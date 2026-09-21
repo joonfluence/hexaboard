@@ -155,7 +155,14 @@ export type $defs = Record<string, never>;
 export interface operations {
     TicketsController_list: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 제목·설명 부분 일치(대소문자 무시). */
+                q?: string;
+                status?: ("TODO" | "IN_PROGRESS" | "DONE")[];
+                priority?: ("LOW" | "MEDIUM" | "HIGH" | "URGENT")[];
+                /** @description 하나라도 가진 티켓(OR). 이름은 정규화해 비교한다. */
+                tag?: string[];
+            };
             header?: never;
             path?: never;
             cookie?: never;

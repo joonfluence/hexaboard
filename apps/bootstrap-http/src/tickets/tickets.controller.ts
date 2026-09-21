@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -25,12 +26,17 @@ import {
   SortColumn,
   UpdateTicket,
 } from '@todo/application';
+import type { TicketStatus } from '@todo/domain';
 import { JsonContentTypeGuard } from '../common/json-content-type.guard';
 import { RejectFieldsPipe } from '../common/reject-fields.pipe';
-import { createBodyValidationPipe } from '../common/validation';
+import {
+  createBodyValidationPipe,
+  createQueryValidationPipe,
+} from '../common/validation';
 import { ValidationFailedException } from '../common/http-errors';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { SortColumnDto } from './dto/sort-column.dto';
+import { ListTicketsQuery } from './dto/list-tickets.query';
 import { MovePositionDto } from './dto/move-position.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketResponse, toTicketResponse } from './dto/ticket-response.dto';
@@ -94,8 +100,16 @@ export class TicketsController {
 
   @Get()
   @ApiOkResponse({ type: TicketResponse, isArray: true })
-  async list(): Promise<TicketResponse[]> {
-    return (await this.listTickets.execute()).map(toTicketResponse);
+  async list(
+    @Query(createQueryValidationPipe()) query: ListTicketsQuery,
+  ): Promise<TicketResponse[]> {
+    const tickets = await this.listTickets.execute({
+      q: query.q,
+      statuses: query.status as TicketStatus[] | undefined,
+      priorities: query.priority,
+      tags: query.tag,
+    });
+    return tickets.map(toTicketResponse);
   }
 
   @Get(':ticketId')

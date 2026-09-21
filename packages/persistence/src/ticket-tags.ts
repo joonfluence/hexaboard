@@ -59,4 +59,18 @@ export class TicketTags {
       [ticketPk, ...names],
     );
   }
+
+  /** 주어진 이름 중 하나라도 가진 티켓의 내부 PK. */
+  async ticketPksWithAny(
+    em: EntityManager,
+    names: readonly string[],
+  ): Promise<string[]> {
+    const rows = await em.getConnection().execute<{ ticket_id: string }[]>(
+      `select distinct tt.ticket_id::text as ticket_id
+         from ticket_tag tt join tag t on t.id = tt.tag_id
+        where t.name in (${TicketTags.placeholders(names.length)})`,
+      [...names],
+    );
+    return rows.map((row) => row.ticket_id);
+  }
 }

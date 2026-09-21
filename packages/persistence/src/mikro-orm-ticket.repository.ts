@@ -1,7 +1,11 @@
-import { UniqueConstraintViolationException } from '@mikro-orm/core';
+import {
+  UniqueConstraintViolationException,
+  type FilterQuery,
+} from '@mikro-orm/core';
 import type { EntityManager, MikroORM } from '@mikro-orm/postgresql';
 import {
   PositionConflictError,
+  type TicketFilter,
   type TicketRepository,
 } from '@todo/application';
 import {
@@ -89,18 +93,60 @@ export class MikroOrmTicketRepository implements TicketRepository {
     return last ? Position.from(last.position) : null;
   }
 
-  async findAll(): Promise<Ticket[]> {
+  async findAll(filter: TicketFilter = {}): Promise<Ticket[]> {
     const em = this.orm.em.fork();
-    const entities = await em.find(
-      TicketSchema,
-      {},
-      { orderBy: { position: 'asc' } },
-    );
+    const where = await this.whereOf(em, filter);
+    if (where === null) {
+      return [];
+    }
+    const entities = await em.find(TicketSchema, where, {
+      orderBy: { position: 'asc' },
+    });
     const domain = await this.toDomainAll(em, entities);
     // 순서 키(C collation) 순으로 읽은 뒤 상태로 안정 정렬해 컬럼 안 순서를 유지한다.
     const rank = (status: string) =>
       TICKET_STATUSES.indexOf(status as TicketStatus);
     return domain.toSorted((a, b) => rank(a.status) - rank(b.status));
+  }
+
+  /** 필터를 쿼리 조건으로 바꾼다. 어떤 티켓도 맞을 수 없으면 null. */
+  private async whereOf(
+    em: EntityManager,
+    filter: TicketFilter,
+  ): Promise<FilterQuery<TicketEntity> | null> {
+    const and: FilterQuery<TicketEntity>[] = [];
+    const q = filter.q?.trim();
+    if (q) {
+      // LIKE의 특수 문자(\, %, _)는 글자 그대로 찾는다.
+      const pattern = `%${q.replace(/[\\%_]/g, '\\$&')}%`;
+      and.push({
+        $or: [
+          { title: { $ilike: pattern } },
+          { description: { $ilike: pattern } },
+        ],
+      });
+    }
+    if (filter.statuses?.length) {
+      and.push({ status: { $in: [...filter.statuses] } });
+    }
+    if (filter.priorities?.length) {
+      and.push({
+        priority: {
+          $in: filter.priorities.map((p) => this.mapper.priorityToNumber(p)),
+        },
+      });
+    }
+    const tags = (filter.tags ?? [])
+      .map((tag) => tag.trim().toLowerCase())
+      .filter((tag) => tag.length > 0);
+    if (tags.length > 0) {
+      const pks = await this.tags.ticketPksWithAny(em, tags);
+      if (pks.length === 0) {
+        return null;
+      }
+      and.push({ id: { $in: pks } });
+    }
+    return and.length > 0 ? { $and: and } : {};
   }
 
   async update(ticket: Ticket): Promise<Ticket | null> {

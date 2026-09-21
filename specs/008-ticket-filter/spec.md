@@ -1,6 +1,6 @@
 # Feature Specification: 검색·필터
 
-**Status**: 진행 중
+**Status**: 구현 완료 (2026-09-21, TC-API-093~100 통과)
 
 참조: [FR-08](../../docs/functional_requirements.md), [API 명세 — 목록 조회](../../docs/api_spec.md).
 
