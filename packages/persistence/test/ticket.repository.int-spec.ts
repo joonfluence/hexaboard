@@ -222,4 +222,130 @@ describe('MikroOrmTicketRepository (Testcontainers Postgres)', () => {
       expect(other!.updatedAt).toEqual(b.updatedAt);
     });
   });
+  describe('이동 (004)', () => {
+    const seed = async (
+      status: 'TODO' | 'IN_PROGRESS' | 'DONE',
+      title: string,
+      key: string,
+    ) => {
+      const saved = await repository.save(
+        Ticket.create({ title, position: Position.from(key) }),
+      );
+      await db.orm.em
+        .getConnection()
+        .execute(
+          `UPDATE ticket SET status = '${status}' WHERE public_id = '${saved.ticketId}'`,
+        );
+      return saved;
+    };
+
+    it('TC-PER-030: 같은 상태에서 기준 바로 앞·뒤 키를 찾고, 제외한 티켓과 다른 상태는 무시한다', async () => {
+      const a = await seed('TODO', 'a', 'a0');
+      const b = await seed('TODO', 'b', 'a1');
+      const c = await seed('TODO', 'c', 'a2');
+      await seed('DONE', 'other', 'a1V');
+
+      expect(
+        (await repository.findAdjacentPosition(
+          'TODO',
+          b.position,
+          'BEFORE',
+          c.ticketId,
+        ))!.value,
+      ).toBe('a0');
+      expect(
+        (await repository.findAdjacentPosition(
+          'TODO',
+          b.position,
+          'AFTER',
+          a.ticketId,
+        ))!.value,
+      ).toBe('a2');
+      // 제외한 티켓은 이웃으로 치지 않는다: b 앞의 a를 제외하면 앞 이웃이 없다.
+      expect(
+        await repository.findAdjacentPosition(
+          'TODO',
+          b.position,
+          'BEFORE',
+          a.ticketId,
+        ),
+      ).toBeNull();
+      expect(
+        await repository.findAdjacentPosition(
+          'TODO',
+          c.position,
+          'AFTER',
+          a.ticketId,
+        ),
+      ).toBeNull();
+    });
+
+    it('TC-PER-031: 제외 티켓 말고 카드가 있는지 알려 준다', async () => {
+      const a = await seed('TODO', 'a', 'a0');
+
+      expect(
+        await repository.hasTicketsInStatus(
+          'TODO',
+          '00000000-0000-4000-8000-000000000000',
+        ),
+      ).toBe(true);
+      expect(await repository.hasTicketsInStatus('TODO', a.ticketId)).toBe(
+        false,
+      );
+      expect(await repository.hasTicketsInStatus('DONE', a.ticketId)).toBe(
+        false,
+      );
+    });
+
+    it('TC-PER-032: 이동하면 상태와 순서 키만 바뀌고 나머지는 그대로다', async () => {
+      const saved = await repository.save(
+        Ticket.create({
+          title: '원래',
+          description: '설명',
+          priority: 'HIGH',
+          position: Position.first(),
+        }),
+      );
+
+      const moved = await repository.move(
+        saved.ticketId,
+        'IN_PROGRESS',
+        Position.from('a5'),
+      );
+
+      const found = await repository.findByTicketId(saved.ticketId);
+      expect(moved).not.toBeNull();
+      expect(found!.status).toBe('IN_PROGRESS');
+      expect(found!.position.value).toBe('a5');
+      expect(found!.title.value).toBe('원래');
+      expect(found!.description).toBe('설명');
+      expect(found!.priority.value).toBe('HIGH');
+      expect(found!.createdAt).toEqual(saved.createdAt);
+      expect(found!.updatedAt!.getTime()).toBeGreaterThanOrEqual(
+        saved.updatedAt!.getTime(),
+      );
+    });
+
+    it('TC-PER-033: 이미 쓰는 (상태, 순서 키)로 이동하면 PositionConflictError이고 티켓은 그대로다', async () => {
+      await seed('DONE', 'existing', 'a0');
+      const saved = await repository.save(newTicket(Position.first(), 'mover'));
+
+      await expect(
+        repository.move(saved.ticketId, 'DONE', Position.from('a0')),
+      ).rejects.toBeInstanceOf(PositionConflictError);
+
+      const found = await repository.findByTicketId(saved.ticketId);
+      expect(found!.status).toBe('TODO');
+    });
+
+    it('TC-PER-034: 없는 티켓을 이동하면 null이다', async () => {
+      expect(
+        await repository.move(
+          '00000000-0000-4000-8000-000000000000',
+          'DONE',
+          Position.first(),
+        ),
+      ).toBeNull();
+    });
+  });
 });

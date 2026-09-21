@@ -97,4 +97,19 @@ export class Ticket {
       this.updatedAt,
     );
   }
+
+  /** 상태와 순서 키만 바꾼 새 티켓을 돌려준다(불변). 카드 이동이 쓴다. */
+  moveTo(status: TicketStatus, position: Position): Ticket {
+    return new Ticket(
+      this.ticketId,
+      this.title,
+      this.description,
+      status,
+      this.priority,
+      this.dueAt,
+      position,
+      this.createdAt,
+      this.updatedAt,
+    );
+  }
 }

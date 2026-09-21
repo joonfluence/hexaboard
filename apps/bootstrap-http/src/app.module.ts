@@ -10,6 +10,7 @@ import {
   DeleteTicket,
   GetTicket,
   ListTickets,
+  MoveTicket,
   UpdateTicket,
 } from '@todo/application';
 import { DatabaseMigrator, PersistenceModule } from '@todo/persistence';
@@ -43,6 +44,7 @@ export class AppModule {
         ListTickets,
         DeleteTicket,
         UpdateTicket,
+        MoveTicket,
       ],
     };
   }

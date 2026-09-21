@@ -56,3 +56,111 @@ describe('Position', () => {
     expect(isAscending(withFraction, Position.after(withFraction))).toBe(true);
   });
 });
+
+describe('Position.between (004)', () => {
+  const key = (raw: string) => Position.from(raw);
+
+  it('TC-DOM-047: 양쪽이 모두 없으면 첫 키다', () => {
+    expect(Position.between(null, null).value).toBe(Position.first().value);
+  });
+
+  it('TC-DOM-048: 뒤가 없으면 앞 키보다 크다', () => {
+    const a = key('a5');
+    const result = Position.between(a, null);
+    expect(isAscending(a, result)).toBe(true);
+    expect(result.value).toBe(Position.after(a).value);
+  });
+
+  it('TC-DOM-049: 앞이 없으면 뒤 키보다 작다(첫 키 앞에도 넣을 수 있고 반복해도 단조 감소한다)', () => {
+    let current = Position.first();
+    for (let i = 0; i < 200; i++) {
+      const next = Position.between(null, current);
+      expect(isAscending(next, current)).toBe(true);
+      current = next;
+    }
+    expect(isAscending(key('a5'), key('a5'))).toBe(false);
+    expect(isAscending(Position.between(null, key('a5')), key('a5'))).toBe(
+      true,
+    );
+  });
+
+  it.each([
+    ['a0', 'a1'],
+    ['a0', 'a0V'],
+    ['a0V', 'a1'],
+    ['a0', 'a2'],
+    ['az', 'b00'],
+    ['Zz', 'a0'],
+    ['Zy', 'Zz'],
+    ['a0G', 'a0H'],
+    ['a0zz', 'a1'],
+  ])('TC-DOM-050: %s와 %s 사이의 키는 두 키의 사이에 있다', (a, b) => {
+    const result = Position.between(key(a), key(b));
+    expect(isAscending(key(a), result)).toBe(true);
+    expect(isAscending(result, key(b))).toBe(true);
+  });
+
+  it('TC-DOM-051: 같은 자리에 200번 반복 삽입해도 순서가 유지되고 중복이 없다', () => {
+    const low = key('a0');
+    let high = key('a1');
+    const inserted: Position[] = [];
+    for (let i = 0; i < 200; i++) {
+      const middle = Position.between(low, high);
+      expect(isAscending(low, middle)).toBe(true);
+      expect(isAscending(middle, high)).toBe(true);
+      inserted.push(middle);
+      high = middle;
+    }
+    expect(new Set(inserted.map((p) => p.value)).size).toBe(200);
+  });
+
+  it.each([
+    ['같음', 'a1', 'a1'],
+    ['뒤집힘', 'a2', 'a1'],
+  ])('TC-DOM-052: 앞 키가 뒤 키보다 %s이면 거부한다', (_label, a, b) => {
+    expect(() => Position.between(key(a), key(b))).toThrow(
+      InvalidPositionError,
+    );
+  });
+
+  it('TC-DOM-053: 앞·뒤·중간에 무작위로 1000번 삽입해도 키 순서가 의도한 목록 순서와 같다', () => {
+    // 고정 시드(mulberry32)로 재현 가능하게 한다.
+    let seed = 20260921;
+    const random = () => {
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const list: Position[] = [];
+    for (let i = 0; i < 1000; i++) {
+      const index = Math.floor(random() * (list.length + 1));
+      const before = index === 0 ? null : list[index - 1]!;
+      const after = index === list.length ? null : list[index]!;
+      list.splice(index, 0, Position.between(before, after));
+    }
+    for (let i = 1; i < list.length; i++) {
+      expect(isAscending(list[i - 1]!, list[i]!)).toBe(true);
+    }
+  });
+
+  it('TC-DOM-054: 음수 머리 키는 복원되고, 소수부 끝이 0인 키와 가장 작은 예약 키는 거부한다', () => {
+    expect(Position.from('Zz').value).toBe('Zz');
+    expect(() => Position.from('a00')).toThrow(InvalidPositionError);
+    expect(() => Position.from(`A${'0'.repeat(26)}`)).toThrow(
+      InvalidPositionError,
+    );
+  });
+
+  it('TC-DOM-056: 만든 모든 키는 저장 값으로 복원할 수 있다', () => {
+    const made = [
+      Position.between(null, key('a0')),
+      Position.between(key('a0'), key('a1')),
+      Position.between(key('a0'), key('a0V')),
+      Position.between(key('az'), null),
+    ];
+    for (const position of made) {
+      expect(Position.from(position.value).value).toBe(position.value);
+    }
+  });
+});

@@ -3,6 +3,7 @@ import {
   InvalidPriorityError,
   InvalidTitleError,
 } from '../src/errors';
+import { Position } from '../src/position';
 import { Ticket } from '../src/ticket';
 
 const created = new Date('2026-09-20T00:00:00.000Z');
@@ -94,5 +95,21 @@ describe('Ticket.update', () => {
     expect(after.createdAt).toEqual(created);
     expect(before.title.value).toBe('원래 제목');
     expect(before.priority.value).toBe('HIGH');
+  });
+});
+
+describe('Ticket.moveTo (004)', () => {
+  it('TC-DOM-055: 상태와 순서 키만 바뀐 새 티켓을 돌려주고 원본은 그대로다', () => {
+    const before = stored();
+    const after = before.moveTo('DONE', Position.from('a9'));
+
+    expect(after).not.toBe(before);
+    expect(after.status).toBe('DONE');
+    expect(after.position.value).toBe('a9');
+    expect(after.ticketId).toBe(before.ticketId);
+    expect(after.title.value).toBe(before.title.value);
+    expect(after.priority.value).toBe('HIGH');
+    expect(before.status).toBe('IN_PROGRESS');
+    expect(before.position.value).toBe('a3');
   });
 });

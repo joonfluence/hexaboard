@@ -6,7 +6,12 @@ import {
   type ArgumentsHost,
   type ExceptionFilter,
 } from '@nestjs/common';
-import { PositionConflictError, TicketNotFoundError } from '@todo/application';
+import {
+  AnchorTicketNotFoundError,
+  InvalidPositionTargetError,
+  PositionConflictError,
+  TicketNotFoundError,
+} from '@todo/application';
 import { DomainError } from '@todo/domain';
 import {
   InvalidTicketIdError,
@@ -58,6 +63,20 @@ function toErrorBody(exception: unknown): ErrorBody | undefined {
       statusCode: 404,
       code: 'TICKET_NOT_FOUND',
       message: '티켓을 찾을 수 없습니다.',
+    };
+  }
+  if (exception instanceof AnchorTicketNotFoundError) {
+    return {
+      statusCode: 404,
+      code: 'ANCHOR_TICKET_NOT_FOUND',
+      message: '기준 티켓을 찾을 수 없습니다.',
+    };
+  }
+  if (exception instanceof InvalidPositionTargetError) {
+    return {
+      statusCode: 400,
+      code: 'INVALID_POSITION_TARGET',
+      message: exception.message,
     };
   }
   if (exception instanceof InvalidTicketIdError) {

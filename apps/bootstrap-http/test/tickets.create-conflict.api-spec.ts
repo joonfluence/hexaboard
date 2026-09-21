@@ -43,6 +43,15 @@ function conflictingRepository(conflicts: number) {
     async deleteByTicketId() {
       return false;
     },
+    async findAdjacentPosition() {
+      return null;
+    },
+    async hasTicketsInStatus() {
+      return false;
+    },
+    async move() {
+      return null;
+    },
   };
   return { repository, calls };
 }

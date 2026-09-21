@@ -6,3 +6,4 @@ export * from './list-tickets.use-case';
 export * from './ticket.repository';
 export * from './tokens';
 export * from './update-ticket.use-case';
+export * from './move-ticket.use-case';

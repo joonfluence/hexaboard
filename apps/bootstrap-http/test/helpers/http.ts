@@ -127,6 +127,41 @@ export async function patchRaw(
   };
 }
 
+/** 카드 이동 요청. */
+export async function putPosition(
+  baseUrl: string,
+  ticketId: string,
+  body: unknown,
+): Promise<ApiResponse> {
+  const response = await fetch(`${baseUrl}/v1/tickets/${ticketId}/position`, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return {
+    status: response.status,
+    json: () => response.json() as Promise<TicketBody>,
+  };
+}
+
+/** 본문을 직렬화하지 않고 그대로 보내는 이동 요청. */
+export async function putPositionRaw(
+  baseUrl: string,
+  ticketId: string,
+  rawBody: string,
+  contentType: string,
+): Promise<ApiResponse> {
+  const response = await fetch(`${baseUrl}/v1/tickets/${ticketId}/position`, {
+    method: 'PUT',
+    headers: { 'content-type': contentType },
+    body: rawBody,
+  });
+  return {
+    status: response.status,
+    json: () => response.json() as Promise<TicketBody>,
+  };
+}
+
 export const UUID_V4 =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 

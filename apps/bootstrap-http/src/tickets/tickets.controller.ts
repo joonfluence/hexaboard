@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,6 +21,7 @@ import {
   DeleteTicket,
   GetTicket,
   ListTickets,
+  MoveTicket,
   UpdateTicket,
 } from '@todo/application';
 import { JsonContentTypeGuard } from '../common/json-content-type.guard';
@@ -27,6 +29,7 @@ import { RejectFieldsPipe } from '../common/reject-fields.pipe';
 import { createBodyValidationPipe } from '../common/validation';
 import { ValidationFailedException } from '../common/http-errors';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { MovePositionDto } from './dto/move-position.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { TicketResponse, toTicketResponse } from './dto/ticket-response.dto';
 import { ParseTicketIdPipe } from './parse-ticket-id.pipe';
@@ -59,6 +62,7 @@ export class TicketsController {
     @Inject(ListTickets) private readonly listTickets: ListTickets,
     @Inject(DeleteTicket) private readonly deleteTicket: DeleteTicket,
     @Inject(UpdateTicket) private readonly updateTicket: UpdateTicket,
+    @Inject(MoveTicket) private readonly moveTicket: MoveTicket,
   ) {}
 
   @Post()
@@ -115,6 +119,23 @@ export class TicketsController {
       description,
       priority,
       dueAt: dueAt === undefined || dueAt === null ? dueAt : new Date(dueAt),
+    });
+    return toTicketResponse(ticket);
+  }
+
+  @Put(':ticketId/position')
+  @UseGuards(JsonContentTypeGuard)
+  @ApiOkResponse({ type: TicketResponse })
+  async move(
+    @Param('ticketId', ParseTicketIdPipe) ticketId: string,
+    @Body(new RejectFieldsPipe({}), createBodyValidationPipe())
+    dto: MovePositionDto,
+  ): Promise<TicketResponse> {
+    const ticket = await this.moveTicket.execute({
+      ticketId,
+      status: dto.status,
+      anchorTicketId: dto.anchorTicketId,
+      placement: dto.placement,
     });
     return toTicketResponse(ticket);
   }

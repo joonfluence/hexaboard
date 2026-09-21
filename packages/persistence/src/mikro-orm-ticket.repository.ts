@@ -1,5 +1,5 @@
 import { UniqueConstraintViolationException } from '@mikro-orm/core';
-import type { MikroORM } from '@mikro-orm/postgresql';
+import type { EntityManager, MikroORM } from '@mikro-orm/postgresql';
 import {
   PositionConflictError,
   type TicketRepository,
@@ -7,6 +7,7 @@ import {
 import {
   Position,
   TICKET_STATUSES,
+  type Placement,
   type Ticket,
   type TicketStatus,
 } from '@todo/domain';
@@ -27,6 +28,12 @@ export class MikroOrmTicketRepository implements TicketRepository {
     const em = this.orm.em.fork();
     const entity = this.mapper.toEntity(ticket);
     em.persist(entity);
+    await this.flushOrConflict(em);
+    return this.mapper.toDomain(entity);
+  }
+
+  /** 저장하고, (상태, 순서 키) 유니크 제약 위반은 PositionConflictError로 바꾼다. */
+  private async flushOrConflict(em: EntityManager): Promise<void> {
     try {
       await em.flush();
     } catch (error) {
@@ -39,7 +46,6 @@ export class MikroOrmTicketRepository implements TicketRepository {
       }
       throw error;
     }
-    return this.mapper.toDomain(entity);
   }
 
   async findByTicketId(ticketId: string): Promise<Ticket | null> {
@@ -94,5 +100,51 @@ export class MikroOrmTicketRepository implements TicketRepository {
       .fork()
       .nativeDelete(TicketSchema, { publicId: ticketId });
     return deleted > 0;
+  }
+
+  async findAdjacentPosition(
+    status: TicketStatus,
+    position: Position,
+    side: Placement,
+    excludeTicketId: string,
+  ): Promise<Position | null> {
+    const before = side === 'BEFORE';
+    const [neighbor] = await this.orm.em.fork().find(
+      TicketSchema,
+      {
+        status,
+        publicId: { $ne: excludeTicketId },
+        position: before ? { $lt: position.value } : { $gt: position.value },
+      },
+      { orderBy: { position: before ? 'desc' : 'asc' }, limit: 1 },
+    );
+    return neighbor ? Position.from(neighbor.position) : null;
+  }
+
+  async hasTicketsInStatus(
+    status: TicketStatus,
+    excludeTicketId: string,
+  ): Promise<boolean> {
+    const count = await this.orm.em
+      .fork()
+      .count(TicketSchema, { status, publicId: { $ne: excludeTicketId } });
+    return count > 0;
+  }
+
+  async move(
+    ticketId: string,
+    status: TicketStatus,
+    position: Position,
+  ): Promise<Ticket | null> {
+    const em = this.orm.em.fork();
+    const entity = await em.findOne(TicketSchema, { publicId: ticketId });
+    if (!entity) {
+      return null;
+    }
+    // 상태와 순서 키만 바꾼다. 나머지 내용은 수정(PATCH)만 바꾼다.
+    entity.status = status;
+    entity.position = position.value;
+    await this.flushOrConflict(em);
+    return this.mapper.toDomain(entity);
   }
 }

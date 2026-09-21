@@ -96,3 +96,27 @@
 | TC-API-049 | UUID 형식이 아님 | `400` `INVALID_TICKET_ID` | api_spec | ✅ |
 | TC-API-050 | 올바르지 않은 JSON·JSON 아닌 `Content-Type` | `400` `INVALID_REQUEST_BODY`·`415` | api_spec | ✅ |
 | TC-API-051 | 검증에 실패한 수정 뒤 | 저장된 값 그대로 | 003 | ✅ |
+
+## 카드 이동 — `PUT /v1/tickets/{ticketId}/position` (004)
+
+| ID | 시나리오 | 기대 결과 | 근거 | 상태 |
+|----|----------|-----------|------|------|
+| TC-API-052 | 빈 컬럼으로 이동(기준 생략) | `200`, 상태 변경, 그 컬럼 첫 카드 | FR-04 | ✅ |
+| TC-API-053 | 같은 컬럼에서 기준 카드 뒤(`AFTER`)로 | 순서 반영, 다른 카드 순서 그대로 | FR-04 | ✅ |
+| TC-API-054 | 같은 컬럼에서 기준 카드 앞(`BEFORE`)으로 | 순서 반영 | FR-04 | ✅ |
+| TC-API-055 | 카드가 있는 다른 컬럼의 기준 앞·뒤로 | 상태 변경, 컬럼 안 그 자리 | FR-04 | ✅ |
+| TC-API-056 | 컬럼 맨 앞으로 5번 반복 | 매번 올바른 순서 | FR-04 | ✅ |
+| TC-API-057 | 두 카드 사이에 반복 삽입 | 순서 유지 | FR-04 | ✅ |
+| TC-API-058 | 응답 | 이동된 티켓, 8개 필드, `position` 없음, 단건 조회와 일치 | D-80 | ✅ |
+| TC-API-059 | 이동 | 다른 티켓의 순서 키는 바뀌지 않음(한 행만 갱신) | data_model | ✅ |
+| TC-API-060 | 컬럼의 유일한 카드를 같은 컬럼으로(기준 생략) | `200` | 004 | ✅ |
+| TC-API-061 | 같은 요청 두 번 | 결과 순서 같음(멱등) | api_spec | ✅ |
+| TC-API-062 | 이동 뒤 새 티켓 생성 | `TODO` 맨 뒤 | D-79 | ✅ |
+| TC-API-063 | 본문 검증(`status`·`placement` 누락·허용 밖, `anchorTicketId` UUID 아님, 본문이 객체 아님 6종) | `400` `VALIDATION_FAILED` | api_spec | ✅ |
+| TC-API-064 | 카드가 있는 컬럼에 기준 생략 | `400` `INVALID_POSITION_TARGET` | api_spec | ✅ |
+| TC-API-065 | 기준이 자기 자신 | `400` `INVALID_POSITION_TARGET` | api_spec | ✅ |
+| TC-API-066 | 기준이 대상 상태 컬럼에 없음 | `400` `INVALID_POSITION_TARGET` | api_spec | ✅ |
+| TC-API-067 | 이동할 카드 없음·UUID 형식 아님 | `404` `TICKET_NOT_FOUND`·`400` `INVALID_TICKET_ID` | api_spec | ✅ |
+| TC-API-068 | 기준 카드 없음 | `404` `ANCHOR_TICKET_NOT_FOUND` | api_spec | ✅ |
+| TC-API-069 | 순서 충돌 | 1~3번 뒤 성공이면 `200`(시도마다 이웃 다시 읽음), 4번 실패면 `409` `POSITION_CONFLICT` | D-69, D-95 | ✅ |
+| TC-API-070 | 올바르지 않은 JSON·JSON 아닌 `Content-Type` | `400` `INVALID_REQUEST_BODY`·`415` | api_spec | ✅ |
