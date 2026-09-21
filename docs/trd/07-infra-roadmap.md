@@ -1,6 +1,6 @@
 # TRD 07. 인프라 로드맵과 관측성
 
-배포를 두 단계로 나눈다. **Phase 1**은 PaaS로 먼저 배포하되 어디로든 옮길 수 있는 구조로 만든다. **Phase 2**는 같은 구조를 IaC로 관리하는 클라우드 컨테이너 환경으로 이식한다. 현재 배포 대상과 CI는 [06. 배포 전략](06-deployment.md)을 본다. 이 문서는 아직 구현하지 않았으며 모든 항목이 ⏳다.
+배포를 두 단계로 나눈다. **Phase 1**은 PaaS로 먼저 배포하되 어디로든 옮길 수 있는 구조로 만든다. **Phase 2**는 같은 구조를 IaC로 관리하는 클라우드 컨테이너 환경으로 이식한다. 현재 배포 대상과 CI는 [06. 배포 전략](06-deployment.md)을 본다. Phase 1 서버 측 항목(컨테이너화·헬스체크·마이그레이션 분리·DB SSL·선언 파일)은 ✅, CI는 작성만 했고, 배포·관측성·Phase 2는 ⏳다.
 
 ## 원칙
 
@@ -10,16 +10,16 @@
 - 손으로 만든 인프라를 남기지 않는다. Phase 1의 PaaS 설정도 저장소에 선언 파일과 환경변수 목록으로 남긴다.
 - 추측한 단가·용량은 적지 않는다. 비용은 공식 계산기와 Infracost로 확인한다.
 
-## Phase 1: PaaS 배포 + 이식 가능한 구조 ⏳
+## Phase 1: PaaS 배포 + 이식 가능한 구조 (배포 제외 ✅)
 
 | 작업 | 내용 |
 |------|------|
-| 서버 컨테이너화 | 멀티스테이지 `Dockerfile`(`pnpm deploy`로 서버에 필요한 파일만 담기), Node 버전은 `.nvmrc`와 일치 |
-| 헬스체크·정상 종료 | 헬스체크 엔드포인트, 종료 신호 처리(이미 `enableShutdownHooks` 사용 중) |
-| 마이그레이션 분리 | 기동 시 자동 실행(D-72)을 유지하되 배포 전 별도 단계로 뺄 수 있게 실행 진입점을 분리한다(다중 인스턴스 경합 대비) |
-| DB SSL 연결 | 관리형 DB(Neon 등)가 요구하는 SSL 옵션을 환경변수로 받는다 |
-| 선언 파일 | `render.yaml` 등 플랫폼 선언 파일과 환경변수 목록 문서 |
-| CI | GitHub Actions: PR에서 typecheck·lint·test·build, 이미지 빌드 확인, OpenAPI 어긋남은 기존 테스트가 잡음. Testcontainers가 Docker 부하에 민감하므로 동시성을 낮게 둔다 |
+| 서버 컨테이너화 ✅ | 멀티스테이지 `Dockerfile`(`pnpm deploy`로 서버에 필요한 파일만 담기), Node 버전은 `.nvmrc`와 일치 |
+| 헬스체크·정상 종료 ✅ | `GET /health`(`/v1` 접두사 없음, DB를 조회하지 않아 유휴 DB를 깨우지 않는다), 종료 신호 처리(이미 `enableShutdownHooks` 사용 중) |
+| 마이그레이션 분리 ✅ | 기본은 기동 시 자동 실행(D-72)이다. `MIGRATE_ON_START=false`로 끄고 `node dist/migrate.js`를 배포 전 단계로 실행할 수 있다(다중 인스턴스 경합 대비) |
+| DB SSL 연결 ✅ | `DATABASE_SSL=true`로 SSL을 켠다 |
+| 선언 파일 ✅ | `render.yaml` 등 플랫폼 선언 파일과 환경변수 목록 문서 |
+| CI (워크플로 작성, GitHub Actions 실행 미확인) | GitHub Actions: PR에서 typecheck·lint·test·build, 이미지 빌드 확인, OpenAPI 어긋남은 기존 테스트가 잡음. Testcontainers가 Docker 부하에 민감하므로 동시성을 낮게 둔다 |
 | 배포 | `main` 머지 시 자동 배포. 이미지에 커밋 SHA 태그를 남겨 롤백을 "이전 이미지"로 한다 |
 
 ## 관측성 (Phase 1에 함께, 프론트·백엔드 모두) ⏳

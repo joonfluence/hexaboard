@@ -29,6 +29,7 @@ export function readDatabaseSettings(env: Env): DatabaseSettings {
     dbName: required(env, 'DATABASE_NAME'),
     user: required(env, 'DATABASE_USER'),
     password: required(env, 'DATABASE_PASSWORD'),
+    ssl: env['DATABASE_SSL'] === 'true',
   };
 }
 
@@ -42,4 +43,9 @@ export function readCorsOrigins(env: Env): string[] {
     .split(',')
     .map((origin) => origin.trim())
     .filter((origin) => origin.length > 0);
+}
+
+/** 기동 시 마이그레이션 실행 여부. 기본은 실행한다(D-72). `false`면 배포 전 단계(`migrate`)에서 따로 실행한다. */
+export function readMigrateOnStart(env: Env): boolean {
+  return env['MIGRATE_ON_START'] !== 'false';
 }

@@ -96,3 +96,4 @@
 | v0.90 | 2026-09-21 | 009 기능(웹 태그·필터·정렬 UI) 구현, D-101 확정, 보류했던 TC-UI-007·017~026 완료와 TC-UI-047~049 추가, UI 컴포넌트 12개 모두 구현 | joonfluence (with Claude) |
 | v0.91 | 2026-09-21 | 인프라 로드맵(Phase 1 PaaS·이식 구조 + 관측성, Phase 2 IaC) 추가: TRD 07 신설, D-102 확정, 기술 스택 표·문서 지도 갱신, 인프라 미결 4건 등록 | joonfluence (with Claude) |
 
+| v0.92 | 2026-09-21 | 인프라 Phase 1 서버 측 구현: Dockerfile, `GET /health`, `migrate` 진입점과 `MIGRATE_ON_START`, `DATABASE_SSL`, `render.yaml`, GitHub Actions CI 워크플로. TRD 07 상태 갱신 | joonfluence (with Claude) |

@@ -10,12 +10,16 @@ export interface DatabaseSettings {
   dbName: string;
   user: string;
   password: string;
+  /** 관리형 DB(Neon 등)가 SSL을 요구할 때 켠다. */
+  ssl?: boolean;
 }
 
 /** ORM 설정. 마이그레이션은 파일 탐색 대신 목록으로 등록한다. */
 export function createOrmConfig(settings: DatabaseSettings) {
+  const { ssl, ...connection } = settings;
   return defineConfig({
-    ...settings,
+    ...connection,
+    ...(ssl ? { driverOptions: { connection: { ssl: true } } } : {}),
     entities: [TicketSchema],
     extensions: [Migrator],
     forceUtcTimezone: true,

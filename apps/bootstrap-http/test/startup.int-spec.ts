@@ -2,6 +2,7 @@ import {
   PostgreSqlContainer,
   type StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
+import { runMigrations } from '@todo/persistence';
 import { createApp } from '../src/app.factory';
 import { POSTGRES_IMAGE, psql, settingsOf } from './helpers/app';
 
@@ -40,5 +41,29 @@ describe('기동 시 마이그레이션 (D-72)', () => {
     } finally {
       await app.close().catch(() => undefined);
     }
+  });
+
+  it('migrateOnStart가 false면 기동해도 마이그레이션을 적용하지 않는다', async () => {
+    const app = await createApp(settingsOf(container), {
+      migrateOnStart: false,
+    });
+    try {
+      await app.init();
+      expect(
+        await psql(
+          container,
+          "select to_regclass('public.ticket') is not null",
+        ),
+      ).toBe('f');
+    } finally {
+      await app.close();
+    }
+  });
+
+  it('runMigrations는 서버 없이 마이그레이션을 적용한다', async () => {
+    await runMigrations(settingsOf(container));
+    expect(
+      await psql(container, "select to_regclass('public.ticket') is not null"),
+    ).toBe('t');
   });
 });

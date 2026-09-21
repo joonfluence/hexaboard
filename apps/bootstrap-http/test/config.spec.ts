@@ -1,4 +1,9 @@
-import { readCorsOrigins, readDatabaseSettings, readPort } from '../src/config';
+import {
+  readCorsOrigins,
+  readDatabaseSettings,
+  readMigrateOnStart,
+  readPort,
+} from '../src/config';
 
 const env = {
   DATABASE_HOST: 'localhost',
@@ -17,6 +22,7 @@ describe('환경변수 설정', () => {
       dbName: 'todo',
       user: 'todo',
       password: 'secret',
+      ssl: false,
     });
   });
 
@@ -57,5 +63,23 @@ describe('CORS 허용 오리진 설정', () => {
     ).toEqual(['http://localhost:3100', 'https://app.example.com']);
     expect(readCorsOrigins({ CORS_ALLOWED_ORIGINS: '' })).toEqual([]);
     expect(readCorsOrigins({})).toEqual([]);
+  });
+});
+
+describe('DB SSL·마이그레이션 실행 설정', () => {
+  it('DATABASE_SSL=true일 때만 SSL을 켠다', () => {
+    expect(readDatabaseSettings(env).ssl).toBe(false);
+    expect(readDatabaseSettings({ ...env, DATABASE_SSL: 'true' }).ssl).toBe(
+      true,
+    );
+    expect(readDatabaseSettings({ ...env, DATABASE_SSL: 'false' }).ssl).toBe(
+      false,
+    );
+  });
+
+  it('MIGRATE_ON_START는 기본 실행이고 false일 때만 건너뛴다', () => {
+    expect(readMigrateOnStart({})).toBe(true);
+    expect(readMigrateOnStart({ MIGRATE_ON_START: 'true' })).toBe(true);
+    expect(readMigrateOnStart({ MIGRATE_ON_START: 'false' })).toBe(false);
   });
 });

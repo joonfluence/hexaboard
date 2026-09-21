@@ -1,0 +1,13 @@
+.git
+.env
+.env.*
+!.env.example
+**/node_modules
+**/dist
+**/.turbo
+.next
+apps/web
+docs
+specs
+.specify
+.claude

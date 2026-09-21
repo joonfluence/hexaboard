@@ -19,4 +19,10 @@ describe('API 하네스', () => {
     const response = await fetch(`${t.baseUrl}/tickets`);
     expect(response.status).toBe(404);
   });
+
+  it('헬스체크는 /v1 접두사 없이 200을 돌려준다', async () => {
+    const response = await fetch(`${t.baseUrl}/health`);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: 'ok' });
+  });
 });

@@ -22,6 +22,7 @@
     "lint": "eslint .",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "dev": "tsc -p tsconfig.build.json && node --env-file=../../.env dist/main.js",
+    "migrate": "node dist/migrate.js",
     "openapi": "node dist/openapi/generate.js ../../packages/api-client/openapi.json"
   },
   "devDependencies": {

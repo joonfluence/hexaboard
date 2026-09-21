@@ -22,6 +22,16 @@ export class DatabaseMigrator {
   }
 }
 
+/** 마이그레이션만 적용하고 연결을 닫는다. 배포 전 단계에서 서버와 따로 실행할 때 쓴다. */
+export async function runMigrations(settings: DatabaseSettings): Promise<void> {
+  const orm = await MikroORM.init(createOrmConfig(settings));
+  try {
+    await orm.migrator.up();
+  } finally {
+    await orm.close();
+  }
+}
+
 /** ORM 연결과 `TicketRepository` 포트 어댑터를 제공한다. 웹 계층은 이 모듈을 조립만 한다. */
 @Module({})
 export class PersistenceModule implements OnApplicationShutdown {

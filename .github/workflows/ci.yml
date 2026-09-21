@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, development]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build
+      # Testcontainers가 Docker 부하에 민감하므로 Jest 동시성은 각 패키지 설정(maxWorkers)을 따른다.
+      - run: pnpm test
+      # OpenAPI 계약이 커밋된 결과와 어긋나면 실패한다.
+      - run: pnpm generate:api
+      - run: git diff --exit-code packages/api-client
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t todo-server:${{ github.sha }} .
