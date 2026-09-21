@@ -32,7 +32,7 @@
 | 에러 추적 | Grafana Cloud 단독([D-103](../decision_log.md)). 웹은 Faro SDK로 예외를 수집하고 소스맵을 올려 원본 코드로 본다. 서버 예외는 로그·트레이스로 보낸다. 릴리스(커밋 SHA)를 붙여 배포별로 본다 |
 | 로그 (서버 접근 로그·요청 ID ✅) | 서버는 요청마다 JSON 한 줄(`requestId`, `method`, `path`, `status`, `durationMs`)을 표준 출력에 쓰고 `X-Request-Id` 응답 헤더를 돌려준다. 안전한 `X-Request-Id` 요청 헤더는 이어받는다. 쿼리스트링·본문은 남기지 않는다. `OTEL_EXPORTER_OTLP_ENDPOINT`가 있으면 같은 로그를 OTel 로그로도 보내 Grafana Cloud(Loki)에서 조회한다([D-104](../decision_log.md)). 앱 오류 로그는 아직 Nest 기본 형식이다 |
 | 메트릭·대시보드 (서버 메트릭 전송 ✅, 대시보드 ⏳) | 서버 요청 수·오류율·지연·DB 연결, 웹 Core Web Vitals. Grafana로 대시보드를 만든다 |
-| 트레이스 ✅ | 서버 요청·express·pg 쿼리를 OpenTelemetry로 계측한다(`/health` 제외). 트레이스에 `app.request_id` 속성을 남겨 웹(Faro)이 보낸 요청 ID로 찾고, 접근 로그의 `traceId`로 로그와 트레이스를 오간다. 500 오류는 스팬에 예외로 기록한다. 웹→서버 트레이스 컨텍스트(`traceparent`) 전파는 아직 없다 |
+| 트레이스 ✅ | 서버 요청·express·pg 쿼리를 OpenTelemetry로 계측한다(`/health` 제외). 트레이스에 `app.request_id` 속성을 남겨 웹(Faro)이 보낸 요청 ID로 찾고, 접근 로그의 `traceId`로 로그와 트레이스를 오간다. 500 오류는 스팬에 예외로 기록한다. 웹은 Faro 트레이싱으로 API 오리진에만 `traceparent`를 실어 서버 트레이스와 한 트레이스로 잇고, 서버 CORS가 `traceparent`·`tracestate`를 허용한다. 서버를 먼저 배포해야 한다(허용 전에 웹이 보내면 프리플라이트가 실패한다) |
 | 알림 | 가동 확인(uptime), 오류율, 지연에 알림. 1인 운영이므로 과하지 않게 |
 | 웹 (Faro ✅) | 프론트 오류·성능은 Grafana Faro 브라우저 SDK로 수집한다. `NEXT_PUBLIC_FARO_URL`이 없으면 꺼진다(로컬·테스트). 콘솔 로그는 수집하지 않고, 페이지 주소의 쿼리스트링·해시(검색어)는 전송 직전에 제거한다. API 요청마다 `X-Request-Id`를 보내고(서버 CORS가 허용·노출) 5xx·네트워크 오류는 `api_failure` 이벤트로 요청 ID와 함께 남긴다. 릴리스는 `NEXT_PUBLIC_APP_VERSION`(Vercel 커밋 SHA). 소스맵 업로드는 미구현. 원래 항목: 프론트 오류·성능은 브라우저 SDK로 수집한다. 개인정보(제목·설명 본문)는 전송하지 않도록 마스킹 |
 

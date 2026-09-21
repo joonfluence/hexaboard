@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { withRequestId } from '@/shared/api/request-id';
-import { scrubItem, scrubUrl } from '@/shared/observability/faro';
+import { apiOrigins, scrubItem, scrubUrl } from '@/shared/observability/faro';
 
 describe('개인정보 마스킹', () => {
   it('주소의 쿼리스트링과 해시를 뗀다', () => {
@@ -72,5 +72,18 @@ describe('요청 ID 전송', () => {
       }, report)(request()),
     ).rejects.toBe(boom);
     expect(report).toHaveBeenCalledWith(expect.objectContaining({ status: 0 }));
+  });
+});
+
+describe('트레이스 헤더 대상', () => {
+  it('API 주소의 오리진에만 붙인다', () => {
+    expect(apiOrigins('https://api.example.com/v1?x=1')).toEqual([
+      'https://api.example.com',
+    ]);
+  });
+
+  it('주소가 없거나 잘못되면 어디에도 붙이지 않는다', () => {
+    expect(apiOrigins(undefined)).toEqual([]);
+    expect(apiOrigins('not a url')).toEqual([]);
   });
 });

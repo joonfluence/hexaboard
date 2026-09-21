@@ -3,6 +3,7 @@ import {
   initializeFaro,
   type TransportItem,
 } from '@grafana/faro-web-sdk';
+import { TracingInstrumentation } from '@grafana/faro-web-tracing';
 
 let initialized = false;
 
@@ -23,6 +24,17 @@ export function scrubItem<T>(item: TransportItem<T>): TransportItem<T> {
   return item;
 }
 
+/** 트레이스 헤더를 붙일 API 오리진. 주소가 없거나 잘못되면 어디에도 붙이지 않는다. */
+export function apiOrigins(
+  baseUrl: string | undefined = process.env.NEXT_PUBLIC_API_BASE_URL,
+): string[] {
+  try {
+    return baseUrl ? [new URL(baseUrl).origin] : [];
+  } catch {
+    return [];
+  }
+}
+
 /**
  * 브라우저 오류·성능을 Grafana Faro로 보낸다. 수집 주소는 환경변수로 받고,
  * 없으면(로컬·테스트) 아무것도 하지 않는다. 콘솔 로그는 수집하지 않는다.
@@ -39,7 +51,16 @@ export function initObservability(): void {
       version: process.env.NEXT_PUBLIC_APP_VERSION,
       environment: process.env.NODE_ENV,
     },
-    instrumentations: [...getWebInstrumentations({ captureConsole: false })],
+    instrumentations: [
+      ...getWebInstrumentations({ captureConsole: false }),
+      // 서버 API로 가는 요청에만 traceparent를 실어 서버 트레이스와 한 트레이스로 잇는다.
+      // 서버 CORS가 traceparent를 허용해야 하므로 서버를 먼저 배포한다.
+      new TracingInstrumentation({
+        instrumentationOptions: {
+          propagateTraceHeaderCorsUrls: apiOrigins(),
+        },
+      }),
+    ],
     beforeSend: scrubItem,
   });
   initialized = true;
