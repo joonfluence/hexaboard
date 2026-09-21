@@ -55,7 +55,7 @@
 | TC-API-020 | V3: 우선순위 허용 값 밖·`null` | `400` `VALIDATION_FAILED` | FR-06 | ✅ |
 | TC-API-021 | V4: `dueAt`이 ISO 8601이 아님 | `400` `VALIDATION_FAILED` | api_spec | ✅ |
 | TC-API-022 | V5: `ticketId`·`status`·`position`·`createdAt`·`updatedAt` 포함 | `400`으로 거부(무시하지 않음) | D-51 | ✅ |
-| TC-API-023 | V6: `tags` 포함 | `400`(이 기능 한정 임시 규칙, 태그 기능에서 폐기) | 기능 명세 FR-006 | ✅ |
+| TC-API-023 | V6: `tags` 포함 | 폐기: 태그 기능(007)이 대체(TC-API-083~089) | 기능 명세 FR-006 | ⛔ |
 | TC-API-024 | V7: 올바르지 않은 JSON | `400` `INVALID_REQUEST_BODY` | api_spec | ✅ |
 | TC-API-025 | V8: JSON이 아닌 `Content-Type` | `415` `UNSUPPORTED_MEDIA_TYPE`(프레임워크 기본은 `500`이라 가드로 구현) | api_spec | ✅ |
 | TC-API-026 | 검증 실패 응답 형식 | `statusCode`·`code`·`message`, 필드별 `details` | api_spec | ✅ |
@@ -93,7 +93,7 @@
 | TC-API-043 | 수정 후 목록 | 상태와 컬럼 안 순서 불변 | api_spec | ✅ |
 | TC-API-044 | 빈 본문 `{}`·미지 필드만(2종) | `400` `VALIDATION_FAILED` | api_spec | ✅ |
 | TC-API-045 | 서버 지정 값 5종(`status` 포함) | `400`으로 거부, 여러 개면 모두 `details` | api_spec, D-92 | ✅ |
-| TC-API-046 | `tags` 포함 | `400`(태그 기능에서 폐기할 임시 규칙) | 003 | ✅ |
+| TC-API-046 | `tags` 포함 | 폐기: 태그 기능(007)이 대체(TC-API-086~089) | 003 | ⛔ |
 | TC-API-047 | 제목 빈 값·`null`·101자, 설명 2001자, 우선순위 허용 밖·`null`, `dueAt` 형식 오류(8종) | `400` `VALIDATION_FAILED` | api_spec | ✅ |
 | TC-API-048 | 없는 티켓 | `404` `TICKET_NOT_FOUND` | api_spec | ✅ |
 | TC-API-049 | UUID 형식이 아님 | `400` `INVALID_TICKET_ID` | api_spec | ✅ |
@@ -146,3 +146,32 @@
 | TC-API-080 | `status`·`sortBy`·`direction` 누락·허용 밖(6종) | `400` `VALIDATION_FAILED` | api_spec | ✅ |
 | TC-API-081 | 올바르지 않은 JSON·JSON 아닌 `Content-Type` | `400`·`415` | api_spec | ✅ |
 | TC-API-082 | 정렬 뒤 내용 필드 | 제목 등 그대로 | FR-09 | ✅ |
+
+## 태그 (007)
+
+| ID | 시나리오 | 기대 결과 | 근거 | 상태 |
+|----|----------|-----------|------|------|
+| TC-API-083 | 생성 시 `tags` | `201`, 정규화·중복 제거·오름차순 | FR-07 | ✅ |
+| TC-API-084 | 생성 시 `tags` 생략 | 응답 `tags`는 `[]` | D-99 | ✅ |
+| TC-API-085 | 단건·목록 조회 | 각 티켓에 `tags` | FR-07 | ✅ |
+| TC-API-086 | 수정 시 `tags` | 통째로 교체, `[]`는 모두 제거, 생략은 유지 | D-99 | ✅ |
+| TC-API-087 | `tags`만 담은 수정 | `200`(수정할 필드로 인정) | D-99 | ✅ |
+| TC-API-088 | 배열 아님·문자열 아닌 항목·빈 이름·31자·11개(5종), 생성·수정 모두 | `400` `VALIDATION_FAILED`, `details.field`=`tags` | api_spec | ✅ |
+| TC-API-089 | `tags: null` | `400` | D-99 | ✅ |
+| TC-API-090 | 응답 필드 | 정해진 9개 필드(`tags` 포함), 내부 PK·`position` 없음 | D-80 | ✅ |
+| TC-API-091 | 이동·정렬·수정 뒤 | 태그 유지 | D-99 | ✅ |
+| TC-API-092 | 삭제 뒤 같은 태그로 새 티켓 | `201` | D-99 | ✅ |
+
+## 검색·필터 — `GET /v1/tickets?q=&status=&priority=&tag=` (008)
+
+| ID | 시나리오 | 기대 결과 | 근거 | 상태 |
+|----|----------|-----------|------|------|
+| TC-API-093 | `q` | 제목·설명 부분 일치(대소문자 무시), 공백뿐·빈 `q`는 무시 | FR-08 | ⏳ |
+| TC-API-094 | `priority`·`status` (단일·반복) | 해당 값의 티켓만, 반복하면 OR | FR-08 | ⏳ |
+| TC-API-095 | `tag` 단일·반복·대문자 | 하나라도 가진 티켓(OR), 정규화해 비교 | FR-08, D-64 | ⏳ |
+| TC-API-096 | 여러 종류 조합 | AND | D-64 | ⏳ |
+| TC-API-097 | 조건에 맞는 티켓 없음 | `200` 빈 배열 | FR-08 | ⏳ |
+| TC-API-098 | 허용 값 밖 `status`·`priority`(2종) | `400` `VALIDATION_FAILED`, `details.field`가 해당 파라미터 | api_spec | ⏳ |
+| TC-API-099 | 필터 결과 | 상태 순서·컬럼 안 순서, 응답 필드는 목록과 같음 | api_spec | ⏳ |
+| TC-API-100 | 정의되지 않은 쿼리 파라미터 | 무시 | D-81 | ⏳ |
+

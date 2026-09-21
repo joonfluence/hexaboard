@@ -11,8 +11,9 @@ import {
   type Ticket,
   type TicketStatus,
 } from '@todo/domain';
-import { TicketSchema } from './ticket.entity';
+import { TicketSchema, type TicketEntity } from './ticket.entity';
 import { TicketMapper } from './ticket.mapper';
+import { TicketTags } from './ticket-tags';
 
 /** (상태, 순서 키) 유니크 제약의 이름. 마이그레이션이 정한다. */
 const POSITION_UNIQUE_CONSTRAINT = 'ticket_status_position_key';
@@ -29,15 +30,37 @@ export class MikroOrmTicketRepository implements TicketRepository {
   constructor(
     private readonly orm: MikroORM,
     private readonly mapper: TicketMapper = new TicketMapper(),
+    private readonly tags: TicketTags = new TicketTags(),
   ) {}
+
+  /** 엔티티들을 태그와 함께 도메인 티켓으로 바꾼다(태그는 한 번의 쿼리로 읽는다). */
+  private async toDomainAll(
+    em: EntityManager,
+    entities: readonly TicketEntity[],
+  ): Promise<Ticket[]> {
+    const byPk = await this.tags.read(
+      em,
+      entities.map((entity) => entity.id),
+    );
+    return entities.map((entity) =>
+      this.mapper.toDomain(entity, byPk.get(entity.id) ?? []),
+    );
+  }
 
   async save(ticket: Ticket): Promise<Ticket> {
     // 호출마다 새 컨텍스트를 써서 식별 맵이 요청 사이에 남지 않게 한다.
     const em = this.orm.em.fork();
     const entity = this.mapper.toEntity(ticket);
-    em.persist(entity);
-    await this.flushOrConflict(em);
-    return this.mapper.toDomain(entity);
+    try {
+      await em.transactional(async (tx) => {
+        tx.persist(entity);
+        await tx.flush();
+        await this.tags.replace(tx, entity.id, ticket.tags);
+      });
+    } catch (error) {
+      throw toConflict(error);
+    }
+    return this.mapper.toDomain(entity, ticket.tags);
   }
 
   /** 저장하고, (상태, 순서 키) 유니크 제약 위반은 PositionConflictError로 바꾼다. */
@@ -50,10 +73,9 @@ export class MikroOrmTicketRepository implements TicketRepository {
   }
 
   async findByTicketId(ticketId: string): Promise<Ticket | null> {
-    const entity = await this.orm.em
-      .fork()
-      .findOne(TicketSchema, { publicId: ticketId });
-    return entity ? this.mapper.toDomain(entity) : null;
+    const em = this.orm.em.fork();
+    const entity = await em.findOne(TicketSchema, { publicId: ticketId });
+    return entity ? (await this.toDomainAll(em, [entity]))[0]! : null;
   }
 
   async findLastPosition(status: TicketStatus): Promise<Position | null> {
@@ -68,15 +90,17 @@ export class MikroOrmTicketRepository implements TicketRepository {
   }
 
   async findAll(): Promise<Ticket[]> {
-    const entities = await this.orm.em
-      .fork()
-      .find(TicketSchema, {}, { orderBy: { position: 'asc' } });
+    const em = this.orm.em.fork();
+    const entities = await em.find(
+      TicketSchema,
+      {},
+      { orderBy: { position: 'asc' } },
+    );
+    const domain = await this.toDomainAll(em, entities);
     // 순서 키(C collation) 순으로 읽은 뒤 상태로 안정 정렬해 컬럼 안 순서를 유지한다.
     const rank = (status: string) =>
       TICKET_STATUSES.indexOf(status as TicketStatus);
-    return entities
-      .toSorted((a, b) => rank(a.status) - rank(b.status))
-      .map((entity) => this.mapper.toDomain(entity));
+    return domain.toSorted((a, b) => rank(a.status) - rank(b.status));
   }
 
   async update(ticket: Ticket): Promise<Ticket | null> {
@@ -92,8 +116,13 @@ export class MikroOrmTicketRepository implements TicketRepository {
     entity.description = ticket.description;
     entity.priority = this.mapper.priorityToNumber(ticket.priority.value);
     entity.dueAt = ticket.dueAt;
-    await em.flush();
-    return this.mapper.toDomain(entity);
+    // 태그만 바뀌어도 수정 시각이 갱신되도록 명시한다.
+    entity.updatedAt = new Date();
+    await em.transactional(async (tx) => {
+      await tx.flush();
+      await this.tags.replace(tx, entity.id, ticket.tags);
+    });
+    return this.mapper.toDomain(entity, ticket.tags);
   }
 
   async deleteByTicketId(ticketId: string): Promise<boolean> {
@@ -146,14 +175,17 @@ export class MikroOrmTicketRepository implements TicketRepository {
     entity.status = status;
     entity.position = position.value;
     await this.flushOrConflict(em);
-    return this.mapper.toDomain(entity);
+    return (await this.toDomainAll(em, [entity]))[0]!;
   }
 
   async findByStatus(status: TicketStatus): Promise<Ticket[]> {
-    const entities = await this.orm.em
-      .fork()
-      .find(TicketSchema, { status }, { orderBy: { position: 'asc' } });
-    return entities.map((entity) => this.mapper.toDomain(entity));
+    const em = this.orm.em.fork();
+    const entities = await em.find(
+      TicketSchema,
+      { status },
+      { orderBy: { position: 'asc' } },
+    );
+    return this.toDomainAll(em, entities);
   }
 
   async reorder(

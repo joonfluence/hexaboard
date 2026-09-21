@@ -31,7 +31,7 @@ describe('POST /v1/tickets 생성 성공 (US1)', () => {
     expect(Date.parse(body.updatedAt)).not.toBeNaN();
   });
 
-  it('C1: 응답에는 내부 PK(id)와 position, tags가 없다 (SC-003, D-80)', async () => {
+  it('C1: 응답에는 내부 PK(id)와 position이 없다 (SC-003, D-80)', async () => {
     const body = await (await postTicket(t.baseUrl, { title: 't' })).json();
     expect(Object.keys(body).sort()).toEqual(TICKET_RESPONSE_KEYS);
   });

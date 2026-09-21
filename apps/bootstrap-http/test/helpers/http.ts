@@ -6,6 +6,7 @@ export interface TicketBody {
   status: string;
   priority: string;
   dueAt: string | null;
+  tags: string[];
   createdAt: string;
   updatedAt: string;
   statusCode?: number;
@@ -205,6 +206,7 @@ export const TICKET_RESPONSE_KEYS = [
   'dueAt',
   'priority',
   'status',
+  'tags',
   'ticketId',
   'title',
   'updatedAt',

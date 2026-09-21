@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { normalizeDescription } from './description';
 import { Position } from './position';
 import { Priority } from './priority';
+import { normalizeTags } from './tags';
 import { Title } from './title';
 
 /** 보드 컬럼 순서다. */
@@ -14,6 +15,7 @@ export interface CreateTicketProps {
   description?: string | null;
   priority?: string;
   dueAt?: Date | null;
+  tags?: unknown;
   position: Position;
 }
 
@@ -25,6 +27,7 @@ export interface RehydrateTicketProps {
   priority: string;
   dueAt: Date | null;
   position: string;
+  tags?: readonly string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -35,6 +38,8 @@ export interface TicketChanges {
   description?: unknown;
   priority?: unknown;
   dueAt?: Date | null;
+  /** 통째로 교체한다. 빈 배열은 모두 제거, 생략은 유지. */
+  tags?: unknown;
 }
 
 export class Ticket {
@@ -46,6 +51,8 @@ export class Ticket {
     readonly priority: Priority,
     readonly dueAt: Date | null,
     readonly position: Position,
+    /** 정규화된 태그 이름(오름차순). */
+    readonly tags: readonly string[],
     /** 저장소가 채우는 시각. 저장 전의 새 티켓에는 없다(도메인은 시계를 모른다). */
     readonly createdAt?: Date,
     readonly updatedAt?: Date,
@@ -61,6 +68,7 @@ export class Ticket {
       Priority.of(props.priority),
       props.dueAt ?? null,
       props.position,
+      props.tags === undefined ? [] : normalizeTags(props.tags),
     );
   }
 
@@ -74,6 +82,7 @@ export class Ticket {
       Priority.of(props.priority),
       props.dueAt,
       Position.from(props.position),
+      [...(props.tags ?? [])],
       props.createdAt,
       props.updatedAt,
     );
@@ -93,6 +102,7 @@ export class Ticket {
         : Priority.of(changes.priority),
       changes.dueAt === undefined ? this.dueAt : changes.dueAt,
       this.position,
+      changes.tags === undefined ? this.tags : normalizeTags(changes.tags),
       this.createdAt,
       this.updatedAt,
     );
@@ -108,6 +118,7 @@ export class Ticket {
       this.priority,
       this.dueAt,
       position,
+      this.tags,
       this.createdAt,
       this.updatedAt,
     );

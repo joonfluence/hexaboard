@@ -36,7 +36,7 @@ export async function startTestDatabase(): Promise<TestDatabase> {
     async reset() {
       await orm.em
         .getConnection()
-        .execute('truncate table ticket restart identity');
+        .execute('truncate table ticket, tag restart identity cascade');
     },
     async stop() {
       await orm.close(true);

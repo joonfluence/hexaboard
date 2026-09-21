@@ -57,13 +57,6 @@ describe('PATCH /v1/tickets/{ticketId} 거부 (003 US2)', () => {
     ]);
   });
 
-  it('TC-API-046: tags는 아직 지원하지 않아 거부한다', async () => {
-    const response = await patchTicket(t.baseUrl, ticketId, { tags: ['a'] });
-
-    expect(response.status).toBe(400);
-    expect((await response.json()).details?.[0]?.field).toBe('tags');
-  });
-
   it.each([
     ['제목이 빈 값', { title: '' }, 'title'],
     ['제목이 null', { title: null }, 'title'],

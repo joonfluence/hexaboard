@@ -245,6 +245,13 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "tags": {
+            "description": "앞뒤 공백 제거·소문자로 정규화, 중복 제거. 최대 10개, 이름 최대 30자.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -287,6 +294,13 @@
             "format": "date-time",
             "nullable": true
           },
+          "tags": {
+            "description": "이름 오름차순.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -303,6 +317,7 @@
           "status",
           "priority",
           "dueAt",
+          "tags",
           "createdAt",
           "updatedAt"
         ]
@@ -367,6 +382,13 @@
             "format": "date-time",
             "nullable": true,
             "description": "null이면 마감일이 지워진다."
+          },
+          "tags": {
+            "description": "앞뒤 공백 제거·소문자로 정규화, 중복 제거. 최대 10개, 이름 최대 30자.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

@@ -83,6 +83,8 @@ export interface components {
             priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
             /** Format: date-time */
             dueAt?: string | null;
+            /** @description 앞뒤 공백 제거·소문자로 정규화, 중복 제거. 최대 10개, 이름 최대 30자. */
+            tags?: string[];
         };
         TicketResponse: {
             /** Format: uuid */
@@ -95,6 +97,8 @@ export interface components {
             priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
             /** Format: date-time */
             dueAt: string | null;
+            /** @description 이름 오름차순. */
+            tags: string[];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -120,6 +124,8 @@ export interface components {
              * @description null이면 마감일이 지워진다.
              */
             dueAt?: string | null;
+            /** @description 앞뒤 공백 제거·소문자로 정규화, 중복 제거. 최대 10개, 이름 최대 30자. */
+            tags?: string[];
         };
         MovePositionDto: {
             /**

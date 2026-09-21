@@ -21,6 +21,9 @@ export class TicketResponse {
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
   dueAt!: string | null;
 
+  @ApiProperty({ type: [String], description: '이름 오름차순.' })
+  tags!: string[];
+
   @ApiProperty({ format: 'date-time' })
   createdAt!: string;
 
@@ -36,6 +39,7 @@ export function toTicketResponse(ticket: Ticket): TicketResponse {
     status: ticket.status,
     priority: ticket.priority.value,
     dueAt: ticket.dueAt?.toISOString() ?? null,
+    tags: [...ticket.tags],
     createdAt: ticket.createdAt!.toISOString(),
     updatedAt: ticket.updatedAt!.toISOString(),
   };

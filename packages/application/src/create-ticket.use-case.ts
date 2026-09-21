@@ -12,6 +12,7 @@ export interface CreateTicketInput {
   description?: string | null;
   priority?: string;
   dueAt?: Date | null;
+  tags?: unknown;
 }
 
 /** 새 티켓을 TODO 컬럼 맨 뒤에 만든다(D-79). */

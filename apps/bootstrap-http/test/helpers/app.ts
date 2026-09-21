@@ -88,7 +88,10 @@ export async function startTestApp(
     container,
     sql: (statement) => psql(container, statement),
     reset: async () => {
-      await psql(container, 'truncate table ticket restart identity');
+      await psql(
+        container,
+        'truncate table ticket, tag restart identity cascade',
+      );
     },
     stop: async () => {
       await app.close();

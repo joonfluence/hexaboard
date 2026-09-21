@@ -43,7 +43,7 @@ export class TicketMapper {
     return entity;
   }
 
-  toDomain(entity: TicketEntity): Ticket {
+  toDomain(entity: TicketEntity, tags: readonly string[] = []): Ticket {
     return Ticket.rehydrate({
       ticketId: entity.publicId,
       title: entity.title,
@@ -52,6 +52,7 @@ export class TicketMapper {
       priority: this.numberToPriority(entity.priority),
       dueAt: entity.dueAt ?? null,
       position: entity.position,
+      tags,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });

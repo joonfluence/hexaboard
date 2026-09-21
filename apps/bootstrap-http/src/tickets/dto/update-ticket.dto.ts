@@ -1,5 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsISO8601, IsString, ValidateIf } from 'class-validator';
+import {
+  IsArray,
+  IsIn,
+  IsISO8601,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
 
 const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
 
@@ -42,4 +48,14 @@ export class UpdateTicketDto {
     { message: '마감일은 ISO 8601 시각 형식이어야 합니다.' },
   )
   dueAt?: string | null;
+
+  @ApiPropertyOptional({
+    type: [String],
+    description:
+      '앞뒤 공백 제거·소문자로 정규화, 중복 제거. 최대 10개, 이름 최대 30자.',
+  })
+  @ValidateIf((_, value) => value !== undefined)
+  @IsArray({ message: '태그는 문자열 배열이어야 합니다.' })
+  @IsString({ each: true, message: '태그 이름은 문자열이어야 합니다.' })
+  tags?: string[];
 }

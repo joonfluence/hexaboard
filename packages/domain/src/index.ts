@@ -4,4 +4,5 @@ export * from './position';
 export * from './priority';
 export * from './ticket';
 export * from './sort';
+export * from './tags';
 export * from './title';

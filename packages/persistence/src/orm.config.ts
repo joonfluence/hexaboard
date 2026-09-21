@@ -1,6 +1,7 @@
 import { Migrator } from '@mikro-orm/migrations';
 import { defineConfig } from '@mikro-orm/postgresql';
 import { Migration20260921000000 } from './migrations/Migration20260921000000';
+import { Migration20260921010000 } from './migrations/Migration20260921010000';
 import { TicketSchema } from './ticket.entity';
 
 export interface DatabaseSettings {
@@ -23,6 +24,10 @@ export function createOrmConfig(settings: DatabaseSettings) {
         {
           name: 'Migration20260921000000',
           class: Migration20260921000000,
+        },
+        {
+          name: 'Migration20260921010000',
+          class: Migration20260921010000,
         },
       ],
       transactional: true,

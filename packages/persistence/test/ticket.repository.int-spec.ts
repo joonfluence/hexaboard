@@ -390,4 +390,79 @@ describe('MikroOrmTicketRepository (Testcontainers Postgres)', () => {
       expect(list.map((x) => x.position.value)).toEqual(['a0', 'a1', 'a2']);
     });
   });
+  describe('태그 (007)', () => {
+    const tagged = (title: string, key: string, tags: string[]) =>
+      Ticket.create({ title, tags, position: Position.from(key) });
+    const tagRows = () =>
+      db.orm.em
+        .getConnection()
+        .execute<{ name: string }[]>('select name from tag order by name');
+
+    it('TC-PER-037: 태그와 함께 저장하면 이름 오름차순으로 돌아온다', async () => {
+      const saved = await repository.save(tagged('a', 'a0', ['b', 'a']));
+
+      expect(saved.tags).toEqual(['a', 'b']);
+      expect((await repository.findByTicketId(saved.ticketId))!.tags).toEqual([
+        'a',
+        'b',
+      ]);
+    });
+
+    it('TC-PER-038: 두 티켓이 같은 태그 이름을 쓰면 tag 행은 하나다', async () => {
+      await repository.save(tagged('a', 'a0', ['docs']));
+      await repository.save(tagged('b', 'a1', ['docs', 'x']));
+
+      expect((await tagRows()).map((r) => r.name)).toEqual(['docs', 'x']);
+    });
+
+    it('TC-PER-039: 수정 저장은 태그를 교체하고 빈 배열은 모두 제거한다', async () => {
+      const saved = await repository.save(tagged('a', 'a0', ['a', 'b']));
+
+      const changed = await repository.update(
+        saved.update({ tags: ['b', 'c'] }),
+      );
+      expect(changed!.tags).toEqual(['b', 'c']);
+      expect((await repository.findByTicketId(saved.ticketId))!.tags).toEqual([
+        'b',
+        'c',
+      ]);
+
+      await repository.update(saved.update({ tags: [] }));
+      expect((await repository.findByTicketId(saved.ticketId))!.tags).toEqual(
+        [],
+      );
+    });
+
+    it('TC-PER-040: 전체·상태별 조회와 이동 결과에도 태그가 있다', async () => {
+      const a = await repository.save(tagged('a', 'a0', ['x']));
+      await repository.save(tagged('b', 'a1', ['y', 'z']));
+
+      expect((await repository.findAll()).map((t) => t.tags)).toEqual([
+        ['x'],
+        ['y', 'z'],
+      ]);
+      expect(
+        (await repository.findByStatus('TODO')).map((t) => t.tags),
+      ).toEqual([['x'], ['y', 'z']]);
+      expect(
+        (await repository.move(a.ticketId, 'DONE', Position.first()))!.tags,
+      ).toEqual(['x']);
+    });
+
+    it('TC-PER-041: 티켓을 삭제하면 그 티켓의 연결만 사라진다', async () => {
+      const a = await repository.save(tagged('a', 'a0', ['x']));
+      const b = await repository.save(tagged('b', 'a1', ['x', 'y']));
+
+      await repository.deleteByTicketId(a.ticketId);
+
+      expect((await repository.findByTicketId(b.ticketId))!.tags).toEqual([
+        'x',
+        'y',
+      ]);
+      const links = await db.orm.em
+        .getConnection()
+        .execute<{ n: string }[]>('select count(*)::text as n from ticket_tag');
+      expect(links[0]!.n).toBe('2');
+    });
+  });
 });

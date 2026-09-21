@@ -25,7 +25,7 @@ describe('OpenAPI 계약 (005)', () => {
     ]);
   });
 
-  it('TC-API-072: 티켓 응답 스키마는 정해진 8개 필드뿐이다', async () => {
+  it('TC-API-072: 티켓 응답 스키마는 정해진 9개 필드뿐이다', async () => {
     const document = await buildOpenApiDocument();
     const schema = document.components?.schemas?.['TicketResponse'] as {
       properties: Record<string, unknown>;
@@ -37,6 +37,7 @@ describe('OpenAPI 계약 (005)', () => {
       'dueAt',
       'priority',
       'status',
+      'tags',
       'ticketId',
       'title',
       'updatedAt',

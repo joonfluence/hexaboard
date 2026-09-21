@@ -112,4 +112,17 @@ describe('ticket 테이블 마이그레이션 (Testcontainers Postgres)', () => 
     );
     expect(rows.map((r) => r.position)).toEqual(['a1', 'aB', 'ab']);
   });
+  it('TC-PER-042: 태그 테이블은 이름이 유니크하고 연결 테이블은 복합 PK다', async () => {
+    await run("insert into tag (name) values ('docs')");
+    await expect(
+      run("insert into tag (name) values ('docs')"),
+    ).rejects.toThrow();
+
+    const pk = await run<{ column_name: string }>(
+      `select a.attname as column_name
+         from pg_index i join pg_attribute a on a.attrelid = i.indrelid and a.attnum = any(i.indkey)
+        where i.indrelid = 'ticket_tag'::regclass and i.indisprimary order by a.attname`,
+    );
+    expect(pk.map((r) => r.column_name)).toEqual(['tag_id', 'ticket_id']);
+  });
 });

@@ -45,16 +45,12 @@ const SERVER_SET_FIELDS = [
   'updatedAt',
 ];
 
-/** 범위 밖 필드. 이 기능에서 태그는 지원하지 않는다(태그 기능에서 폐기할 임시 규칙). */
-const REJECTED_FIELDS: Record<string, string> = {
-  ...Object.fromEntries(
-    SERVER_SET_FIELDS.map((field) => [
-      field,
-      `${field}은(는) 서버가 정하는 값이라 보낼 수 없습니다.`,
-    ]),
-  ),
-  tags: '태그는 아직 지원하지 않습니다.',
-};
+const REJECTED_FIELDS: Record<string, string> = Object.fromEntries(
+  SERVER_SET_FIELDS.map((field) => [
+    field,
+    `${field}은(는) 서버가 정하는 값이라 보낼 수 없습니다.`,
+  ]),
+);
 
 @Controller('tickets')
 export class TicketsController {
@@ -80,6 +76,7 @@ export class TicketsController {
       description: dto.description,
       priority: dto.priority,
       dueAt: dto.dueAt ? new Date(dto.dueAt) : null,
+      tags: dto.tags,
     });
     return toTicketResponse(ticket);
   }
@@ -117,12 +114,13 @@ export class TicketsController {
     @Body(new RejectFieldsPipe(REJECTED_FIELDS), createBodyValidationPipe())
     dto: UpdateTicketDto,
   ): Promise<TicketResponse> {
-    const { title, description, priority, dueAt } = dto;
+    const { title, description, priority, dueAt, tags } = dto;
     if (
       title === undefined &&
       description === undefined &&
       priority === undefined &&
-      dueAt === undefined
+      dueAt === undefined &&
+      tags === undefined
     ) {
       throw new ValidationFailedException([
         { field: 'body', reason: '수정할 필드가 하나도 없습니다.' },
@@ -133,6 +131,7 @@ export class TicketsController {
       description,
       priority,
       dueAt: dueAt === undefined || dueAt === null ? dueAt : new Date(dueAt),
+      tags,
     });
     return toTicketResponse(ticket);
   }
