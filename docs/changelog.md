@@ -97,3 +97,4 @@
 | v0.91 | 2026-09-21 | 인프라 로드맵(Phase 1 PaaS·이식 구조 + 관측성, Phase 2 IaC) 추가: TRD 07 신설, D-102 확정, 기술 스택 표·문서 지도 갱신, 인프라 미결 4건 등록 | joonfluence (with Claude) |
 
 | v0.92 | 2026-09-21 | 인프라 Phase 1 서버 측 구현: Dockerfile, `GET /health`, `migrate` 진입점과 `MIGRATE_ON_START`, `DATABASE_SSL`, `render.yaml`, GitHub Actions CI 워크플로. TRD 07 상태 갱신 | joonfluence (with Claude) |
+| v0.93 | 2026-09-21 | 웹 검증(typecheck·lint·vitest 59·next build 통과), Vercel 배포 설정(`apps/web/vercel.json`, `NEXT_PUBLIC_API_BASE_URL`) 추가 | joonfluence (with Claude) |
