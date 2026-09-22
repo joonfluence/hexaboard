@@ -8,9 +8,147 @@
 
 **SDD(Spec-Driven Development)**는 코드보다 명세(spec)를 먼저 쓰고, 그 명세를 정본(canonical source)으로 삼는 방식이다. 나는 [GitHub Spec Kit](https://github.com/github/spec-kit)을 썼다. 기능 하나마다 `spec.md`(무엇을·왜) → `plan.md`(어떻게) → `tasks.md`(순서)를 만들고, 그 위에 `docs/`라는 더 큰 정본을 하나 더 뒀다 — PRD, 요구사항, API 명세, 데이터 모델, 그리고 **아직 정하지 않은 것만 모아둔 `open_questions.md`**와 **정한 것과 이유를 적은 `decision_log.md`**.
 
-**TDD**는 다들 아는 그것이다. Red(실패하는 테스트) → Green(통과시키는 최소 구현) → Refactor. 이 프로젝트에서는 `tasks.md`에 테스트 태스크가 구현 태스크보다 항상 먼저 오도록 강제했다.
+**TDD**는 다들 아는 그것이다. Red(실패하는 테스트) → Green(통과시키는 최소 구현) → Refactor.
 
-둘 다 새로운 개념은 아니다. 내가 겪은 건 "이걸 사람이 아니라 AI 에이전트가 주로 코드를 쓰는 상황에 적용하면 어떻게 되는가"였다.
+둘 다 새로운 개념은 아니다. 내가 겪은 건 "이걸 사람이 아니라 AI 에이전트가 주로 코드를 쓰는 상황에 적용하면 실제로 어떤 산출물과 절차가 나오는가"였다. 아래는 그 실제 절차다.
+
+## SDD: Spec Kit 6단계로 실제로 어떻게 했나
+
+Spec Kit은 슬래시 커맨드 6개가 파이프라인을 이룬다. `.specify/workflows/speckit/workflow.yml`에 단계와 리뷰 게이트가 선언돼 있다.
+
+```
+/speckit.specify → [사람 승인] → /speckit.plan → [사람 승인] → /speckit.tasks → /speckit.implement
+```
+
+**1) `/speckit.constitution` — 원칙을 헌법 파일 하나에 못박는다 (프로젝트 시작 시 1회)**
+
+`.specify/memory/constitution.md`에 "테스트 먼저(NON-NEGOTIABLE)", "계층 경계는 패키지로 강제", "확정 안 된 건 지어내지 않는다" 같은 7개 원칙을 적었다. 이후 모든 spec·plan·tasks는 이 파일을 참조한다. 구현하다 새 원칙이 필요해지면(예: "TypeScript strict 모드 필수·`any` 금지") 헌법을 v1.0.0 → v1.1.0 → v1.2.0으로 올렸다 — 코드가 아니라 헌법을 먼저 고치는 것도 원칙 중 하나다.
+
+**2) `/speckit.specify` — 기능 하나당 `spec.md`를 만든다**
+
+"무엇을·왜"만 쓰고 "어떻게"는 안 쓴다. User Story, 범위(포함/제외), 그리고 **`## Clarifications`**라는 섹션이 자동으로 생긴다. 예를 들어 004(카드 이동) 기능의 spec에는 이런 게 실제로 들어있다:
+
+> - Q: 이동할 카드 자신이 대상 컬럼의 이웃 계산에 끼면? → A: 이동할 카드 자신은 제외하고 계산한다.
+> - Q: 대상 컬럼에 카드가 하나도 없으면 기준 카드를 필수로 받아야 하나? → A: 생략을 허용한다.
+
+이게 `/speckit.clarify`가 하는 일이다 — spec을 다시 읽고 애매한 지점을 최대 5개 질문으로 좁혀서 답을 spec 안에 그대로 인코딩한다. 질문에 이미 `docs/decision_log.md`에 있는 답이면 거기서 끌어오고, 없으면 나한테 되물었다.
+
+**3) `/speckit.plan` — "어떻게"를 쓰고, 헌법 위반 여부를 표로 판정한다**
+
+`plan.md`에는 매번 **Constitution Check**라는 표가 들어간다. 001 기능(티켓 생성·조회)의 실제 표 일부:
+
+| 원칙 | 판정 | 근거 |
+|---|---|---|
+| III. 테스트 먼저 | 통과 | 모든 Phase가 "Red 확인 → Green → Refactor" 순서다 |
+| IV. 핵심 불변식 | 통과 | `ticketId`(UUID v4)는 도메인이 생성, 내부 PK는 응답에 노출 안 함 |
+| V. 단순함과 범위 절제 | 통과 | 이동용 로직·태그·목록·수정·삭제는 이번 범위에서 만들지 않는다 |
+
+**위반이 있으면 그냥 못 넘어간다.** "Complexity Tracking" 섹션에 왜 이 위반이 불가피한지 정당화를 적어야 다음 단계(tasks)로 갈 수 있다. plan을 다 쓴 뒤 한 번 더 재확인하는 게이트도 있다(설계하다 보면 처음엔 안 보이던 위반이 나중에 보이기 때문).
+
+**4) `/speckit.tasks` — plan을 실행 순서가 있는 태스크 목록으로 쪼갠다**
+
+여기서 태스크가 계층 순서(domain → persistence → API)로, 그리고 테스트-구현 쌍으로 나열된다. 이건 다음 섹션(TDD 파트)에서 자세히 본다.
+
+**5) `/speckit.implement` — tasks를 순서대로 실행한다**
+
+**6) `/speckit.analyze` (선택) — spec·plan·tasks 세 문서가 서로 어긋나지 않는지 교차 검사한다**
+
+각 단계 사이에 사람이 승인/거부하는 게이트가 있다(`workflow.yml`의 `type: gate`). 거부하면 그 단계에서 멈춘다 — 에이전트가 다음 단계로 알아서 넘어가지 않는다.
+
+## TDD를 SDD 안에 강제로 끼워 넣은 방법
+
+여기서 짚고 싶은 게 하나 있다. **Spec Kit 기본 템플릿은 테스트를 선택 사항으로 둔다.** `.specify/templates/tasks-template.md` 원문:
+
+> Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+
+그대로 쓰면 에이전트가 "이번엔 테스트 없이 빨리 갈게요"를 기본값으로 고를 수 있다는 뜻이다. 이걸 뒤집은 게 헌법 원칙 III다:
+
+> 모든 프로덕션 코드는 실패하는 테스트를 먼저 작성한 뒤에 구현한다. Red → Green → Refactor 순서를 지킨다. (...) 테스트를 통과시키려고 테스트를 약화하거나 삭제하지 않는다.
+
+`/speckit.tasks`는 태스크를 짤 때 헌법을 먼저 읽기 때문에, 템플릿의 "OPTIONAL"이 아니라 헌법의 "NON-NEGOTIABLE"이 이긴다. 실제 004(카드 이동) 기능의 `tasks.md`를 그대로 옮기면:
+
+```
+- [X] T001 TC 정의: TC-DOM-047~056, TC-PER-030~034, TC-API-052~070을 ⏳로 추가
+- [X] T002 RED: Position.between, 확장된 Position.from, Ticket.moveTo 테스트
+- [X] T003 GREEN: 도메인 구현
+- [X] T004 RED: 저장소 findAdjacentPosition·hasTicketsInStatus·move 통합 테스트
+- [X] T005 GREEN: 포트와 MikroOrmTicketRepository 구현
+- [X] T006 RED: API 테스트 tickets.move*.api-spec.ts
+- [X] T007 GREEN: MoveTicket, 오류 2종, MovePositionDto, 컨트롤러 PUT, 필터 매핑
+- [X] T008 문서: D-95, open_questions 해소, changelog, TC ✅, tdd-log
+```
+
+RED와 GREEN이 계층마다(도메인 → persistence → API) 한 번씩, 총 3세트로 반복된다. 그리고 기능마다 `tdd-log.md`라는 파일을 따로 둬서 RED에서 실제로 몇 개가 실패했는지 숫자로 남겼다. 같은 기능의 실제 기록:
+
+```
+## RED (2026-09-21)
+- 도메인: Position.between·Ticket.moveTo 없음으로 TC-DOM-047~056 19건 실패(기존 74건 통과)
+- persistence: 포트 메서드 없음으로 TC-PER-030~034 5건 실패(기존 32건 통과)
+- API: tickets.move* 27건 중 25건 실패(PUT 라우트 없음)
+
+## GREEN
+- 도메인: Position을 fractional indexing으로 재작성 (...)
+## 게이트 (2026-09-21)
+- domain 93, persistence 37, bootstrap-http 124 통과. typecheck·lint·build·prettier 통과.
+- 테스트 결함 1건: TC-PER-031이 uuid 컬럼에 'x-none'을 넣어 실패 → 유효한 UUID로 수정(구현 결함 아님)
+```
+
+마지막 줄이 재미있는데, **실패한 게 구현이 아니라 테스트 자체였던 적도 있다.** TDD가 "테스트만 맞으면 안전하다"는 뜻은 아니다 — 다만 실패가 RED 단계에서, 숫자로, 즉시 드러난다는 게 핵심이다. 숫자가 안 맞으면(기대한 개수만큼 안 깨지면) 그 자리에서 걸린다.
+
+### 계층마다 TDD가 실제로 달랐다: 백엔드 3계층 vs 프론트 2계층
+
+**백엔드는 계층마다 테스트 방식 자체가 다르다.** 헌법이 계층별로 범위를 못박아뒀다.
+
+- **domain — 순수 단위 테스트.** 프레임워크·DB 전혀 없이 함수만 테스트한다.
+  ```ts
+  it('2001자는 거부한다 (V2)', () => {
+    expect(() => normalizeDescription('가'.repeat(2001))).toThrow(
+      InvalidDescriptionError,
+    );
+  });
+  ```
+- **persistence — Testcontainers로 띄운 진짜 Postgres.** Mock ORM이 아니라 실제 DB에 실제 마이그레이션을 적용하고 붙는다. 동시성 충돌(같은 컬럼에 순서 키가 겹치는 유니크 제약 위반) 같은 건 진짜 DB가 아니면 애초에 검증할 방법이 없다.
+  ```ts
+  export async function startTestDatabase(): Promise<TestDatabase> {
+    const container = await new PostgreSqlContainer('postgres:18').start();
+    const orm = await MikroORM.init(createOrmConfig({ /* 컨테이너 접속 정보 */ }));
+    // ...마이그레이션 적용 후 orm 반환
+  }
+  ```
+- **API — 진짜 Nest 앱을 통째로 띄우고 HTTP로 때린다.** 컨트롤러만 단위 테스트하지 않고, DTO 검증부터 도메인 규칙, DB 저장까지 실제 요청·응답으로 확인한다.
+  ```ts
+  it('C1: 제목만 주면 201, TODO, MEDIUM, 새 ticketId를 돌려준다', async () => {
+    const response = await postTicket(t.baseUrl, { title: '문서 정리' });
+    const body = await response.json();
+    expect(response.status).toBe(201);
+    expect(body).toMatchObject({ status: 'TODO', priority: 'MEDIUM' });
+  });
+  ```
+
+**프론트는 계층이 다르다 — E2E가 아예 없다.** dnd-kit 드래그를 jsdom에서 실제 포인터 이벤트로 재현하는 게 불안정해서(헌법 문서에 이 판단 근거가 남아있다), 대신 두 조각으로 쪼갰다.
+
+- **순수 함수 테스트.** 드래그 결과(어느 카드를, 어디에 놓았는지)를 "요청 바디"로 바꾸는 로직(`planMove`)을 UI와 완전히 분리해서 함수로 뽑고, 그 함수만 순수 단위 테스트한다.
+  ```ts
+  it('TC-UI-027: 다른 컬럼 본문에 놓으면 그 컬럼의 상태로 요청한다', () => {
+    const plan = planMove(board(), 'a', columnDroppableId('IN_PROGRESS'));
+    expect(plan?.request).toEqual({
+      status: 'IN_PROGRESS', anchorTicketId: 'd', placement: 'AFTER',
+    });
+  });
+  ```
+- **컴포넌트 테스트 + 가짜 네트워크 레이어.** 실제 서버 대신 `fetch`를 가로채는 `createFakeServer()`를 만들어 API 계약(`docs/api_spec.md`)을 흉내 낸다. 여기서 낙관적 업데이트(응답 오기 전에 화면을 먼저 바꾸는 것)를 테스트하는 게 까다로웠는데, 응답을 일부러 붙잡아두는 `gate()` 헬퍼로 해결했다:
+  ```ts
+  const held = gate();
+  server.override('PUT', PUT, async (call) => {
+    await held.opened; // 내가 release()할 때까지 응답 안 보냄
+    return Response.json(aTicket('a', 'TODO'));
+  });
+  await user.click(screen.getByRole('button', { name: '이동' }));
+  // 서버는 아직 응답 안 했는데 화면 순서가 벌써 바뀌어 있어야 한다
+  await waitFor(() => expect(order()).toEqual(['TODO:b', 'TODO:c', 'TODO:a']));
+  await act(async () => held.release()); // 이제 응답 보냄
+  ```
+  실패(409) 케이스는 원위치 롤백·토스트 노출·자동 재시도 없음까지 각각 별도 테스트로 검증한다. 이 패턴을 지원하는 실제 구현(`useMoveTicket`)은 TanStack Query의 `onMutate`(먼저 바꾸기)·`onError`(되돌리기)·`onSuccess`(서버 값으로 교체)로 15줄 남짓이다 — 테스트가 먼저 이 세 갈래를 요구했기 때문에 구현이 이 모양으로 수렴했다.
 
 ## 왜 에이전틱 코딩에서 더 절실한가
 
