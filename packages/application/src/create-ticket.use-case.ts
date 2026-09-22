@@ -16,8 +16,12 @@ export interface CreateTicketInput {
 }
 
 /** 새 티켓을 TODO 컬럼 맨 뒤에 만든다(D-79). */
+export interface CreateTicket {
+  execute(input: CreateTicketInput): Promise<Ticket>;
+}
+
 @Injectable()
-export class CreateTicket {
+export class CreateTicketService implements CreateTicket {
   constructor(
     @Inject(TICKET_REPOSITORY) private readonly tickets: TicketRepository,
   ) {}

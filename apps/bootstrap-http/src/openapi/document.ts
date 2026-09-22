@@ -7,13 +7,13 @@ import {
   type OpenAPIObject,
 } from '@nestjs/swagger';
 import {
-  CreateTicket,
-  DeleteTicket,
-  GetTicket,
-  ListTickets,
-  MoveTicket,
-  SortColumn,
-  UpdateTicket,
+  CREATE_TICKET,
+  DELETE_TICKET,
+  GET_TICKET,
+  LIST_TICKETS,
+  MOVE_TICKET,
+  SORT_COLUMN,
+  UPDATE_TICKET,
 } from '@todo/application';
 import { configureApp } from '../app.factory';
 import { TicketsController } from '../tickets/tickets.controller';
@@ -22,14 +22,14 @@ import { TicketsController } from '../tickets/tickets.controller';
 @Module({
   controllers: [TicketsController],
   providers: [
-    CreateTicket,
-    DeleteTicket,
-    GetTicket,
-    ListTickets,
-    MoveTicket,
-    SortColumn,
-    UpdateTicket,
-  ].map((useCase) => ({ provide: useCase, useValue: {} })),
+    CREATE_TICKET,
+    DELETE_TICKET,
+    GET_TICKET,
+    LIST_TICKETS,
+    MOVE_TICKET,
+    SORT_COLUMN,
+    UPDATE_TICKET,
+  ].map((token) => ({ provide: token, useValue: {} })),
 })
 class OpenApiModule {}
 

@@ -25,8 +25,12 @@ export interface MoveTicketInput {
 }
 
 /** 카드를 대상 컬럼의 기준 카드 앞/뒤로 옮긴다. 순서 키는 서버가 계산한다(D-95). */
+export interface MoveTicket {
+  execute(input: MoveTicketInput): Promise<Ticket>;
+}
+
 @Injectable()
-export class MoveTicket {
+export class MoveTicketService implements MoveTicket {
   constructor(
     @Inject(TICKET_REPOSITORY) private readonly tickets: TicketRepository,
   ) {}

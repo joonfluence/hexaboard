@@ -6,13 +6,20 @@ import {
   type OnModuleInit,
 } from '@nestjs/common';
 import {
-  CreateTicket,
-  DeleteTicket,
-  GetTicket,
-  ListTickets,
-  MoveTicket,
-  SortColumn,
-  UpdateTicket,
+  CREATE_TICKET,
+  CreateTicketService,
+  DELETE_TICKET,
+  DeleteTicketService,
+  GET_TICKET,
+  GetTicketService,
+  LIST_TICKETS,
+  ListTicketsService,
+  MOVE_TICKET,
+  MoveTicketService,
+  SORT_COLUMN,
+  SortColumnService,
+  UPDATE_TICKET,
+  UpdateTicketService,
 } from '@todo/application';
 import { DatabaseMigrator, PersistenceModule } from '@todo/persistence';
 import type { DatabaseSettings } from '@todo/persistence';
@@ -45,13 +52,13 @@ export class AppModule {
       controllers: [HealthController, TicketsController],
       providers: [
         ...(options.migrateOnStart === false ? [] : [StartupMigration]),
-        CreateTicket,
-        GetTicket,
-        ListTickets,
-        DeleteTicket,
-        UpdateTicket,
-        MoveTicket,
-        SortColumn,
+        { provide: CREATE_TICKET, useClass: CreateTicketService },
+        { provide: GET_TICKET, useClass: GetTicketService },
+        { provide: LIST_TICKETS, useClass: ListTicketsService },
+        { provide: DELETE_TICKET, useClass: DeleteTicketService },
+        { provide: UPDATE_TICKET, useClass: UpdateTicketService },
+        { provide: MOVE_TICKET, useClass: MoveTicketService },
+        { provide: SORT_COLUMN, useClass: SortColumnService },
       ],
     };
   }

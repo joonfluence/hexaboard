@@ -18,13 +18,20 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import {
-  CreateTicket,
-  DeleteTicket,
-  GetTicket,
-  ListTickets,
-  MoveTicket,
-  SortColumn,
-  UpdateTicket,
+  CREATE_TICKET,
+  DELETE_TICKET,
+  GET_TICKET,
+  LIST_TICKETS,
+  MOVE_TICKET,
+  SORT_COLUMN,
+  UPDATE_TICKET,
+  type CreateTicket,
+  type DeleteTicket,
+  type GetTicket,
+  type ListTickets,
+  type MoveTicket,
+  type SortColumn,
+  type UpdateTicket,
 } from '@todo/application';
 import type { TicketStatus } from '@todo/domain';
 import { JsonContentTypeGuard } from '../common/json-content-type.guard';
@@ -61,13 +68,13 @@ const REJECTED_FIELDS: Record<string, string> = Object.fromEntries(
 @Controller('tickets')
 export class TicketsController {
   constructor(
-    @Inject(CreateTicket) private readonly createTicket: CreateTicket,
-    @Inject(GetTicket) private readonly getTicket: GetTicket,
-    @Inject(ListTickets) private readonly listTickets: ListTickets,
-    @Inject(DeleteTicket) private readonly deleteTicket: DeleteTicket,
-    @Inject(UpdateTicket) private readonly updateTicket: UpdateTicket,
-    @Inject(MoveTicket) private readonly moveTicket: MoveTicket,
-    @Inject(SortColumn) private readonly sortColumn: SortColumn,
+    @Inject(CREATE_TICKET) private readonly createTicket: CreateTicket,
+    @Inject(GET_TICKET) private readonly getTicket: GetTicket,
+    @Inject(LIST_TICKETS) private readonly listTickets: ListTickets,
+    @Inject(DELETE_TICKET) private readonly deleteTicket: DeleteTicket,
+    @Inject(UPDATE_TICKET) private readonly updateTicket: UpdateTicket,
+    @Inject(MOVE_TICKET) private readonly moveTicket: MoveTicket,
+    @Inject(SORT_COLUMN) private readonly sortColumn: SortColumn,
   ) {}
 
   @Post()
