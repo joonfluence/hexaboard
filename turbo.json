@@ -11,6 +11,10 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
+    "@todo/web#build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
     "dev": {
       "dependsOn": ["^build"],
       "cache": false,
