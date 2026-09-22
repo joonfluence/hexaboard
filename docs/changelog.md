@@ -104,3 +104,6 @@
 | v0.97 | 2026-09-21 | 관측성 이식 조건(수집기 경유, 환경변수화, 벤더 SDK 비확산) 기록 | joonfluence (with Claude) |
 | v0.98 | 2026-09-21 | 웹에 Grafana Faro SDK 연동(쿼리스트링 제거, 콘솔 미수집), API 요청 ID 전송과 5xx·네트워크 오류 이벤트, 서버 CORS의 `X-Request-Id` 허용·노출 | joonfluence (with Claude) |
 | v0.99 | 2026-09-21 | 서버에 OpenTelemetry(OTLP) 연동: 로그·트레이스·메트릭을 Grafana Cloud로 직접 전송, 접근 로그에 traceId·spanId 추가, 트레이스에 요청 ID 속성, 500 예외 기록(D-104) | joonfluence (with Claude) |
+| v0.100 | 2026-09-21 | 웹 Faro 트레이싱(API 오리진에만 `traceparent` 전파)과 서버 CORS의 `traceparent`·`tracestate` 허용으로 웹→서버 트레이스 연결 | joonfluence (with Claude) |
+| v0.101 | 2026-09-22 | 웹 소스맵을 Vercel 빌드 뒤 `faro-cli`로 Faro에 업로드하고 배포물에서 삭제(D-105). 업로드 환경변수 4종을 `.env.example`에 추가 | joonfluence (with Claude) |
+| v0.102 | 2026-09-23 | Grafana Cloud 대시보드·알림을 선언 파일로 구성(D-106): `infra/grafana/todo-server-overview.json`(요청·오류율·지연·DB 커넥션·로그 볼륨 패널)과 알림 규칙 표(`infra/grafana/README.md`). Phase 1 PaaS(Render·Vercel·Neon) 최종 확정(D-107). `component_spec.md`·`non_functional_requirements.md`의 낡은 ⏳·미정 표시(이미 D-96·D-101·NFR-09로 확정된 항목) 정리. 인프라 미결 "Grafana Cloud 대시보드·알림 항목"·"Phase 1 PaaS 선택" 해소 | joonfluence (with Claude) |

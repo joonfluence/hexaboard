@@ -14,7 +14,7 @@
 | NFR-06 | 유지보수성 | 계층 경계를 패키지 의존성으로 강제 | 확정 |
 | NFR-07 | 계약 일관성 | FE-BE API 계약을 OpenAPI로 공유 | 확정 |
 | NFR-08 | 품질 | 자동화 테스트 + CI | best-effort |
-| NFR-09 | 접근성 | 드래그 앤 드롭의 키보드 접근성 | 구현 시 확인 |
+| NFR-09 | 접근성 | 드래그 앤 드롭의 키보드 접근성 | 확정 |
 | NFR-10 | 개발환경 | 테스트 실행에 Docker 필요 | 확정 |
 
 ## 상세
@@ -64,11 +64,11 @@
 - 백엔드 테스트 범위: `domain` 단위, `persistence` 통합(실제 Postgres), API/컨트롤러.
 - `main`, `development` 브랜치로 PR을 올리면 GitHub Actions가 테스트를 실행한다.
 - 프론트엔드 테스트 범위: 순수 로직 단위 테스트 + 컴포넌트 테스트(Testing Library). E2E는 하지 않는다.
-- 미정: 드래그(dnd-kit) 상호작용을 컴포넌트 테스트에서 어떻게 다룰지
+- 드래그(dnd-kit) 상호작용은 결과를 요청으로 바꾸는 순수 함수(`planMove`)와 이동 훅(낙관적 업데이트·롤백·재조회·토스트)만 컴포넌트 테스트로 다룬다. dnd-kit 포인터 상호작용 자체의 E2E 검증은 2차로 미룬다 (D-96).
 
 ### NFR-09 접근성
 
-- 드래그 앤 드롭은 dnd-kit을 쓴다. 키보드 조작 지원 범위는 구현 시 공식 문서로 확인한다.
+- 드래그 앤 드롭은 dnd-kit을 쓴다. `PointerSensor`(거리 6px 활성화)와 `KeyboardSensor`를 함께 등록해 키보드로도 카드를 옮길 수 있다 ([board-dnd.tsx](../apps/web/src/features/move-ticket/ui/board-dnd.tsx)).
 
 ### NFR-10 개발환경
 

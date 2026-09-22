@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3457",
-    "build": "next build",
+    "build": "next build && sh scripts/upload-sourcemaps.sh",
     "start": "next start -p 3457",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
@@ -15,6 +15,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@grafana/faro-web-sdk": "^2.12.0",
+    "@grafana/faro-web-tracing": "^2.12.0",
     "@radix-ui/react-dialog": "^1.1.23",
     "@tanstack/react-query": "^5.103.1",
     "@todo/api-client": "workspace:*",
@@ -26,6 +27,7 @@
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
+    "@grafana/faro-cli": "^0.12.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
