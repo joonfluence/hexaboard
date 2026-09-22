@@ -1,4 +1,4 @@
-# To-do-app Constitution
+# hexaboard Constitution
 
 프로젝트 규칙의 상세는 `docs/`가 정본이다. 이 헌법은 Spec Kit 산출물(spec, plan, tasks)이 반드시 지켜야 할 원칙만 담고, 상세 내용은 링크로 참조한다.
 

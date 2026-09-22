@@ -14,7 +14,7 @@ Browser ──(REST, CORS)──────> Render   apps/bootstrap-http (Nest
 ## 모노레포 구조 (계획, 아직 생성 전)
 
 ```
-to-do-app/
+hexaboard/
 ├─ apps/
 │  ├─ web/               Next.js + FSD
 │  └─ bootstrap-http/    NestJS 진입점: 컨트롤러, DTO, 모듈 조립, 마이그레이션 CLI

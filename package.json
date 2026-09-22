@@ -1,5 +1,5 @@
 {
-  "name": "to-do-app",
+  "name": "hexaboard",
   "private": true,
   "packageManager": "pnpm@12.4.1",
   "engines": {

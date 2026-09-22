@@ -1,4 +1,4 @@
-# To-do-app PRD
+# hexaboard PRD
 
 - **버전**: v0.73 · **상태**: Draft (불완전, 계속 보강) · **작성**: joonfluence (with Claude)
 - 미결 사항은 [open_questions.md](open_questions.md), 결정 근거는 [decision_log.md](decision_log.md), 문서 지도는 [README.md](README.md)를 본다.
